@@ -44,7 +44,52 @@ interface ChatMessage {
   readonly content: string;
 }
 
+const SECURITY_HEADERS: Record<string, string> = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+};
+
+const ALLOWED_ORIGINS = [
+  'https://qu-ira.com',
+  'https://www.qu-ira.com',
+  'https://quira-docs.yuzuapple0227.workers.dev',
+];
+
+const rateLimitMap = new Map<string, { count: number; reset: number }>();
+const RATE_LIMIT_MAX = 20;
+const RATE_LIMIT_WINDOW = 60_000;
+
+function checkServerRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.reset) {
+    rateLimitMap.set(ip, { count: 1, reset: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  entry.count++;
+  return entry.count <= RATE_LIMIT_MAX;
+}
+
 export const POST: APIRoute = async ({ request }) => {
+  // Origin validation
+  const origin = request.headers.get('Origin');
+  if (origin && !ALLOWED_ORIGINS.some(o => origin === o)) {
+    return new Response(JSON.stringify({ error: 'Forbidden' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json', ...SECURITY_HEADERS },
+    });
+  }
+
+  // Server-side rate limiting by IP
+  const clientIp = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() || 'unknown';
+  if (!checkServerRateLimit(clientIp)) {
+    return new Response(JSON.stringify({ error: 'Too many requests' }), {
+      status: 429,
+      headers: { 'Content-Type': 'application/json', 'Retry-After': '60', ...SECURITY_HEADERS },
+    });
+  }
+
   let apiKey: string | undefined;
   try {
     const cf = await import('cloudflare:workers');
@@ -55,7 +100,7 @@ export const POST: APIRoute = async ({ request }) => {
   if (!apiKey) {
     return new Response(JSON.stringify({ error: 'GH_MODELS_TOKEN is not configured' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...SECURITY_HEADERS },
     });
   }
 
@@ -65,7 +110,7 @@ export const POST: APIRoute = async ({ request }) => {
   } catch {
     return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
       status: 400,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...SECURITY_HEADERS },
     });
   }
 
@@ -73,7 +118,7 @@ export const POST: APIRoute = async ({ request }) => {
   if (!message || message.length > MAX_MESSAGE_LENGTH) {
     return new Response(JSON.stringify({ error: 'Message is required and must be under 1000 characters' }), {
       status: 400,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...SECURITY_HEADERS },
     });
   }
 
@@ -125,7 +170,7 @@ export const POST: APIRoute = async ({ request }) => {
       console.error('GitHub Models API error:', response.status, errText);
       return new Response(JSON.stringify({ error: 'AI service temporarily unavailable' }), {
         status: 502,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...SECURITY_HEADERS },
       });
     }
 
@@ -136,13 +181,14 @@ export const POST: APIRoute = async ({ request }) => {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
+        ...SECURITY_HEADERS,
       },
     });
   } catch (err) {
     console.error('Chat API error:', err);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...SECURITY_HEADERS },
     });
   }
 };
