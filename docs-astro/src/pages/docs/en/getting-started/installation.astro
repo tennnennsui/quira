@@ -1,0 +1,57 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'installation', text: 'Installation', depth: 2 },
+  { id: 'system-requirements', text: 'System Requirements', depth: 2 },
+  { id: 'macos', text: 'macOS', depth: 2 },
+  { id: 'linux', text: 'Linux', depth: 2 },
+  { id: 'build-from-source', text: 'Build from source', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Installation" description="Platform-specific installation instructions, system requirements, and building Quira from source." section="Getting Started" headings={headings}>
+  <h1 id="installation" class="content-section">Installation</h1>
+  <p>The <a href="/docs/en/getting-started/quick-start/">Quick Start</a> showed the one-liner install. This section covers platform-specific details, system requirements, and <a href="#build-from-source">building from source</a>. Quira is available for macOS (Apple Silicon and Intel) and Linux. Windows support is planned for Phase 2.</p>
+  <h2 id="system-requirements" class="content-section">System Requirements</h2>
+  <table><thead><tr><th>Resource</th><th>Minimum</th><th>Recommended</th></tr></thead><tbody>
+    <tr><td>RAM</td><td>8 GB</td><td>16 GB</td></tr>
+    <tr><td>CPU Cores</td><td>4</td><td>8</td></tr>
+    <tr><td>Storage</td><td>2 GB free</td><td>5 GB free</td></tr>
+    <tr><td>GPU</td><td>Integrated (for WebGPU)</td><td>Discrete (for large graphs)</td></tr>
+  </tbody></table>
+  <h2 id="macos" class="content-section">macOS</h2>
+  <p>Quira supports both Apple Silicon (M1/M2/M3/M4) and Intel Macs. The installer auto-detects your architecture.</p>
+  <pre><code>{`# One-line install (auto-detects Apple Silicon vs Intel)
+curl -fsSL https://get.qu-ira.com | sh
+
+# Or install via Homebrew
+brew install --cask quira`}</code></pre>
+  <p>On Apple Silicon, Quira uses the MLX runtime for GPU-accelerated local AI. On Intel Macs, it falls back to llama.cpp with CPU inference.</p>
+  <h2 id="linux" class="content-section">Linux</h2>
+  <pre><code>{`# Debian / Ubuntu
+wget -qO- https://get.qu-ira.com/linux | sudo sh
+
+# Arch Linux (AUR)
+yay -S quira-bin
+
+# Fedora / RHEL
+sudo dnf install quira
+
+# AppImage (any distro)
+wget https://releases.qu-ira.com/latest/quira.AppImage
+chmod +x quira.AppImage
+./quira.AppImage`}</code></pre>
+  <p>On Linux, Quira uses llama.cpp with CUDA (NVIDIA), Vulkan, or CPU fallback for local AI inference. For GPU acceleration, ensure your CUDA or Vulkan drivers are up to date.</p>
+  <h2 id="build-from-source" class="content-section">Build from source</h2>
+  <p>Building from source requires Rust (1.75+), Node.js (20+), and the <code>just</code> command runner.</p>
+  <pre><code>{`git clone https://github.com/tennnennsui/quira.git
+cd cortex
+just setup    # Install dependencies
+just build    # Build release binary
+just run      # Run the development build`}</code></pre>
+  <Callout type="tip" title="Dev Container available">
+    <p>The repository includes a <code>.devcontainer</code> configuration for VS Code and GitHub Codespaces. This gives you a fully configured development environment with all prerequisites pre-installed. See <a href="/docs/en/contributing/dev-setup/">Development Setup</a> for the full build guide.</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/en/getting-started/quick-start/', title: 'Quick Start' }} next={{ href: '/docs/en/core-concepts/context-graph/', title: 'Context Graph' }} />
+</DocsLayout>

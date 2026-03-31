@@ -1,0 +1,93 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'threat-model', text: 'Formal Threat Model', depth: 2 },
+  { id: 'knowledge-graph-definition', text: 'Knowledge graph definition', depth: 2 },
+  { id: 'compositional-sensitivity', text: 'Compositional sensitivity', depth: 3 },
+  { id: 'adversary-model', text: 'Adversary model', depth: 2 },
+  { id: 'attack-surfaces', text: 'Attack surfaces', depth: 2 },
+  { id: 'security-properties', text: 'Security properties', depth: 2 },
+  { id: 'defense-mapping', text: 'Attack-defense mapping', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Formal Threat Model" description="Formal definitions of adversaries, assets, and security properties that underpin Quira's entire security architecture." section="Security & Privacy" headings={headings}>
+  <h1 id="threat-model" class="content-section">Formal Threat Model</h1>
+  <p>Every defense mechanism in Quira — from <a href="/docs/en/security/permission-system/">capability tokens</a> to <a href="/docs/en/security/emergent-security/">emergent security structures</a> — is built on top of this formal threat model. It defines <strong>what we protect</strong>, <strong>who we protect against</strong>, and <strong>what security guarantees we provide</strong>.</p>
+  <Callout type="info" title="Research document">
+    <p>Full formal definitions with proofs and quantitative privacy analysis are in <code>docs/security/threat-model.md</code> (~400 lines). This page is the web-accessible summary.</p>
+  </Callout>
+
+  <h2 id="knowledge-graph-definition" class="content-section">Knowledge graph definition</h2>
+  <p>Quira's Context Graph is formally defined as a 5-tuple:</p>
+  <p style="font-family:monospace;font-size:15px;text-align:center;padding:12px 0;">G = (V, E, &Sigma;, &Phi;, &Tau;)</p>
+  <table><thead><tr><th>Symbol</th><th>Definition</th></tr></thead><tbody>
+    <tr><td><strong>V</strong></td><td>Node set — each node corresponds to one page visit</td></tr>
+    <tr><td><strong>E &sube; V &times; V &times; L</strong></td><td>Labeled directed edges (navigation, ai_inferred, user_created)</td></tr>
+    <tr><td><strong>&Sigma;: V &rarr; S</strong></td><td>Structured attributes per node (title, url, summary, entities, tags, notes, space_id)</td></tr>
+    <tr><td><strong>&Phi;: V &rarr; R<sup>384</sup></strong></td><td>Embedding vector per node (384-dimensional)</td></tr>
+    <tr><td><strong>&Tau;: V &rarr; T</strong></td><td>Temporal metadata (visit timestamps, dwell time, visit count)</td></tr>
+  </tbody></table>
+
+  <h3 id="compositional-sensitivity" class="content-section">Compositional sensitivity</h3>
+  <p>Individual data points have low sensitivity. But the aggregated graph is <strong>super-additive</strong> — the sensitivity of the whole far exceeds the sum of its parts.</p>
+  <table><thead><tr><th>Asset</th><th>Sensitivity</th><th>Reason</th></tr></thead><tbody>
+    <tr><td>Individual node summary</td><td>Low</td><td>Public web content</td></tr>
+    <tr><td>Entity set (union)</td><td>Medium</td><td>Partial interest profile</td></tr>
+    <tr><td>Navigation edges</td><td>High</td><td>Complete research path = thought flow</td></tr>
+    <tr><td>Embedding vectors</td><td>High</td><td>Content inversion attacks possible</td></tr>
+    <tr><td>Temporal metadata</td><td>High</td><td>Full behavioral timeline</td></tr>
+    <tr><td>Graph topology</td><td>Critical</td><td>Uniquely identifies a person (cognitive fingerprint)</td></tr>
+    <tr><td>Entire graph G</td><td>Critical</td><td>Complete representation of personal knowledge</td></tr>
+  </tbody></table>
+
+  <h2 id="adversary-model" class="content-section">Adversary model</h2>
+  <p>Five adversary classes, each defined as a triple (Capabilities, Goals, Prior Knowledge). Upper classes subsume lower capabilities.</p>
+  <table><thead><tr><th>Class</th><th>Name</th><th>Capabilities</th><th>Example</th></tr></thead><tbody>
+    <tr><td><strong>A<sub>1</sub></strong></td><td>Network Observer</td><td>Passive traffic observation (DNS, TLS SNI, packet timing). Cannot read encrypted payloads.</td><td>ISP, public WiFi, state surveillance</td></tr>
+    <tr><td><strong>A<sub>2</sub></strong></td><td>Malicious Web Content</td><td>Arbitrary HTML/CSS/JS in renderer process. Prompt injection, entity poisoning, embedding manipulation, cognitive fingerprinting.</td><td>Phishing sites, ad networks, disinfo campaigns</td></tr>
+    <tr><td><strong>A<sub>3</sub></strong></td><td>Malicious Extension</td><td>WebExtensions API access within declared permissions. Updates can inject code. Can exfiltrate via network.</td><td>Supply-chain compromised extensions, acquired extensions</td></tr>
+    <tr><td><strong>A<sub>4</sub></strong></td><td>OS-Level Adversary</td><td>Filesystem read (direct SQLite access), process memory dump, DMA/cold boot attacks.</td><td>Malware, rootkits, physical device theft, forensics</td></tr>
+    <tr><td><strong>A<sub>5</sub></strong></td><td>Browser Vendor</td><td>Code modification, telemetry addition, update distribution. Mitigated by OSS + reproducible builds.</td><td>Acquisition, management change, legal compulsion</td></tr>
+  </tbody></table>
+
+  <Callout type="warning" title="AI-specific attack vectors (A2)">
+    <p>Malicious web content can specifically target Quira's AI pipeline: prompt injection to corrupt summaries (A2.1), entity poisoning with invisible text (A2.2), embedding space manipulation to pollute similarity search (A2.3), and cluster centroid shifting across multiple pages (A2.5). See <a href="/docs/en/security/threat-protection/">Threat Protection</a>.</p>
+  </Callout>
+
+  <h2 id="attack-surfaces" class="content-section">Attack surfaces</h2>
+  <table><thead><tr><th>ID</th><th>Surface</th><th>Adversary</th><th>Defense</th></tr></thead><tbody>
+    <tr><td>S1</td><td>Network layer (DNS, TLS)</td><td>A<sub>1</sub></td><td><a href="/docs/en/security/network-firewall/">Network Firewall</a></td></tr>
+    <tr><td>S2</td><td>Web content → AI pipeline</td><td>A<sub>2</sub></td><td><a href="/docs/en/security/threat-protection/">Threat Protection</a> (4-layer defense)</td></tr>
+    <tr><td>S3</td><td>Extension → Context Graph API</td><td>A<sub>3</sub></td><td><a href="/docs/en/security/permission-system/">Permission System</a> (capability tokens)</td></tr>
+    <tr><td>S4</td><td>Local filesystem (SQLite DB)</td><td>A<sub>4</sub></td><td><a href="/docs/en/security/privacy-architecture/">Privacy Architecture</a> (SQLCipher + TEE)</td></tr>
+    <tr><td>S5</td><td>Embedding vectors</td><td>A<sub>2</sub>-A<sub>4</sub></td><td>Independent encryption, TEE inference</td></tr>
+    <tr><td>S6</td><td>IPC channels (Gecko IPDL)</td><td>A<sub>2</sub></td><td>Capability checks at every IPC boundary</td></tr>
+    <tr><td>S7</td><td>Graph topology metadata</td><td>A<sub>1</sub>-A<sub>4</sub></td><td><a href="/docs/en/security/emergent-security/">AGTR</a> + Phantom Knowledge Obfuscation</td></tr>
+    <tr><td>S8</td><td>Temporal metadata patterns</td><td>A<sub>1</sub>-A<sub>3</sub></td><td>Batch processing, temporal noise injection</td></tr>
+    <tr><td>S9</td><td>Update/build pipeline</td><td>A<sub>5</sub></td><td>OSS + reproducible builds + code signing</td></tr>
+    <tr><td>S10</td><td>Inference residues (after node deletion)</td><td>A<sub>3</sub>-A<sub>4</sub></td><td><a href="/docs/en/security/emergent-security/">IRD + RSIP + CAV</a></td></tr>
+  </tbody></table>
+
+  <h2 id="security-properties" class="content-section">Security properties</h2>
+  <table><thead><tr><th>Property</th><th>Definition</th><th>Verification</th></tr></thead><tbody>
+    <tr><td><strong>Graph Confidentiality</strong></td><td>Adversary cannot access nodes/edges/attributes beyond their authorized capability tokens.</td><td>Formal (TLA+ model of CGAG)</td></tr>
+    <tr><td><strong>Graph Integrity</strong></td><td>No unauthorized modification of graph structure. AI pipeline cannot write without passing validation.</td><td>Hash chain (<a href="/docs/en/security/emergent-security/">TCV</a>)</td></tr>
+    <tr><td><strong>Deletion Completeness</strong></td><td>When a user deletes data, all direct and derived artifacts (embeddings, summaries, inference residues) are purged.</td><td>Cryptographic (<a href="/docs/en/security/emergent-security/">CAV</a>)</td></tr>
+    <tr><td><strong>Flow Isolation</strong></td><td>Data cannot flow between security contexts without explicit user action. IFC labels are monotonic.</td><td>Label propagation audit</td></tr>
+    <tr><td><strong>Temporal Decay</strong></td><td>Permissions and sessions expire. No permanent grants.</td><td>Capability token TTL enforcement</td></tr>
+  </tbody></table>
+
+  <h2 id="defense-mapping" class="content-section">Attack-defense mapping</h2>
+  <p>Each adversary class maps to specific defense layers:</p>
+  <table><thead><tr><th>Adversary</th><th>Primary Defense</th><th>Advanced Defense</th></tr></thead><tbody>
+    <tr><td>A<sub>1</sub> (Network)</td><td>DoH/DoT, ECH, TLS 1.3, <a href="/docs/en/security/network-firewall/">Network Firewall</a></td><td>PQC (ML-KEM hybrid), batch timing</td></tr>
+    <tr><td>A<sub>2</sub> (Web Content)</td><td><a href="/docs/en/security/content-filtering/">Content Filtering</a>, <a href="/docs/en/security/threat-protection/">AI Immune System</a></td><td><a href="/docs/en/security/emergent-security/">KSCI</a>, Adversarial ML, Inverse Sandboxing</td></tr>
+    <tr><td>A<sub>3</sub> (Extension)</td><td><a href="/docs/en/security/permission-system/">Capability tokens, Context TCC</a></td><td><a href="/docs/en/security/advanced-architecture/">CSEB</a> anomaly detection, behavioral monitoring</td></tr>
+    <tr><td>A<sub>4</sub> (OS-Level)</td><td><a href="/docs/en/security/privacy-architecture/">SQLCipher, Keychain, TEE</a></td><td><a href="/docs/en/security/advanced-architecture/">SKV</a>, Context Lockdown, Dead Man's Switch</td></tr>
+    <tr><td>A<sub>5</sub> (Vendor)</td><td>OSS, reproducible builds, opt-in telemetry</td><td>Differential privacy (&epsilon; published), <a href="/docs/en/security/emergent-security/">CAV</a></td></tr>
+  </tbody></table>
+
+  <PrevNext prev={{ href: '/docs/en/security/overview/', title: 'Security Overview' }} next={{ href: '/docs/en/security/network-firewall/', title: 'Network Firewall' }} />
+</DocsLayout>

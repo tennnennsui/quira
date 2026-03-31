@@ -1,0 +1,53 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'network-firewall', text: 'ネットワークファイアウォール', depth: 2 },
+  { id: 'how-it-works', text: '仕組み', depth: 2 },
+  { id: 'firewall-rules', text: 'ファイアウォールルール', depth: 2 },
+  { id: 'dns-filtering', text: 'DNSフィルタリング', depth: 2 },
+  { id: 'tls-enforcement', text: 'TLS強制', depth: 2 },
+  { id: 'configuration', text: '設定', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="ネットワークファイアウォール" description="接続をフィルタリングし、TLSを強制し、悪意のあるドメインをブロックする内蔵アプリケーションレベルファイアウォール。" section="セキュリティ & プライバシー" headings={headings}>
+  <h1 id="network-firewall" class="content-section">ネットワークファイアウォール</h1>
+  <p>Quiraにはブラウザ内部のネットワーク層で動作するアプリケーションレベルファイアウォールが内蔵されています。macOSの内蔵ファイアウォールやLittle Snitchに類似し、すべてのアウトバウンド・インバウンド接続がデータ送信前に設定可能なルールに対して評価されます。</p>
+
+  <h2 id="how-it-works" class="content-section">仕組み</h2>
+  <p>ファイアウォールはGeckoネットワーキング層（リクエストがブラウザプロセスを離れる前）ですべてのネットワークリクエストをインターセプトします。各リクエストは順序付けられたルールセットに対して評価されます：</p>
+  <ol>
+    <li><strong>ドメインブロックリスト</strong> — 既知の悪意のあるドメイン、トラッキングサーバー、広告ネットワーク</li>
+    <li><strong>プロトコルルール</strong> — 機密ページでの非HTTPS接続をブロック</li>
+    <li><strong>サイトごとのルール</strong> — ユーザー定義の許可/ブロックルール（オリジン別）</li>
+    <li><strong>AI分類器</strong> — デバイス上のモデルが不審な接続パターンをフラグ</li>
+  </ol>
+
+  <h2 id="firewall-rules" class="content-section">ファイアウォールルール</h2>
+  <table><thead><tr><th>ルールタイプ</th><th>デフォルト</th><th>説明</th></tr></thead><tbody>
+    <tr><td>既知のトラッカーをブロック</td><td>有効</td><td>EasyList + EasyPrivacy + Quira独自リストを使用</td></tr>
+    <tr><td>クリプトマイナーをブロック</td><td>有効</td><td>マイニングプールへのWebSocket/HTTP接続をブロック</td></tr>
+    <tr><td>混在コンテンツをブロック</td><td>有効</td><td>HTTPSページ上のHTTPリソースを防止</td></tr>
+    <tr><td>テレメトリをブロック</td><td>有効</td><td>サードパーティスクリプトの既知のテレメトリエンドポイントをブロック</td></tr>
+    <tr><td>カスタムドメインルール</td><td>空</td><td>ドメインパターンによるユーザー定義の許可/ブロック</td></tr>
+  </tbody></table>
+
+  <h2 id="dns-filtering" class="content-section">DNSフィルタリング</h2>
+  <p>QuiraはDNS-over-HTTPS（DoH）サポート内蔵でDNSをローカルに解決します。DNSクエリは暗号化され、設定可能なリゾルバ（デフォルトはCloudflare 1.1.1.1）に送信されます。既知の悪意のあるドメインのローカルブロックリストも保持し、DNSクエリ送信前に評価されます。</p>
+
+  <h2 id="tls-enforcement" class="content-section">TLS強制</h2>
+  <p>すべての接続は内蔵のHTTPS-Onlyモードにより可能な限りHTTPSにアップグレードされます。証明書透明性ログもチェックされます。Quiraは以下の場合に警告します：</p>
+  <ul>
+    <li>不明または信頼されていないCAが発行した証明書</li>
+    <li>フィッシングインフラを示す可能性のある短期間の証明書</li>
+    <li>以前訪問したドメインの証明書変更（TOFUモデル）</li>
+  </ul>
+
+  <h2 id="configuration" class="content-section">設定</h2>
+  <p>ファイアウォール設定は<code>quira://settings/security/firewall</code>からアクセスできます。上級ユーザーはJSON形式でルールセットのインポート/エクスポートが可能で、コミュニティが管理するルールリストの購読もできます。</p>
+  <Callout type="info" title="パフォーマンスへの影響">
+    <p>ファイアウォールはO(1)ハッシュベースのドメイン検索でリクエストパイプラインレベルで動作します。通常のオーバーヘッドはリクエストあたり1ms未満で、通常のブラウジングでは感知できません。</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/ja/security/overview/', title: 'セキュリティ概要' }} next={{ href: '/docs/ja/security/privacy-architecture/', title: 'プライバシーアーキテクチャ' }} />
+</DocsLayout>

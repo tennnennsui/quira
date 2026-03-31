@@ -1,0 +1,66 @@
+---
+import { getSidebarSections, getBasePath, t, type Lang } from '../i18n/translations';
+
+interface Props {
+  currentPath: string;
+  lang: Lang;
+}
+
+const { currentPath, lang } = Astro.props;
+const sections = getSidebarSections(lang);
+const base = getBasePath(lang);
+const translations = t(lang);
+
+function isActive(href: string): boolean {
+  const normalizedCurrent = currentPath.replace(/\/$/, '') || base;
+  const normalizedHref = href.replace(/\/$/, '') || base;
+  return normalizedCurrent === normalizedHref;
+}
+
+function sectionHasActive(items: Array<{ href: string }>): boolean {
+  return items.some((item) => isActive(item.href));
+}
+---
+
+<aside id="left-sidebar" class="left-sidebar" style="position:fixed;top:56px;left:0;bottom:0;width:256px;background:#1F1E1D;border-right:1px solid rgba(222,220,209,0.15);z-index:40;display:flex;flex-direction:column;">
+  <div style="padding:12px 12px 8px;flex-shrink:0;">
+    <button id="sidebar-search-btn" style="display:flex;align-items:center;gap:0.5rem;width:100%;padding:8px 12px;font-size:14px;color:#9C9A92;background:transparent;border:1px solid rgba(222,220,209,0.15);border-radius:8px;cursor:pointer;font-family:inherit;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span>{translations.sidebarSearch}</span>
+      <span style="margin-left:auto;font-size:12px;border:1px solid rgba(222,220,209,0.15);border-radius:4px;padding:2px 6px;">Ctrl K</span>
+    </button>
+  </div>
+
+  <nav style="padding:0 12px;flex:1;overflow-y:auto;" id="sidebar-nav">
+    {sections.map((section) => {
+      const hasActive = sectionHasActive(section.items);
+      const isOpen = section.defaultOpen || hasActive;
+      return (
+        <div class="nav-group" style="margin-bottom:4px;">
+          <button class="nav-section-btn" style="display:flex;align-items:center;gap:6px;width:100%;padding:8px;text-align:left;font-size:14px;color:#FAF9F5;background:none;border:none;cursor:pointer;font-family:inherit;">
+            <svg class={`chevron ${isOpen ? 'open' : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            {section.title}
+          </button>
+          <div class="nav-items" style={isOpen ? '' : 'display:none;'}>
+            {section.items.map((item) => (
+              <a href={item.href} class={`nav-link ${isActive(item.href) ? 'active' : ''}`}>{item.label}</a>
+            ))}
+          </div>
+        </div>
+      );
+    })}
+  </nav>
+
+  <div style="flex-shrink:0;padding:12px;border-top:1px solid rgba(222,220,209,0.15);background:#1F1E1D;">
+    <div style="display:flex;flex-direction:column;gap:2px;">
+      <a href="https://discord.gg/quira" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:0.5rem;padding:6px 12px;font-size:13px;color:#9C9A92;text-decoration:none;border-radius:8px;transition:color 0.15s;" onmouseover="this.style.color='#C2C0B6'" onmouseout="this.style.color='#9C9A92'">
+        <svg width="14" height="14" viewBox="0 0 127.14 96.36" fill="currentColor" aria-hidden="true"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
+        <span>Discord</span>
+      </a>
+      <a href={`${base}/getting-started/quick-start/`} style="display:flex;align-items:center;gap:0.5rem;padding:6px 12px;font-size:13px;color:#9C9A92;text-decoration:none;border-radius:8px;transition:color 0.15s;" onmouseover="this.style.color='#C2C0B6'" onmouseout="this.style.color='#9C9A92'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>{translations.sidebarQuickStart}</span>
+      </a>
+    </div>
+  </div>
+</aside>

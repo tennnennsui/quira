@@ -1,0 +1,71 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'for-writers', text: 'For Writers & Content Creators', depth: 2 },
+  { id: 'research-pipeline', text: 'Research-to-article pipeline', depth: 2 },
+  { id: 'source-organization', text: 'Source material organization', depth: 2 },
+  { id: 'fact-checking', text: 'Fact-checking workflow', depth: 2 },
+  { id: 'example-blog', text: 'Example: Writing a technical blog post', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="For Writers & Content Creators" description="How writers and content creators use Quira to organize research, track sources, and streamline the writing process." section="Use Cases" headings={headings}>
+  <h1 id="for-writers" class="content-section">For Writers & Content Creators</h1>
+  <p>Writing well-researched content requires gathering information from many sources, organizing it into a coherent structure, and being able to trace every claim back to its origin. Quira turns your browser into a research workbench that captures your entire information-gathering process.</p>
+
+  <h2 id="research-pipeline" class="content-section">Research-to-article pipeline</h2>
+  <p>Most writing projects follow a pattern: research broadly, narrow down, outline, draft, and verify. Quira supports each stage:</p>
+  <table><thead><tr><th>Stage</th><th>How Quira helps</th></tr></thead><tbody>
+    <tr><td>Broad research</td><td>Browse freely — Quira captures everything in the <a href="/docs/en/core-concepts/context-graph/">Context Graph</a></td></tr>
+    <tr><td>Narrowing down</td><td>Use <a href="/docs/en/features/graph-visualization/">Graph Visualization</a> to identify the most connected clusters — these are your key themes</td></tr>
+    <tr><td>Outlining</td><td>The AI-generated topic clusters map naturally to article sections</td></tr>
+    <tr><td>Drafting</td><td>Query the graph for specific facts: "what statistics did I find about X?"</td></tr>
+    <tr><td>Verification</td><td>Trace every claim back to its source page with one click</td></tr>
+  </tbody></table>
+
+  <h2 id="source-organization" class="content-section">Source material organization</h2>
+  <p>Writers often juggle dozens of open tabs during research, losing track of which source said what. Quira solves this in several ways:</p>
+  <ul>
+    <li><strong>Automatic categorization</strong> — The Local AI groups your sources by topic, so you can see all "statistics" sources, all "expert quotes", and all "counterarguments" in separate clusters</li>
+    <li><strong>Source metadata</strong> — Each node in the Context Graph stores the page title, URL, visit timestamp, and an AI-generated summary</li>
+    <li><strong>Exportable bibliography</strong> — <a href="/docs/en/features/export-import/">Export</a> your research graph as a Markdown file with links and summaries, ready to use as a reference section</li>
+    <li><strong>Cross-reference detection</strong> — When multiple sources reference the same study or claim, the graph shows these convergence points, helping you identify primary sources</li>
+  </ul>
+  <Callout type="tip" title="One Space per article">
+    <p>Create a dedicated <a href="/docs/en/core-concepts/context-spaces/">Context Space</a> for each article or content project. When you finish writing, the Space serves as a permanent archive of your research trail, making it easy to update or fact-check the article later.</p>
+  </Callout>
+
+  <h2 id="fact-checking" class="content-section">Fact-checking workflow</h2>
+  <p>Quira makes fact-checking faster by linking claims to their sources throughout your research:</p>
+  <ol>
+    <li><strong>Identify a claim</strong> in your draft that needs verification</li>
+    <li><strong>Query the Context Graph</strong> — Ask "where did I read about [specific claim]?"</li>
+    <li><strong>Quira retrieves</strong> the original source page, along with related pages that confirm or contradict the claim</li>
+    <li><strong>Follow the chain</strong> — If the source itself cites another study, the graph shows that connection too</li>
+  </ol>
+  <p>This workflow eliminates the common problem of remembering a fact but being unable to locate the original source.</p>
+
+  <h2 id="example-blog" class="content-section">Example: Writing a technical blog post</h2>
+  <p>A technical writer creating a blog post about "WebAssembly in Production" might use Quira like this:</p>
+  <ol>
+    <li><strong>Create a Context Space</strong> called "Wasm Blog Post"</li>
+    <li><strong>Research phase</strong> (2-3 hours):
+      <ul>
+        <li>Browse case studies from Figma, Shopify, and Cloudflare about their Wasm usage</li>
+        <li>Read the WebAssembly specification and MDN documentation</li>
+        <li>Review benchmark comparisons on blog posts and GitHub repos</li>
+        <li>Check recent conference talks and slide decks</li>
+      </ul>
+    </li>
+    <li><strong>Quira captures</strong> — 31 pages, automatically clustered into: "performance benchmarks", "real-world case studies", "toolchain", "limitations"</li>
+    <li><strong>Outline from clusters</strong> — Each cluster becomes a section in the blog post</li>
+    <li><strong>Write with references</strong> — While drafting, query "what was Figma's load time improvement?" and Quira returns the exact blog post with the statistic</li>
+    <li><strong>Fact-check</strong> — Before publishing, verify each claim by tracing it back through the graph to its primary source</li>
+    <li><strong>Export sources</strong> — Generate a "Further Reading" section with links to the most important sources</li>
+  </ol>
+  <Callout type="note" title="Content stays local">
+    <p>Your research graph, drafts, and source materials are stored entirely on your device. Quira never sends your browsing data to external servers, making it safe for research involving embargoed or confidential information.</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/en/use-cases/researchers/', title: 'For Researchers' }} next={{ href: '/docs/en/troubleshooting/', title: 'Troubleshooting' }} />
+</DocsLayout>

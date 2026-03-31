@@ -1,0 +1,72 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'for-researchers', text: 'For Researchers', depth: 2 },
+  { id: 'literature-review', text: 'Literature review workflow', depth: 2 },
+  { id: 'paper-trail', text: 'Paper trail tracking', depth: 2 },
+  { id: 'cross-discipline', text: 'Cross-discipline connection discovery', depth: 2 },
+  { id: 'citation-network', text: 'Citation network building', depth: 2 },
+  { id: 'example-crispr', text: 'Example: Reviewing CRISPR gene therapy papers', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="For Researchers" description="How academic and industry researchers use Quira to manage literature reviews, trace citations, and discover cross-discipline connections." section="Use Cases" headings={headings}>
+  <h1 id="for-researchers" class="content-section">For Researchers</h1>
+  <p>Research is fundamentally about connecting ideas across sources. Quira's <a href="/docs/en/core-concepts/context-graph/">Context Graph</a> mirrors the way researchers actually think — following citation chains, comparing methodologies across papers, and building mental models that span dozens of sources.</p>
+
+  <h2 id="literature-review" class="content-section">Literature review workflow</h2>
+  <p>A literature review typically involves reading papers on Google Scholar, PubMed, arXiv, or IEEE Xplore, then following reference chains across multiple databases. Quira captures this entire process:</p>
+  <ul>
+    <li><strong>Automatic source mapping</strong> — Every paper, preprint, and dataset page becomes a node in your Context Graph</li>
+    <li><strong>Citation chain tracking</strong> — When you click a reference link from Paper A to Paper B, Quira records this as a directed edge, building a citation graph automatically</li>
+    <li><strong>Temporal context</strong> — See which papers you read first, which ones changed your understanding, and where you spent the most time</li>
+    <li><strong>AI-powered summaries</strong> — The <a href="/docs/en/core-concepts/local-ai/">Local AI</a> generates brief summaries of each page, letting you quickly recall key findings without re-reading</li>
+  </ul>
+  <Callout type="tip" title="Dedicated research spaces">
+    <p>Create a <a href="/docs/en/core-concepts/context-spaces/">Context Space</a> for each literature review or research project. This prevents unrelated browsing from polluting your research graph and makes it easy to export findings later.</p>
+  </Callout>
+
+  <h2 id="paper-trail" class="content-section">Paper trail tracking</h2>
+  <p>Researchers often follow long chains of references — a paper cites another paper, which references a dataset, which links to a methodology paper. Quira preserves these chains as navigable paths in the graph:</p>
+  <ol>
+    <li>Start with a seed paper on Google Scholar</li>
+    <li>Follow "Cited by" links to find subsequent work</li>
+    <li>Open referenced datasets and methodology papers</li>
+    <li>Quira records every step as a connected subgraph</li>
+  </ol>
+  <p>Later, you can use <a href="/docs/en/features/nl-query/">Natural Language Query</a> to ask questions like "which papers cited the Smith 2023 study?" or "what datasets were mentioned in the machine learning papers I read?"</p>
+
+  <h2 id="cross-discipline" class="content-section">Cross-discipline connection discovery</h2>
+  <p>Some of the most valuable research insights come from unexpected connections between disciplines. Quira's graph visualization helps you see these connections:</p>
+  <ul>
+    <li>The <a href="/docs/en/features/graph-visualization/">Graph Visualization</a> shows clusters of related pages — when two clusters share edges, it indicates cross-discipline overlap</li>
+    <li>The Local AI can suggest connections between pages that share concepts but use different terminology (e.g., "reinforcement learning" in CS and "operant conditioning" in psychology)</li>
+    <li>Filter the graph by time period, domain, or keyword to focus on specific connection patterns</li>
+  </ul>
+
+  <h2 id="citation-network" class="content-section">Citation network building</h2>
+  <p>As you browse academic sources, Quira builds a citation network that you can visualize and export:</p>
+  <ul>
+    <li><strong>Forward citations</strong> — Papers that cite your source (via "Cited by" links on Google Scholar)</li>
+    <li><strong>Backward citations</strong> — References listed in a paper that you followed</li>
+    <li><strong>Co-citation clusters</strong> — Papers frequently cited together, indicating related methodology or topic</li>
+  </ul>
+  <p>Export the citation network as JSON or Markdown for use in reference managers like Zotero or Mendeley, or include it directly in your literature review document.</p>
+
+  <h2 id="example-crispr" class="content-section">Example: Reviewing CRISPR gene therapy papers</h2>
+  <p>A biomedical researcher reviewing CRISPR gene therapy papers might use Quira like this:</p>
+  <ol>
+    <li><strong>Create a Context Space</strong> called "CRISPR Gene Therapy Review"</li>
+    <li><strong>Start on PubMed</strong> — Search for recent CRISPR gene therapy clinical trials</li>
+    <li><strong>Follow citation chains</strong> — Read foundational papers (Doudna & Charpentier, Zhang et al.), then trace forward to clinical applications</li>
+    <li><strong>Cross-reference</strong> — Visit ClinicalTrials.gov entries linked from papers, FDA guidance documents, and bioethics discussions</li>
+    <li><strong>Quira captures</strong> — 83 pages across PubMed, Nature, Science, ClinicalTrials.gov, and bioRxiv, organized into clusters: "delivery mechanisms", "off-target effects", "clinical trials", "regulatory landscape"</li>
+    <li><strong>Query the graph</strong> — "What delivery mechanisms showed the best efficiency in 2025 trials?" — Quira surfaces the relevant papers and highlights key connections</li>
+    <li><strong>Export</strong> — Generate a structured bibliography with Quira's summaries as annotations</li>
+  </ol>
+  <Callout type="warning" title="Sensitive medical data">
+    <p>If your research involves browsing patient-related medical portals, consider using <a href="/docs/en/security/privacy-architecture/">Strict privacy mode</a> or dedicated Incognito spaces to ensure no sensitive data is captured in the Context Graph.</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/en/use-cases/developers/', title: 'For Developers' }} next={{ href: '/docs/en/use-cases/writers/', title: 'For Writers' }} />
+</DocsLayout>

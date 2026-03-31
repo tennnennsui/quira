@@ -1,0 +1,57 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'installation', text: 'インストール', depth: 2 },
+  { id: 'system-requirements', text: 'システム要件', depth: 2 },
+  { id: 'macos', text: 'macOS', depth: 2 },
+  { id: 'linux', text: 'Linux', depth: 2 },
+  { id: 'build-from-source', text: 'ソースからビルド', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="インストール" description="プラットフォーム別のインストール手順、システム要件、ソースからのビルド方法。" section="はじめに" headings={headings}>
+  <h1 id="installation" class="content-section">インストール</h1>
+  <p><a href="/docs/ja/getting-started/quick-start/">クイックスタート</a>ではワンライナーインストールを紹介しました。このセクションでは、プラットフォーム固有の詳細、システム要件、そして<a href="#build-from-source">ソースからのビルド</a>について説明します。Quira は macOS（Apple Silicon および Intel）と Linux で利用可能です。Windows サポートは Phase 2 で予定されています。</p>
+  <h2 id="system-requirements" class="content-section">システム要件</h2>
+  <table><thead><tr><th>リソース</th><th>最小</th><th>推奨</th></tr></thead><tbody>
+    <tr><td>RAM</td><td>8 GB</td><td>16 GB</td></tr>
+    <tr><td>CPU コア数</td><td>4</td><td>8</td></tr>
+    <tr><td>ストレージ</td><td>2 GB 空き</td><td>5 GB 空き</td></tr>
+    <tr><td>GPU</td><td>内蔵（WebGPU 用）</td><td>ディスクリート（大規模グラフ用）</td></tr>
+  </tbody></table>
+  <h2 id="macos" class="content-section">macOS</h2>
+  <p>Quira は Apple Silicon（M1/M2/M3/M4）と Intel Mac の両方をサポートしています。インストーラーがアーキテクチャを自動検出します。</p>
+  <pre><code>{`# ワンラインインストール（Apple Silicon vs Intel を自動検出）
+curl -fsSL https://get.qu-ira.com | sh
+
+# Homebrew でインストール
+brew install --cask quira`}</code></pre>
+  <p>Apple Silicon では、Quira は GPU アクセラレーテッドなローカル AI 用に MLX ランタイムを使用します。Intel Mac では llama.cpp の CPU 推論にフォールバックします。</p>
+  <h2 id="linux" class="content-section">Linux</h2>
+  <pre><code>{`# Debian / Ubuntu
+wget -qO- https://get.qu-ira.com/linux | sudo sh
+
+# Arch Linux (AUR)
+yay -S quira-bin
+
+# Fedora / RHEL
+sudo dnf install quira
+
+# AppImage（全ディストリビューション対応）
+wget https://releases.qu-ira.com/latest/quira.AppImage
+chmod +x quira.AppImage
+./quira.AppImage`}</code></pre>
+  <p>Linux では、Quira はローカル AI 推論に llama.cpp を使用し、CUDA（NVIDIA）、Vulkan、または CPU フォールバックに対応しています。GPU アクセラレーションを利用するには、CUDA または Vulkan ドライバーが最新であることを確認してください。</p>
+  <h2 id="build-from-source" class="content-section">ソースからビルド</h2>
+  <p>ソースからのビルドには Rust（1.75+）、Node.js（20+）、そして <code>just</code> コマンドランナーが必要です。</p>
+  <pre><code>{`git clone https://github.com/tennnennsui/quira.git
+cd cortex
+just setup    # 依存関係をインストール
+just build    # リリースバイナリをビルド
+just run      # 開発ビルドを実行`}</code></pre>
+  <Callout type="tip" title="Dev Container 対応">
+    <p>リポジトリには VS Code と GitHub Codespaces 用の <code>.devcontainer</code> 設定が含まれています。すべての前提条件がプリインストールされた、完全に設定済みの開発環境を利用できます。完全なビルドガイドは<a href="/docs/ja/contributing/dev-setup/">開発環境セットアップ</a>をご覧ください。</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/ja/getting-started/quick-start/', title: 'クイックスタート' }} next={{ href: '/docs/ja/core-concepts/context-graph/', title: 'Context Graph' }} />
+</DocsLayout>

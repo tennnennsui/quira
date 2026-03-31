@@ -1,0 +1,49 @@
+{
+  "version": "v1.0.0",
+  "entity": {
+    "type": "individual",
+    "role": "maintainer",
+    "name": "Ryoma Hori",
+    "email": "yuzuapple0227@gmail.com",
+    "description": "Full-stack developer building Quira Browser, a local-first Gecko-based browser with AI-powered context graph.",
+    "webpageUrl": {
+      "url": "https://qu-ira.com"
+    }
+  },
+  "projects": [
+    {
+      "guid": "quira-browser",
+      "name": "Quira Browser",
+      "description": "A local-first, Gecko-based browser that builds a personal context graph from browsing activity, enabling users to query their own browsing history with natural language. All processing happens on-device with zero cloud dependency.",
+      "webpageUrl": {
+        "url": "https://qu-ira.com"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/tennnennsui/quira"
+      },
+      "licenses": ["MPL-2.0"],
+      "tags": ["browser", "privacy", "local-first", "ai", "gecko", "knowledge-graph", "open-source"]
+    }
+  ],
+  "funding": {
+    "channels": [
+      {
+        "guid": "github-sponsors",
+        "type": "payment-provider",
+        "address": "https://github.com/sponsors/tennnennsui",
+        "description": "GitHub Sponsors"
+      }
+    ],
+    "plans": [
+      {
+        "guid": "core-development",
+        "status": "active",
+        "name": "Core Development",
+        "description": "Gecko fork setup, context graph engine, on-device LLM integration, browser UI, and WebExtension API development.",
+        "amount": 50000,
+        "currency": "EUR",
+        "frequency": "one-time"
+      }
+    ]
+  }
+}

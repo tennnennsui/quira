@@ -1,0 +1,30 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'pull-requests', text: 'プルリクエスト', depth: 2 },
+  { id: 'branch-naming', text: 'ブランチ命名規則', depth: 2 },
+  { id: 'review-process', text: 'レビュープロセス', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="プルリクエスト" description="Quira にプルリクエストを提出する方法。" section="コントリビュート" headings={headings}>
+  <h1 id="pull-requests" class="content-section">プルリクエスト</h1>
+  <p><a href="/docs/ja/contributing/code-style/">コードスタイル</a>ガイドに従ってコードを書きました。ここではその提出方法を説明します。大きな変更の場合は、まず <a href="/docs/ja/contributing/rfc-process/">RFC</a> を提出することを検討してください。</p>
+  <h2 id="branch-naming" class="content-section">ブランチ命名規則</h2>
+  <pre><code>feat/context-graph-filtering
+fix/duplicate-node-detection
+refactor/extract-llm-runtime
+docs/api-reference-update</code></pre>
+  <h2 id="review-process" class="content-section">レビュープロセス</h2>
+  <ul>
+    <li><strong>レビュー SLA</strong>：すべての PR は24時間以内にレビューされます</li>
+    <li><strong>DCO サインオフ</strong>：すべてのコミットは Developer Certificate of Origin を証明するためにサインオフが必要です（<code>git commit -s</code>）</li>
+    <li><strong>CI の通過が必須</strong>：テスト、リンティング、ビルドチェックがすべてグリーンであることがマージの条件です</li>
+    <li><strong>1名の承認が必要</strong>：マージには少なくとも1名のメンテナーの承認が必要です</li>
+  </ul>
+  <Callout type="tip" title="PR テンプレート付き">
+    <p>リポジトリにはプルリクエストテンプレートが含まれており、変更の説明、テストカバレッジの記載、破壊的変更のフラグ付けをガイドしてくれます。</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/ja/contributing/code-style/', title: 'コードスタイル' }} next={{ href: '/docs/ja/contributing/rfc-process/', title: 'RFC プロセス' }} />
+</DocsLayout>

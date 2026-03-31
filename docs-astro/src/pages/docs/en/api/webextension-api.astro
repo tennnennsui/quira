@@ -1,0 +1,31 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'webextension-api', text: 'WebExtension API', depth: 2 },
+  { id: 'mv2-mv3', text: 'MV2 + MV3 compatibility', depth: 2 },
+  { id: 'quira-specific', text: 'Quira-specific extensions', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="WebExtension API" description="Quira's full WebExtension compatibility with both MV2 and MV3 manifest versions." section="API Reference" headings={headings}>
+  <h1 id="webextension-api" class="content-section">WebExtension API</h1>
+  <p>The <a href="/docs/en/api/plugin-api/">Plugin API</a> gives extensions access to Quira-specific features. Underneath, Quira supports the standard WebExtensions API with both MV2 and MV3 manifest versions, thanks to its <a href="/docs/en/architecture/gecko-engine/">Gecko</a> foundation. This means most Firefox and Chrome extensions work out of the box.</p>
+  <h2 id="mv2-mv3" class="content-section">MV2 + MV3 compatibility</h2>
+  <p>Unlike Chrome which has fully deprecated Manifest V2, Quira continues to support both versions. This means extensions like uBlock Origin (which relies on MV2's <code>webRequestBlocking</code> API) work without modifications. MV3 extensions are also fully supported.</p>
+  <h2 id="quira-specific" class="content-section">Quira-specific extensions</h2>
+  <p>In addition to the standard <code>browser.*</code> APIs, Quira provides the <code>quira.*</code> namespace for Context Graph and AI interactions:</p>
+  <pre><code>{`// Example: Extension that shows related research in a sidebar
+browser.tabs.onActivated.addListener(async (activeInfo) => {
+  const tab = await browser.tabs.get(activeInfo.tabId);
+
+  // Use Quira's graph API to find related nodes
+  const related = await quira.graph.getRelated(tab.url, {
+    hops: 2,
+    limit: 5
+  });
+
+  // Display in extension sidebar
+  updateSidebar(related);
+});`}</code></pre>
+  <PrevNext prev={{ href: '/docs/en/api/plugin-api/', title: 'Plugin API' }} next={{ href: '/docs/en/api/graph-query-api/', title: 'Graph Query API' }} />
+</DocsLayout>

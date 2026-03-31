@@ -1,0 +1,35 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'development-setup', text: '開発環境セットアップ', depth: 2 },
+  { id: 'prerequisites', text: '前提条件', depth: 2 },
+  { id: 'one-command-setup', text: 'ワンコマンドセットアップ', depth: 2 },
+  { id: 'development-commands', text: '開発コマンド', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="開発環境セットアップ" description="Quira をソースからビルドするための完全な開発環境のセットアップ。" section="コントリビュート" headings={headings}>
+  <h1 id="development-setup" class="content-section">開発環境セットアップ</h1>
+  <p>コントリビュートの準備はできましたか？<a href="/docs/ja/getting-started/installation/">インストール</a>のセクションではエンドユーザー向けのセットアップを説明しました。このセクションでは、Quira をソースからビルドするための完全な開発環境について説明します。</p>
+  <h2 id="prerequisites" class="content-section">前提条件</h2>
+  <table><thead><tr><th>ツール</th><th>バージョン</th><th>用途</th></tr></thead><tbody>
+    <tr><td>Rust</td><td>1.75+</td><td>コアブラウザ、UI レイヤー、グラフエンジン</td></tr>
+    <tr><td>Node.js</td><td>20+</td><td>ビルドツーリング、拡張機能システム</td></tr>
+    <tr><td>Just</td><td>最新版</td><td>コマンドランナー（Make の代替）</td></tr>
+  </tbody></table>
+  <h2 id="one-command-setup" class="content-section">ワンコマンドセットアップ</h2>
+  <pre><code>{`git clone https://github.com/tennnennsui/quira.git
+cd cortex
+just setup    # すべての依存関係をインストール + モデルをダウンロード`}</code></pre>
+  <h2 id="development-commands" class="content-section">開発コマンド</h2>
+  <pre><code>{`just dev      # ホットリロード付き開発サーバーを起動
+just test     # 全テストスイートを実行
+just lint     # リンター実行（rustfmt + clippy + eslint）
+just build    # リリースバイナリをビルド
+just bench    # パフォーマンスベンチマークを実行`}</code></pre>
+  <Callout type="tip" title="Dev Container サポート">
+    <p>リポジトリには VS Code と GitHub Codespaces 用の <code>.devcontainer</code> が含まれています。コンテナでプロジェクトを開くと、手動セットアップなしで完全に設定済みの環境を利用できます。</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/ja/architecture/llm-integration/', title: 'LLM Integration' }} next={{ href: '/docs/ja/contributing/code-style/', title: 'コードスタイル' }} />
+</DocsLayout>

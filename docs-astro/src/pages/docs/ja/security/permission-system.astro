@@ -1,0 +1,89 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'permission-system', text: 'パーミッションシステム', depth: 2 },
+  { id: 'capability-based-security', text: 'Capability-Based Security', depth: 2 },
+  { id: 'context-tcc', text: 'Context TCC', depth: 2 },
+  { id: 'tcc-permissions', text: 'TCCパーミッションタイプ', depth: 3 },
+  { id: 'information-flow-control', text: '情報フロー制御', depth: 2 },
+  { id: 'space-scoped-security', text: 'Spaceスコープセキュリティ境界', depth: 2 },
+  { id: 'plugin-sandboxing', text: 'プラグインサンドボックス', depth: 2 },
+  { id: 'per-site-permissions', text: 'サイト別パーミッション', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="パーミッションシステム" description="Capability-Based Security、Context TCC、情報フロー制御、Spaceスコープセキュリティ境界。" section="セキュリティ & プライバシー" headings={headings}>
+  <h1 id="permission-system" class="content-section">パーミッションシステム</h1>
+  <p>Quiraは従来のIDベースアクセスモデル ―「あなたは誰？」― を<strong>Capability-Based Security</strong>モデル ―「あなたはどんな証明を持っている？」― に置き換えます。この根本的な転換により、環境権限が排除され、すべてのパーミッションが明示的、スコープ付き、時間制限付きになります。</p>
+
+  <h2 id="capability-based-security" class="content-section">Capability-Based Security</h2>
+  <p>従来のブラウザでは、拡張機能やページは環境権限の下で動作します: 一度広いパーミッションが付与されると自由に行使できます。Quiraはこのパターンを完全に排除します。すべてのCapabilityトークン評価は、macOS AMFIに着想を得た単一の判定ポイントである<a href="/docs/ja/security/advanced-architecture/#cta">Context Trust Arbiter (CTA)</a>に集約されます。</p>
+  <table><thead><tr><th>特性</th><th>従来型 (Chrome/Firefox)</th><th>Quira</th></tr></thead><tbody>
+    <tr><td>アクセスモデル</td><td>IDベースACL</td><td>Capabilityトークン（偽造不能）</td></tr>
+    <tr><td>トークン生成</td><td>インストール時に付与</td><td>プロセス+タイムスタンプにバインドされたHMAC-SHA256</td></tr>
+    <tr><td>スコープ</td><td>グローバルまたはオリジン単位</td><td>Space単位、パーミッション単位、セッション単位</td></tr>
+    <tr><td>委譲</td><td>不可</td><td>減衰サブCapability（read-writeからread-onlyへ）</td></tr>
+    <tr><td>失効</td><td>アンインストールまたは手動切替</td><td>即時無効化、派生トークンもすべて失効</td></tr>
+    <tr><td>有効期間</td><td>失効まで永続</td><td>時間制限付き減衰（設定可能なTTL）</td></tr>
+  </tbody></table>
+  <Callout type="info" title="環境権限なし">
+    <p>Capabilityトークンは偽造不能、転送不能、プロセスバインドです。拡張機能のメモリが侵害されても、攻撃者は異なるプロセスから盗んだトークンを使用できません。</p>
+  </Callout>
+
+  <h2 id="context-tcc" class="content-section">Context TCC</h2>
+  <p>macOS TCC (Transparency, Consent, and Control)にインスパイアされた<strong>Context TCC</strong>は、同じ明示的同意モデルをContext Graphに適用します ― このきめ細かさでナレッジグラフを保護するブラウザは世界に存在しません。</p>
+  <p>プラグインや内部サブシステムがContext Graphへのアクセスを要求すると、Context TCCがリクエストをインターセプトし、正確にどのデータにアクセスするか、なぜアクセスするかを説明する同意ダイアログを表示します。</p>
+
+  <h3 id="tcc-permissions" class="content-section">TCCパーミッションタイプ</h3>
+  <table><thead><tr><th>パーミッション</th><th>スコープ</th><th>許可する操作</th><th>感度</th></tr></thead><tbody>
+    <tr><td><code>read:nodes</code></td><td>Space単位</td><td>グラフからページタイトル、URL、メタデータを読み取り</td><td>中</td></tr>
+    <tr><td><code>read:embeddings</code></td><td>Space単位</td><td>セマンティック埋め込みベクトルの読み取り ― 最もセンシティブ</td><td>最重要</td></tr>
+    <tr><td><code>write:edges</code></td><td>Space単位</td><td>グラフノード間のリレーションシップの作成・変更</td><td>高</td></tr>
+    <tr><td><code>query:nl</code></td><td>Space単位</td><td>AIレイヤーを介した自然言語クエリの実行</td><td>高</td></tr>
+  </tbody></table>
+  <Callout type="warning" title="read:embeddingsは最重要">
+    <p>埋め込みベクトルはブラウジングコンテンツのセマンティックな意味をエンコードしています。逆演算でおおよそのページコンテンツを復元可能です。このパーミッションはSpace単位での明示的同意が必要で、自動付与されることはありません。</p>
+  </Callout>
+
+  <h2 id="information-flow-control" class="content-section">情報フロー制御</h2>
+  <p>誰がデータに<em>アクセス</em>できるかを制御するだけでなく、Quiraはデータが<em>どこに流れるか</em>を追跡します。Context Graphのすべてのデータには、伝搬を制約するIFCラベルが付与されます。</p>
+  <ul>
+    <li><strong>単調ラベル</strong> ― 感度ラベルは増加のみ可能で、減少はできません。「confidential」ソースから派生したデータは少なくとも「confidential」感度を継承します。</li>
+    <li><strong>テイント追跡</strong> ― AIがグラフデータを処理する際、出力はすべての入力の最大感度を継承します。</li>
+    <li><strong>Cross-Spaceバリア</strong> ― WorkスペースのデータがPersonalスペースに黙って流入することはできません。ユーザーがCross-Space転送を明示的に承認する必要があります。</li>
+    <li><strong>エクスポート制御</strong> ― ブラウザから出ていくデータ（クリップボード、ファイルエクスポート、ネットワーク）はIFCラベルに対してチェックされます。高感度データは確認ダイアログをトリガーします。</li>
+  </ul>
+
+  <h2 id="space-scoped-security" class="content-section">Spaceスコープセキュリティ境界</h2>
+  <p>Context Spaceは単なる整理用コンテナではなく、<strong>セキュリティ境界</strong>です。各Spaceは独立したセキュリティ設定を持ちます:</p>
+  <ul>
+    <li>独立したCapabilityトークンプール（Space AのトークンはSpace Bにアクセス不能）</li>
+    <li>Space個別のプライバシーモード設定（標準、厳格、シークレット）</li>
+    <li>独立暗号化鍵を持つ隔離されたContext Graphパーティション</li>
+    <li>全グラフ書き込み操作のSpace単位監査ログ</li>
+  </ul>
+
+  <h2 id="plugin-sandboxing" class="content-section">プラグインサンドボックス</h2>
+  <p>Quiraプラグインは宣言的Capabilityモデルを持つサンドボックス環境で実行されます:</p>
+  <ul>
+    <li><strong>マニフェスト宣言</strong> ― 各プラグインはマニフェストで必要なCapabilityを宣言</li>
+    <li><strong>減衰委譲</strong> ― プラグインは必要最小限のCapabilityトークンのみ受け取る</li>
+    <li><strong>ネットワークアローリスト</strong> ― マニフェストで宣言されたドメインにのみ接続可能</li>
+    <li><strong>ストレージ割り当て</strong> ― プラグインごとのストレージ上限（デフォルト10MB）</li>
+    <li><strong>監査ログ</strong> ― プラグインによるすべてのContext Graph操作は <code>quira://settings/security/audit</code> で記録</li>
+  </ul>
+
+  <h2 id="per-site-permissions" class="content-section">サイト別パーミッション</h2>
+  <p>従来のWebパーミッション（カメラ、マイク、位置情報、通知）も同じCapabilityモデルに従います:</p>
+  <table><thead><tr><th>カテゴリ</th><th>API</th><th>デフォルト</th></tr></thead><tbody>
+    <tr><td>位置情報</td><td>Geolocation API</td><td>毎回確認</td></tr>
+    <tr><td>カメラ / マイク</td><td>getUserMedia</td><td>毎回確認</td></tr>
+    <tr><td>通知</td><td>Notification API, Push API</td><td>ブロック</td></tr>
+    <tr><td>クリップボード</td><td>Clipboard API (読み取り)</td><td>毎回確認</td></tr>
+    <tr><td>自動再生</td><td>音声/動画の自動再生</td><td>ブロック（ユーザー操作必須）</td></tr>
+    <tr><td>ダウンロード</td><td>プログラムによるファイルダウンロード</td><td>毎回確認</td></tr>
+  </tbody></table>
+
+  <PrevNext prev={{ href: '/docs/ja/security/threat-protection/', title: '脅威対策' }} next={{ href: '/docs/ja/security/advanced-architecture/', title: '先進アーキテクチャ' }} />
+</DocsLayout>

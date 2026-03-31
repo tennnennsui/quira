@@ -1,0 +1,50 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'context-graph', text: 'Context Graph', depth: 2 },
+  { id: 'how-nodes-are-created', text: 'ノードの作成方法', depth: 2 },
+  { id: 'edge-types', text: 'エッジの種類', depth: 2 },
+  { id: 'three-layer-access-model', text: '3層アクセスモデル', depth: 2 },
+  { id: 'storage-and-free-tier', text: 'ストレージと無料プラン', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="Context Graph" description="Quira がブラウジングを自動的にキャプチャし、インタラクティブなナレッジグラフに構造化する仕組み。" section="コアコンセプト" headings={headings}>
+  <h1 id="context-graph" class="content-section">Context Graph</h1>
+  <p><a href="/docs/ja/getting-started/installation/">Quira のインストール</a>が完了したら、他のブラウザとの違いを生み出すコア機能を探索しましょう。Context Graph は Quira のコアとなる差別化要素です。ブラウジング活動を自動的にキャプチャし、インタラクティブなナレッジグラフに構造化することで、一時的なタブセッションを永続的でクエリ可能なコンテキストに変換します。<a href="/docs/ja/features/graph-visualization/">可視化</a>したり、<a href="/docs/ja/features/nl-query/">自然言語でクエリ</a>したり、他のツールに<a href="/docs/ja/features/export-import/">エクスポート</a>したりできます。</p>
+  <pre><code>{`従来型:  タブ -> 閉じる -> 忘れる
+Quira:   タブ -> 自動コンテキストノード -> 思考フローマッピング -> いつでも再開`}</code></pre>
+  <h2 id="how-nodes-are-created" class="content-section">ノードの作成方法</h2>
+  <p><strong>30秒以上</strong>滞在したページは、自動的にコンテキストノードを生成します。この閾値により、誤クリックやすぐに離脱したページがフィルタリングされ、実際にエンゲージしたページのみがキャプチャされます。ドメイン除外リスト（メール、銀行サイトなど）に登録されたページはキャプチャされません。</p>
+  <p>各ノードにはローカル AI が生成するリッチなメタデータが保存されます：</p>
+  <table><thead><tr><th>フィールド</th><th>型</th><th>説明</th></tr></thead><tbody>
+    <tr><td><code>title</code></td><td>string</td><td>キャプチャ時のページタイトル</td></tr>
+    <tr><td><code>ai_summary</code></td><td>string</td><td>ローカル AI が生成した要約（2〜3文）</td></tr>
+    <tr><td><code>ai_entities</code></td><td>string[]</td><td>抽出されたエンティティ（人物、概念、プロダクト、技術）</td></tr>
+    <tr><td><code>ai_embedding</code></td><td>float[384]</td><td>類似検索用のセマンティック埋め込みベクトル</td></tr>
+    <tr><td><code>total_dwell_time</code></td><td>integer</td><td>ページの累計滞在時間（秒）</td></tr>
+    <tr><td><code>user_tags</code></td><td>string[]</td><td>ユーザーが手動で割り当てたタグ</td></tr>
+  </tbody></table>
+  <h2 id="edge-types" class="content-section">エッジの種類</h2>
+  <p>エッジはノード同士を接続し、接続の強度を示す <code>weight</code> フィールド（0.0〜1.0）を持ちます。3種類のエッジがあります：</p>
+  <table><thead><tr><th>エッジタイプ</th><th>ソース</th><th>説明</th></tr></thead><tbody>
+    <tr><td><code>navigation</code></td><td>ブラウザイベント</td><td>ユーザーがページ A からページ B に遷移（実際のリサーチパス）</td></tr>
+    <tr><td><code>ai_inferred</code></td><td>ローカル AI</td><td>ノード間のトピックまたはエンティティの類似性を検出</td></tr>
+    <tr><td><code>user_created</code></td><td>手動操作</td><td>ユーザーが明示的に2つのノードをリンク</td></tr>
+  </tbody></table>
+  <Callout type="note" title="Navigation エッジは Quira 独自のものです">
+    <p>「関連性」のみをキャプチャする従来のナレッジグラフとは異なり、Navigation エッジはあなたの実際の思考フロー — 調査のパスを表します。これが Research Replay を可能にしている要素です。</p>
+  </Callout>
+  <h2 id="three-layer-access-model" class="content-section">3層アクセスモデル</h2>
+  <p>Context Graph は、アンビエントな認知から完全な探索まで、3つの層を通じて段階的に開示されます：</p>
+  <table><thead><tr><th>レイヤー</th><th>表示面</th><th>幅</th><th>説明</th></tr></thead><tbody>
+    <tr><td>レイヤー 1</td><td>アンビエントサイドバー（KG Pulse）</td><td>48px</td><td>現在のページに関連するノードが光るドットとして表示</td></tr>
+    <tr><td>レイヤー 2</td><td>コンテキストパネル</td><td>360px</td><td>フィルタリングとナビゲーション付きの2ホップローカルグラフ。<code>Cmd+Shift+K</code> で表示</td></tr>
+    <tr><td>レイヤー 3</td><td>フルグラフエクスプローラー</td><td>全画面</td><td><code>quira://graph</code> にある WebGPU レンダリングのエクスプローラー（タイムライン再生付き）</td></tr>
+  </tbody></table>
+  <h2 id="storage-and-free-tier" class="content-section">ストレージと無料プラン</h2>
+  <p>すべての Context Graph データは、全文検索用の FTS5 とベクトル類似検索用の sqlite-vec を備えた暗号化ローカル SQLite データベースに保存されます。データがデバイスの外に出ることはありません。</p>
+  <p>無料プランには<strong>月500ノード</strong>が含まれます。400、480、500ノードで段階的な通知が届きます。上限到達後も、ブラウジングと手動操作は制限なく利用できます — 自動ノード生成のみが一時停止されます。Pro プランではノード数が無制限になります。基盤データベースの詳細については、<a href="/docs/ja/architecture/storage/">ストレージ（SQLite）</a>をご覧ください。</p>
+  <PrevNext prev={{ href: '/docs/ja/getting-started/installation/', title: 'インストール' }} next={{ href: '/docs/ja/core-concepts/context-spaces/', title: 'Context Spaces' }} />
+</DocsLayout>

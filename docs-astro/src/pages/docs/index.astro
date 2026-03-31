@@ -1,0 +1,19 @@
+---
+---
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting...</title>
+  <style>body{background:#262624;margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;}</style>
+  <script is:inline>
+    var saved = null;
+    try { saved = localStorage.getItem('quira-docs-lang'); } catch(e) {}
+    var browserLang = navigator.language || (navigator.languages && navigator.languages[0]) || 'en';
+    var target = saved === 'ja' || saved === 'en' ? saved
+      : browserLang.toLowerCase().startsWith('ja') ? 'ja' : 'en';
+    window.location.replace('/docs/' + target + '/');
+  </script>
+  <noscript><meta http-equiv="refresh" content="0; url=/docs/en/"></noscript>
+</head>
+<body></body>
+</html>

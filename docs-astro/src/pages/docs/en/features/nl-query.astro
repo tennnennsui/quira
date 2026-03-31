@@ -1,0 +1,32 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'natural-language-query', text: 'Natural Language Query', depth: 2 },
+  { id: 'how-to-use-it', text: 'How to use it', depth: 2 },
+  { id: 'example-queries', text: 'Example queries', depth: 2 },
+  { id: 'zero-hallucination', text: 'Zero-hallucination guarantee', depth: 2 },
+  { id: 'response-time-targets', text: 'Response time targets', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Natural Language Query" description="Ask your browser anything in plain English and get answers grounded in your actual browsing history." section="Features" headings={headings}>
+  <h1 id="natural-language-query" class="content-section">Natural Language Query</h1>
+  <p>With your <a href="/docs/en/core-concepts/context-graph/">Context Graph</a> building and <a href="/docs/en/core-concepts/local-ai/">Local AI</a> running, you can now do what no other browser allows. NL Query is Quira's killer feature: ask your browser anything in plain English and get answers grounded in your actual browsing history. For the technical details, see <a href="/docs/en/architecture/llm-integration/">LLM Integration</a>.</p>
+  <h2 id="how-to-use-it" class="content-section">How to use it</h2>
+  <p>Open the Command Palette with <code>Cmd+Shift+P</code> and type a natural language question. Input starting with <code>?</code> or natural language phrasing routes directly to NL Query.</p>
+  <h2 id="example-queries" class="content-section">Example queries</h2>
+  <pre><code>"What was that Rust crate I looked at yesterday?"
+"Summarize everything I read about WebGPU this week"
+"What pages did I spend the most time on about authentication?"
+"Compare the two database articles I read on Monday"</code></pre>
+  <h2 id="zero-hallucination" class="content-section">Zero-hallucination guarantee</h2>
+  <p>Every answer <strong>must</strong> cite source pages with URL, title, and visit timestamp. If the answer cannot be grounded in your Context Graph, Quira says so explicitly rather than fabricating information.</p>
+  <h2 id="response-time-targets" class="content-section">Response time targets</h2>
+  <table><thead><tr><th>Scenario</th><th>Target</th></tr></thead><tbody>
+    <tr><td>NL Query over 100 nodes</td><td>&lt; 3 seconds</td></tr>
+    <tr><td>NL Query over 1,000 nodes</td><td>&lt; 8 seconds</td></tr>
+    <tr><td>Page summarization</td><td>&lt; 2 seconds</td></tr>
+    <tr><td>Entity extraction</td><td>&lt; 1 second</td></tr>
+  </tbody></table>
+  <PrevNext prev={{ href: '/docs/en/core-concepts/research-replay/', title: 'Research Replay' }} next={{ href: '/docs/en/features/ai-privacy/', title: 'AI Privacy Levels' }} />
+</DocsLayout>

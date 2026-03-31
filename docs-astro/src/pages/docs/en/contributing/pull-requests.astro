@@ -1,0 +1,30 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'pull-requests', text: 'Pull Requests', depth: 2 },
+  { id: 'branch-naming', text: 'Branch naming', depth: 2 },
+  { id: 'review-process', text: 'Review process', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Pull Requests" description="How to submit pull requests to Quira." section="Contributing" headings={headings}>
+  <h1 id="pull-requests" class="content-section">Pull Requests</h1>
+  <p>You've written code following the <a href="/docs/en/contributing/code-style/">Code Style</a> guide. Here's how to submit it. For large changes, consider opening an <a href="/docs/en/contributing/rfc-process/">RFC</a> first.</p>
+  <h2 id="branch-naming" class="content-section">Branch naming</h2>
+  <pre><code>feat/context-graph-filtering
+fix/duplicate-node-detection
+refactor/extract-llm-runtime
+docs/api-reference-update</code></pre>
+  <h2 id="review-process" class="content-section">Review process</h2>
+  <ul>
+    <li><strong>Review SLA</strong>: All PRs receive a review within 24 hours</li>
+    <li><strong>DCO sign-off</strong>: All commits must be signed off (<code>git commit -s</code>) to certify the Developer Certificate of Origin</li>
+    <li><strong>CI must pass</strong>: Tests, linting, and build checks must all be green before merge</li>
+    <li><strong>One approval required</strong>: At least one maintainer approval for merge</li>
+  </ul>
+  <Callout type="tip" title="PR template included">
+    <p>The repository includes a pull request template that guides you through describing changes, listing test coverage, and flagging breaking changes.</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/en/contributing/code-style/', title: 'Code Style' }} next={{ href: '/docs/en/contributing/rfc-process/', title: 'RFC Process' }} />
+</DocsLayout>

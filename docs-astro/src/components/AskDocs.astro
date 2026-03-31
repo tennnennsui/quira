@@ -1,0 +1,328 @@
+---
+import type { Lang } from '../i18n/translations';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const ui = lang === 'ja'
+  ? { label: 'Ask AI', placeholder: '質問を入力...', emptyTitle: 'Ask AI', emptyDesc: 'ドキュメントについて何でも聞いてください', starter1: 'Quira とは何ですか？', starter2: 'Context Graph の仕組みは？', starter3: 'インストール方法を教えて', error: 'エラーが発生しました。もう一度お試しください。' }
+  : { label: 'Ask AI', placeholder: 'Ask a question...', emptyTitle: 'Ask AI', emptyDesc: 'Ask anything about the documentation', starter1: 'What is Quira?', starter2: 'How does Context Graph work?', starter3: 'How do I install Quira?', error: 'An error occurred. Please try again.' };
+---
+
+<!-- Floating trigger button -->
+<button id="ask-docs-trigger" aria-label={ui.label} style="position:fixed;bottom:24px;right:24px;z-index:70;display:flex;align-items:center;gap:8px;padding:10px 16px;background:#E8A838;color:#141413;border:none;border-radius:999px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,0.3);transition:transform 0.15s ease,box-shadow 0.15s ease;">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+  <span>{ui.label}</span>
+</button>
+
+<!-- Backdrop overlay -->
+<div id="ask-docs-backdrop" style="display:none;position:fixed;inset:0;z-index:75;background:rgba(0,0,0,0.4);backdrop-filter:blur(2px);transition:opacity 0.3s ease;opacity:0;"></div>
+
+<!-- Right slide panel -->
+<div id="ask-docs-panel" style="position:fixed;top:0;right:0;bottom:0;z-index:80;width:420px;max-width:100vw;background:#1F1E1D;border-left:1px solid rgba(222,220,209,0.15);box-shadow:-8px 0 32px rgba(0,0,0,0.4);transform:translateX(100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);font-family:'Inter',system-ui,sans-serif;display:flex;flex-direction:column;">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid rgba(222,220,209,0.15);flex-shrink:0;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:28px;height:28px;background:rgba(232,168,56,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8A838" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </div>
+      <span style="font-size:15px;font-weight:500;color:#FAF9F5;">{ui.emptyTitle}</span>
+    </div>
+    <button id="ask-docs-close" style="padding:4px;background:none;border:none;cursor:pointer;color:#9C9A92;border-radius:6px;display:flex;align-items:center;justify-content:center;" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <!-- Messages area -->
+  <div id="ask-docs-messages" style="flex:1;overflow-y:auto;padding:16px;">
+    <!-- Empty state -->
+    <div id="ask-docs-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;text-align:center;">
+      <div style="width:48px;height:48px;background:rgba(232,168,56,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E8A838" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><text x="12" y="16.5" text-anchor="middle" fill="#E8A838" font-family="Georgia,serif" font-size="14" font-weight="600">Q</text></svg>
+      </div>
+      <div>
+        <p style="font-size:14px;color:#FAF9F5;margin:0 0 4px;">{ui.emptyDesc}</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:280px;">
+        <button class="ask-docs-starter" data-question={ui.starter1} style="padding:8px 12px;font-size:13px;color:#C2C0B6;background:rgba(222,220,209,0.06);border:1px solid rgba(222,220,209,0.1);border-radius:8px;cursor:pointer;font-family:inherit;text-align:left;transition:border-color 0.15s ease;">{ui.starter1}</button>
+        <button class="ask-docs-starter" data-question={ui.starter2} style="padding:8px 12px;font-size:13px;color:#C2C0B6;background:rgba(222,220,209,0.06);border:1px solid rgba(222,220,209,0.1);border-radius:8px;cursor:pointer;font-family:inherit;text-align:left;transition:border-color 0.15s ease;">{ui.starter2}</button>
+        <button class="ask-docs-starter" data-question={ui.starter3} style="padding:8px 12px;font-size:13px;color:#C2C0B6;background:rgba(222,220,209,0.06);border:1px solid rgba(222,220,209,0.1);border-radius:8px;cursor:pointer;font-family:inherit;text-align:left;transition:border-color 0.15s ease;">{ui.starter3}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input area -->
+  <div style="padding:12px 16px;border-top:1px solid rgba(222,220,209,0.15);flex-shrink:0;">
+    <form id="ask-docs-form" style="display:flex;gap:8px;">
+      <input id="ask-docs-input" type="text" placeholder={ui.placeholder} autocomplete="off" maxlength="1000" style="flex:1;padding:10px 14px;font-size:14px;color:#FAF9F5;background:rgba(222,220,209,0.06);border:1px solid rgba(222,220,209,0.15);border-radius:10px;outline:none;font-family:inherit;transition:border-color 0.15s ease;">
+      <button id="ask-docs-send" type="submit" disabled style="padding:10px;background:#E8A838;color:#141413;border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity 0.15s ease;opacity:0.5;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </form>
+  </div>
+</div>
+
+<style is:inline>
+  #ask-docs-trigger:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+  #ask-docs-close:hover { color: #FAF9F5; background: rgba(222,220,209,0.1); }
+  #ask-docs-input:focus { border-color: rgba(232,168,56,0.4); }
+  .ask-docs-starter:hover { border-color: rgba(222,220,209,0.3) !important; color: #FAF9F5 !important; }
+  #ask-docs-send:not(:disabled) { opacity: 1; }
+  #ask-docs-send:not(:disabled):hover { background: #D4962F; }
+  #ask-docs-panel.open { transform: translateX(0); }
+  #ask-docs-backdrop.visible { opacity: 1; }
+  #ask-docs-messages { scrollbar-width: thin; scrollbar-color: #4A4A48 transparent; }
+  #ask-docs-messages::-webkit-scrollbar { width: 4px; }
+  #ask-docs-messages::-webkit-scrollbar-track { background: transparent; }
+  #ask-docs-messages::-webkit-scrollbar-thumb { background: #4A4A48; border-radius: 2px; }
+  .ask-docs-msg { margin-bottom: 16px; animation: askDocsSlideIn 0.2s ease; }
+  .ask-docs-msg-user { text-align: right; }
+  .ask-docs-msg-user .ask-docs-bubble { display: inline-block; max-width: 85%; padding: 10px 14px; background: rgba(232,168,56,0.15); color: #FAF9F5; border-radius: 14px 14px 4px 14px; font-size: 14px; line-height: 1.5; text-align: left; }
+  .ask-docs-msg-assistant .ask-docs-bubble { max-width: 100%; padding: 10px 0; color: #FAF9F5; font-size: 14px; line-height: 1.6; }
+  .ask-docs-msg-assistant .ask-docs-bubble p { margin: 0 0 8px; }
+  .ask-docs-msg-assistant .ask-docs-bubble p:last-child { margin-bottom: 0; }
+  .ask-docs-msg-assistant .ask-docs-bubble a { color: #E8A838; text-decoration: underline; text-decoration-color: rgba(232,168,56,0.4); text-underline-offset: 2px; }
+  .ask-docs-msg-assistant .ask-docs-bubble a:hover { text-decoration-color: #E8A838; }
+  .ask-docs-msg-assistant .ask-docs-bubble code { background: #30302E; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'JetBrains Mono', monospace; }
+  .ask-docs-msg-assistant .ask-docs-bubble strong { color: #FAF9F5; }
+  .ask-docs-msg-assistant .ask-docs-bubble ul, .ask-docs-msg-assistant .ask-docs-bubble ol { padding-left: 1.25rem; margin: 4px 0 8px; }
+  .ask-docs-msg-assistant .ask-docs-bubble li { margin-bottom: 2px; }
+  .ask-docs-typing { display: inline-flex; gap: 4px; padding: 10px 0; }
+  .ask-docs-typing span { width: 6px; height: 6px; background: #6B6A64; border-radius: 50%; animation: askDocsBounce 1.2s ease-in-out infinite; }
+  .ask-docs-typing span:nth-child(2) { animation-delay: 0.15s; }
+  .ask-docs-typing span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes askDocsSlideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes askDocsBounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
+
+  @media (max-width: 480px) {
+    #ask-docs-panel { width: 100vw; }
+    #ask-docs-trigger span { display: none; }
+    #ask-docs-trigger { padding: 12px; }
+  }
+</style>
+
+<script is:inline define:vars={{ lang: lang, errorMsg: ui.error }}>
+(function() {
+  var trigger = document.getElementById('ask-docs-trigger');
+  var panel = document.getElementById('ask-docs-panel');
+  var backdrop = document.getElementById('ask-docs-backdrop');
+  var closeBtn = document.getElementById('ask-docs-close');
+  var form = document.getElementById('ask-docs-form');
+  var input = document.getElementById('ask-docs-input');
+  var sendBtn = document.getElementById('ask-docs-send');
+  var messagesEl = document.getElementById('ask-docs-messages');
+  var emptyEl = document.getElementById('ask-docs-empty');
+  if (!trigger || !panel || !backdrop || !closeBtn || !form || !input || !sendBtn || !messagesEl || !emptyEl) return;
+
+  var MAX_HISTORY_LENGTH = 10;
+  var history = [];
+  var isStreaming = false;
+
+  function trimHistory() {
+    if (history.length > MAX_HISTORY_LENGTH) {
+      history = history.slice(-MAX_HISTORY_LENGTH);
+    }
+  }
+
+  function openPanel() {
+    backdrop.style.display = 'block';
+    requestAnimationFrame(function() {
+      backdrop.classList.add('visible');
+      panel.classList.add('open');
+    });
+    trigger.style.display = 'none';
+    input.focus();
+  }
+
+  function closePanel() {
+    panel.classList.remove('open');
+    backdrop.classList.remove('visible');
+    setTimeout(function() { backdrop.style.display = 'none'; }, 300);
+    trigger.style.display = 'flex';
+  }
+
+  trigger.addEventListener('click', openPanel);
+  closeBtn.addEventListener('click', closePanel);
+  backdrop.addEventListener('click', closePanel);
+
+  if (window.__askDocsEscHandler) document.removeEventListener('keydown', window.__askDocsEscHandler);
+  window.__askDocsEscHandler = function(e) {
+    if (e.key === 'Escape' && panel.classList.contains('open')) closePanel();
+  };
+  document.addEventListener('keydown', window.__askDocsEscHandler);
+
+  input.addEventListener('input', function() {
+    sendBtn.disabled = !input.value.trim() || isStreaming;
+  });
+
+  // Starter question buttons
+  document.querySelectorAll('.ask-docs-starter').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var q = btn.getAttribute('data-question');
+      if (q) { input.value = q; sendBtn.disabled = false; sendMessage(q); }
+    });
+  });
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var msg = input.value.trim();
+    if (!msg || isStreaming) return;
+    sendMessage(msg);
+  });
+
+  function sendMessage(msg) {
+    isStreaming = true;
+    sendBtn.disabled = true;
+    input.value = '';
+    emptyEl.style.display = 'none';
+
+    // Add user message
+    appendMessage('user', msg);
+    history.push({ role: 'user', content: msg });
+    trimHistory();
+
+    // Add typing indicator
+    var typingEl = document.createElement('div');
+    typingEl.className = 'ask-docs-msg ask-docs-msg-assistant';
+    typingEl.innerHTML = '<div class="ask-docs-typing"><span></span><span></span><span></span></div>';
+    messagesEl.appendChild(typingEl);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    // Call API
+    fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, lang: lang, history: history.slice(0, -1).slice(-MAX_HISTORY_LENGTH) })
+    }).then(function(res) {
+      // Remove typing indicator
+      if (typingEl.parentNode) typingEl.parentNode.removeChild(typingEl);
+
+      if (!res.ok) {
+        appendMessage('assistant', errorMsg);
+        isStreaming = false;
+        sendBtn.disabled = !input.value.trim();
+        return;
+      }
+
+      // Stream SSE
+      var reader = res.body.getReader();
+      var decoder = new TextDecoder();
+      var fullText = '';
+      var bubbleEl = appendMessage('assistant', '');
+      var buffer = '';
+
+      function readChunk() {
+        reader.read().then(function(result) {
+          if (result.done) {
+            history.push({ role: 'assistant', content: fullText });
+            trimHistory();
+            isStreaming = false;
+            sendBtn.disabled = !input.value.trim();
+            return;
+          }
+          buffer += decoder.decode(result.value, { stream: true });
+          var lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (var i = 0; i < lines.length; i++) {
+            var line = lines[i].trim();
+            if (!line.startsWith('data: ')) continue;
+            var data = line.slice(6);
+            if (data === '[DONE]') continue;
+            try {
+              var event = JSON.parse(data);
+              if (event.choices && event.choices[0] && event.choices[0].delta && event.choices[0].delta.content) {
+                fullText += event.choices[0].delta.content;
+                bubbleEl.innerHTML = renderMarkdown(fullText);
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+              }
+            } catch(e) { /* skip unparseable chunks */ }
+          }
+          readChunk();
+        }).catch(function() {
+          if (!fullText) {
+            bubbleEl.innerHTML = renderMarkdown(errorMsg);
+          }
+          history.push({ role: 'assistant', content: fullText || errorMsg });
+          trimHistory();
+          isStreaming = false;
+          sendBtn.disabled = !input.value.trim();
+        });
+      }
+      readChunk();
+    }).catch(function() {
+      if (typingEl.parentNode) typingEl.parentNode.removeChild(typingEl);
+      appendMessage('assistant', errorMsg);
+      isStreaming = false;
+      sendBtn.disabled = !input.value.trim();
+    });
+  }
+
+  function appendMessage(role, text) {
+    var div = document.createElement('div');
+    div.className = 'ask-docs-msg ask-docs-msg-' + role;
+    var bubble = document.createElement('div');
+    bubble.className = 'ask-docs-bubble';
+    bubble.innerHTML = role === 'assistant' ? renderMarkdown(text) : escapeHtml(text);
+    div.appendChild(bubble);
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return bubble;
+  }
+
+  function escapeHtml(s) {
+    var d = document.createElement('div');
+    d.appendChild(document.createTextNode(s));
+    return d.innerHTML;
+  }
+
+  function escapeAttribute(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function sanitizeUrl(url) {
+    var normalized = String(url || '').trim();
+    if (!normalized) return null;
+    if (/^\s*(javascript|data|vbscript)\s*:/i.test(normalized)) return null;
+    if (/^(https?:\/\/|\/(?!\/)|#)/i.test(normalized)) return normalized;
+    return null;
+  }
+
+  function renderMarkdown(text) {
+    if (!text) return '';
+    var html = escapeHtml(text);
+    // Bold
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    // Inline code
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    // Links (sanitize dangerous protocols)
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m, text, url) {
+      var safeUrl = sanitizeUrl(url);
+      if (!safeUrl) return text;
+      if (/^https?:\/\//i.test(safeUrl)) {
+        return '<a href="' + escapeAttribute(safeUrl) + '" target="_blank" rel="noopener noreferrer">' + text + '</a>';
+      }
+      return '<a href="' + escapeAttribute(safeUrl) + '">' + text + '</a>';
+    });
+    // Lists
+    html = html.replace(/^- (.+)/gm, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+    // Paragraphs
+    html = html.replace(/\n\n+/g, '</p><p>');
+    html = '<p>' + html + '</p>';
+    html = html.replace(/<p>\s*<\/p>/g, '');
+    // Clean up empty wrapping
+    html = html.replace(/<p>(<ul>)/g, '$1');
+    html = html.replace(/(<\/ul>)<\/p>/g, '$1');
+    return html;
+  }
+})();
+</script>

@@ -1,0 +1,25 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'ai-privacy-levels', text: 'AI プライバシーレベル', depth: 2 },
+  { id: 'privacy-levels', text: 'プライバシーレベル', depth: 2 },
+  { id: 'per-site-privacy', text: 'サイトごとのプライバシー設定', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="AI プライバシーレベル" description="Quira がデータをどのように処理するかを制御 — 完全ローカル AI からオプトインのクラウドモデルまで。" section="機能" headings={headings}>
+  <h1 id="ai-privacy-levels" class="content-section">AI プライバシーレベル</h1>
+  <p><a href="/docs/ja/core-concepts/local-ai/">Local AI</a> はデフォルトでデバイス上で動作しますが、より高い能力のためにクラウドモデルをオプトインすることもできます。Quira は MVP で2つの AI プライバシーレベルを提供しており、アーキテクチャは将来的に4レベルへの拡張をサポートしています。</p>
+  <h2 id="privacy-levels" class="content-section">プライバシーレベル</h2>
+  <table><thead><tr><th>レベル</th><th>ラベル</th><th>データフロー</th><th>デフォルト</th></tr></thead><tbody>
+    <tr><td>レベル 1</td><td>LOCAL</td><td>すべての処理がデバイス上</td><td>はい（デフォルト）</td></tr>
+    <tr><td>レベル 2</td><td>CLOUD</td><td>負荷の高いタスクをクラウドにオフロード（オプトイン）</td><td>いいえ</td></tr>
+  </tbody></table>
+  <h2 id="per-site-privacy" class="content-section">サイトごとのプライバシー設定</h2>
+  <p><code>quira://settings/ai</code> でサイトごとにプライバシーレベルを設定できます。たとえば、一般的なリサーチには CLOUD モードを使用しながら、機密性の高いサイトには LOCAL モードを維持するといった使い分けが可能です。</p>
+  <Callout type="warning" title="データ主権の保証">
+    <p>CLOUD モードでも、ブラウジング履歴や Context Graph データがデバイスの外に出ることはありません。クラウドサービスに送信されるのはクエリテキストと関連する AI 生成の要約のみです。生のページコンテンツが送信されることはありません。</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/ja/features/nl-query/', title: '自然言語クエリ' }} next={{ href: '/docs/ja/features/graph-visualization/', title: 'グラフビジュアライゼーション' }} />
+</DocsLayout>

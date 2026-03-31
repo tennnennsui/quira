@@ -1,0 +1,31 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'webextension-api', text: 'WebExtension API', depth: 2 },
+  { id: 'mv2-mv3', text: 'MV2 + MV3 互換性', depth: 2 },
+  { id: 'quira-specific', text: 'Quira 固有の拡張', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="WebExtension API" description="Quira の完全な WebExtension 互換性 — MV2 と MV3 の両マニフェストバージョンをサポート。" section="API リファレンス" headings={headings}>
+  <h1 id="webextension-api" class="content-section">WebExtension API</h1>
+  <p><a href="/docs/ja/api/plugin-api/">Plugin API</a> は拡張機能に Quira 固有の機能へのアクセスを提供します。その基盤として、Quira は <a href="/docs/ja/architecture/gecko-engine/">Gecko</a> をベースにしているため、MV2 と MV3 の両マニフェストバージョンで標準 WebExtensions API をサポートしています。これにより、ほとんどの Firefox および Chrome 拡張機能がそのまま動作します。</p>
+  <h2 id="mv2-mv3" class="content-section">MV2 + MV3 互換性</h2>
+  <p>Manifest V2 を完全に廃止した Chrome とは異なり、Quira は両方のバージョンを引き続きサポートしています。これにより、uBlock Origin（MV2 の <code>webRequestBlocking</code> API に依存）などの拡張機能が変更なしで動作します。MV3 拡張機能も完全にサポートされています。</p>
+  <h2 id="quira-specific" class="content-section">Quira 固有の拡張</h2>
+  <p>標準的な <code>browser.*</code> API に加えて、Quira は Context Graph と AI のインタラクション用に <code>quira.*</code> 名前空間を提供しています：</p>
+  <pre><code>{`// 例: サイドバーに関連リサーチを表示する拡張機能
+browser.tabs.onActivated.addListener(async (activeInfo) => {
+  const tab = await browser.tabs.get(activeInfo.tabId);
+
+  // Quira の Graph API を使って関連ノードを検索
+  const related = await quira.graph.getRelated(tab.url, {
+    hops: 2,
+    limit: 5
+  });
+
+  // 拡張機能のサイドバーに表示
+  updateSidebar(related);
+});`}</code></pre>
+  <PrevNext prev={{ href: '/docs/ja/api/plugin-api/', title: 'Plugin API' }} next={{ href: '/docs/ja/api/graph-query-api/', title: 'Graph Query API' }} />
+</DocsLayout>

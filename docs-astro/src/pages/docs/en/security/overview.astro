@@ -1,0 +1,87 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'security-overview', text: 'Security Overview', depth: 2 },
+  { id: 'context-security', text: 'Context Security: a new paradigm', depth: 2 },
+  { id: 'compositional-sensitivity', text: 'Compositional sensitivity', depth: 3 },
+  { id: 'eight-paradigms', text: 'Eight security paradigms', depth: 2 },
+  { id: 'defense-in-depth', text: 'Defense in depth', depth: 2 },
+  { id: 'security-layers', text: 'Security layers', depth: 2 },
+  { id: 'security-comparison', text: 'Competitive comparison', depth: 2 },
+  { id: 'implementation-roadmap', text: 'Implementation roadmap', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Security Overview" description="Context Security — Quira's world-first security architecture that protects your accumulated knowledge, not just your connection." section="Security & Privacy" headings={headings}>
+  <h1 id="security-overview" class="content-section">Security Overview</h1>
+  <p>Quira is designed from the ground up with security as a first-class concern. But Quira goes further than any existing browser: it introduces <strong>Context Security</strong> — a new security discipline that protects your accumulated knowledge structure, not just your network connection.</p>
+
+  <h2 id="context-security" class="content-section">Context Security: a new paradigm</h2>
+  <p>Every major browser — Chrome, Firefox, Brave — focuses on protecting users <em>from the web</em> via sandboxing, site isolation, and content security policies. None of them protect the <em>user's own accumulated knowledge</em> with the same rigor.</p>
+  <p>Quira's Context Graph is an automatically constructed personal knowledge graph — a structured map of your intellectual activity. This is an entirely new category of sensitive data that no existing browser security model protects. <strong>Context Security</strong> is the discipline of protecting personal knowledge structures.</p>
+  <Callout type="warning" title="Why this matters">
+    <p>The Context Graph holds AI summaries, entity extractions, semantic embeddings, browsing patterns, and temporal research paths. This is categorically more sensitive than browsing history — it is a machine-readable map of your thinking.</p>
+  </Callout>
+
+  <h3 id="compositional-sensitivity" class="content-section">Compositional sensitivity</h3>
+  <p>Individual page visits are low-sensitivity data. But when accumulated in the Context Graph — combined with AI summaries, extracted entities, and temporal patterns — they become one of the most sensitive personal datasets possible. This is the same principle by which individual mobile location pings are harmless, but aggregated location history becomes complete surveillance.</p>
+
+  <h2 id="eight-paradigms" class="content-section">Eight security paradigms</h2>
+  <p>Quira's security architecture is built on eight interlocking paradigms. Each is independently valuable; together they form a living, adaptive, cryptographically-grounded defense system.</p>
+  <table><thead><tr><th>#</th><th>Paradigm</th><th>Core idea</th><th>Details</th></tr></thead><tbody>
+    <tr><td>1</td><td>Capability-Based Security</td><td>Unforgeable tokens replace identity-based access. No ambient authority.</td><td><a href="/docs/en/security/permission-system/">Permission System</a></td></tr>
+    <tr><td>2</td><td>Information Flow Control</td><td>Track where data flows, not just who can access it. Labels are monotonic.</td><td><a href="/docs/en/security/permission-system/">Permission System</a></td></tr>
+    <tr><td>3</td><td>AI Immune System</td><td>Behavioral baselining and anomaly detection. The AI defends itself.</td><td><a href="/docs/en/security/threat-protection/">Threat Protection</a></td></tr>
+    <tr><td>4</td><td>Temporal Security</td><td>Permissions decay. Sessions are time-locked. Dead man's switch.</td><td><a href="/docs/en/security/privacy-architecture/">Privacy Architecture</a></td></tr>
+    <tr><td>5</td><td>Adversarial ML Defense</td><td>Multi-layer defense against web content manipulating browser AI.</td><td><a href="/docs/en/security/threat-protection/">Threat Protection</a></td></tr>
+    <tr><td>6</td><td>Cryptographic Innovation</td><td>Forward secrecy at rest, threshold encryption, verifiable deletion, ZKP.</td><td><a href="/docs/en/security/privacy-architecture/">Privacy Architecture</a></td></tr>
+    <tr><td>7</td><td>Hardware Co-Design</td><td>TEE for AI inference, memory encryption, per-tab decryption.</td><td><a href="/docs/en/security/privacy-architecture/">Privacy Architecture</a></td></tr>
+    <tr><td>8</td><td>Living Security</td><td>Security Health Score, continuous adaptation, not static configuration.</td><td><a href="/docs/en/security/threat-protection/">Threat Protection</a></td></tr>
+  </tbody></table>
+  <p>Beyond these eight paradigms, Quira introduces 26 novel security structures — from <a href="/docs/en/security/advanced-architecture/">macOS deep-architecture concepts</a> (8 structures including CSEB, KPC, CTA) to <a href="/docs/en/security/emergent-security/">emergent interaction structures</a> (8 structures including KSCI, IRD, RSIP, CAV). See each page for formal models and implementation details.</p>
+
+  <h2 id="defense-in-depth" class="content-section">Defense in depth</h2>
+  <p>Quira implements a <strong>defense-in-depth</strong> strategy inspired by macOS's multilayered security model. Rather than relying on a single boundary, multiple independent layers ensure that a breach in one does not compromise the whole system.</p>
+  <table><thead><tr><th>macOS</th><th>Quira equivalent</th><th>Difference from existing browsers</th></tr></thead><tbody>
+    <tr><td>Gatekeeper</td><td>Cryptographic extension verification before install</td><td>Chrome reviews after publish; Quira verifies before execution</td></tr>
+    <tr><td>TCC</td><td>Context TCC — granular per-permission consent for graph access</td><td>World first: no browser has knowledge graph access control</td></tr>
+    <tr><td>SIP</td><td>Context Graph immutability protection</td><td>No browser guarantees browsing data integrity</td></tr>
+    <tr><td>App Sandbox</td><td>Space-Scoped Security — Context Spaces are security boundaries</td><td>World first: tab groups as security boundaries</td></tr>
+    <tr><td>Keychain</td><td>Encrypted embedding vault with independent encryption</td><td>World first: encrypted browsing data at rest</td></tr>
+    <tr><td>Lockdown Mode</td><td>Context Lockdown — JIT disabled, panic wipe, RAM-only mode</td><td>World first: extreme privacy mode for journalists/activists</td></tr>
+  </tbody></table>
+
+  <h2 id="security-layers" class="content-section">Security layers</h2>
+  <table><thead><tr><th>Layer</th><th>Component</th><th>What it protects</th></tr></thead><tbody>
+    <tr><td>L1 — Network</td><td><a href="/docs/en/security/network-firewall/">Network Firewall</a></td><td>Malicious connections, DNS filtering, TLS enforcement</td></tr>
+    <tr><td>L2 — Content</td><td><a href="/docs/en/security/content-filtering/">Content Filtering</a></td><td>Trackers, ads, fingerprinting scripts, cryptominers</td></tr>
+    <tr><td>L3 — Threats</td><td><a href="/docs/en/security/threat-protection/">Threat Protection</a></td><td>Phishing, malware, AI immune system, adversarial ML defense</td></tr>
+    <tr><td>L4 — Permissions</td><td><a href="/docs/en/security/permission-system/">Permission System</a></td><td>Capability tokens, Context TCC, IFC labels, Space isolation</td></tr>
+    <tr><td>L5 — Privacy</td><td><a href="/docs/en/security/privacy-architecture/">Privacy Architecture</a></td><td>Encryption at rest, temporal security, hardware integration</td></tr>
+    <tr><td>L6 — Infrastructure</td><td><a href="/docs/en/security/advanced-architecture/">Advanced Architecture</a></td><td>KPC classification, CSEB event bus, KQR relay, CTA trust arbiter, ASP posture</td></tr>
+    <tr><td>L7 — Emergent</td><td><a href="/docs/en/security/emergent-security/">Emergent Security</a></td><td>KSCI supply chain, IRD inference residue, SBRC blast radius, TCV causality, CAV amnesia</td></tr>
+  </tbody></table>
+
+  <h2 id="security-comparison" class="content-section">Competitive comparison</h2>
+  <table><thead><tr><th>Feature</th><th>Chrome</th><th>Firefox</th><th>Brave</th><th>Tor</th><th>Quira</th></tr></thead><tbody>
+    <tr><td>Site isolation</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes (Gecko Fission)</td></tr>
+    <tr><td>Extension sandbox</td><td>Basic</td><td>Basic</td><td>Basic</td><td>Restricted</td><td>Capability-based TCC</td></tr>
+    <tr><td>History encryption</td><td>No</td><td>No</td><td>No</td><td>RAM only</td><td>SQLCipher + embedding encryption</td></tr>
+    <tr><td>AI threat defense</td><td>No</td><td>No</td><td>No</td><td>N/A</td><td>4-layer prompt injection defense</td></tr>
+    <tr><td>Knowledge exfiltration detection</td><td>No</td><td>No</td><td>No</td><td>No</td><td>Context DLP</td></tr>
+    <tr><td>Lockdown mode</td><td>No</td><td>No</td><td>No</td><td>Partial</td><td>Context Lockdown</td></tr>
+    <tr><td>Compositional sensitivity</td><td>No</td><td>No</td><td>No</td><td>No</td><td>Yes — world first</td></tr>
+  </tbody></table>
+
+  <h2 id="implementation-roadmap" class="content-section">Implementation roadmap</h2>
+  <p>Unified roadmap across core security, <a href="/docs/en/security/advanced-architecture/">advanced architecture</a>, and <a href="/docs/en/security/emergent-security/">emergent security</a> structures.</p>
+  <table><thead><tr><th>Phase</th><th>Core Security</th><th>Advanced Architecture</th><th>Emergent Security</th><th>Timeline</th></tr></thead><tbody>
+    <tr><td>Phase 1 (MVP)</td><td>SQLCipher, extension entitlements, content sanitization, domain exclusion</td><td>KPC (protection classes), CSEB (event bus), CTA (trust arbiter)</td><td>KSCI (supply chain integrity), TCV (temporal causality)</td><td>Q3 2026</td></tr>
+    <tr><td>Phase 2 (Pro)</td><td>Context TCC, Space boundaries, embedding encryption, differential privacy</td><td>PSCS (privilege separation), SKV (sealed volumes), ASP (adaptive posture)</td><td>IRD (inference residue defense), SBRC (blast radius containment)</td><td>Q4 2026</td></tr>
+    <tr><td>Phase 3 (Enterprise)</td><td>TEE integration, Context Lockdown, exfiltration detection, PQC</td><td>KQR (query relay), DSPL (policy language)</td><td>AGTR (graph topology resistance), CSELP (entropy leakage prevention)</td><td>2027</td></tr>
+    <tr><td>Phase 4 (Standard)</td><td>Context Security Framework — W3C/IETF standardization proposal</td><td>Full integration + formal verification</td><td>RSIP (retroactive sanitization), CAV (amnesia verification)</td><td>2027+</td></tr>
+  </tbody></table>
+
+  <PrevNext prev={{ href: '/docs/en/features/export-import/', title: 'Export & Import' }} next={{ href: '/docs/en/security/threat-model/', title: 'Threat Model' }} />
+</DocsLayout>

@@ -1,0 +1,58 @@
+---
+---
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>404 - Quira Docs</title>
+  <style>
+    body { background: #262624; color: #FAF9F5; font-family: Inter, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    .container { text-align: center; }
+    h1 { font-size: 72px; color: #E8A838; margin: 0; }
+    p { color: #C2C0B6; font-size: 18px; }
+    a { color: #E8A838; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>404</h1>
+    <p id="not-found-text">Page not found</p>
+    <p><a id="docs-home-link" href="/docs/en/">Return to documentation &rarr;</a></p>
+  </div>
+  <script is:inline>
+    var messages = {
+      en: {
+        htmlLang: 'en',
+        title: '404 - Quira Docs',
+        notFound: 'Page not found',
+        home: 'Return to documentation \u2192',
+      },
+      ja: {
+        htmlLang: 'ja',
+        title: '404 - Quira \u30c9\u30ad\u30e5\u30e1\u30f3\u30c8',
+        notFound: '\u30da\u30fc\u30b8\u304c\u898b\u3064\u304b\u308a\u307e\u305b\u3093',
+        home: '\u30c9\u30ad\u30e5\u30e1\u30f3\u30c8\u306b\u623b\u308b \u2192',
+      }
+    };
+
+    var savedLang = null;
+    try { savedLang = localStorage.getItem('quira-docs-lang'); } catch(e) {}
+    var browserLang = navigator.language || (navigator.languages && navigator.languages[0]) || 'en';
+    var targetLang = savedLang === 'ja' || savedLang === 'en'
+      ? savedLang
+      : browserLang.toLowerCase().startsWith('ja') ? 'ja' : 'en';
+    var copy = messages[targetLang] || messages.en;
+
+    document.documentElement.lang = copy.htmlLang;
+    document.title = copy.title;
+
+    var notFoundText = document.getElementById('not-found-text');
+    if (notFoundText) notFoundText.textContent = copy.notFound;
+
+    var docsHomeLink = document.getElementById('docs-home-link');
+    if (docsHomeLink) {
+      docsHomeLink.textContent = copy.home;
+      docsHomeLink.href = '/docs/' + targetLang + '/';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'graph-query-api', text: 'Graph Query API', depth: 2 },
+  { id: 'quira-graph-query', text: 'quira.graph.query()', depth: 2 },
+  { id: 'quira-graph-getrelated', text: 'quira.graph.getRelated()', depth: 2 },
+  { id: 'quira-graph-getnode', text: 'quira.graph.getNode()', depth: 2 },
+  { id: 'quira-graph-search', text: 'quira.graph.search()', depth: 2 },
+  { id: 'quira-graph-export', text: 'quira.graph.export()', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="Graph Query API" description="quira.graph 名前空間の完全なリファレンス。" section="API リファレンス" headings={headings}>
+  <h1 id="graph-query-api" class="content-section">Graph Query API</h1>
+  <Callout type="tip" title="前提条件">
+    <p>このセクションの前に <a href="/docs/ja/core-concepts/context-graph/">Context Graph</a> と <a href="/docs/ja/api/plugin-api/">Plugin API</a> を読んでおいてください。</p>
+  </Callout>
+  <p>これは <code>quira.graph</code> 名前空間のすべてのメソッドの詳細リファレンスです。Graph Query API は <a href="/docs/ja/core-concepts/context-graph/">Context Graph</a> へのプログラマティックアクセスを提供します。すべてのメソッドは Promise を返します。</p>
+  <Callout type="warning" title="アルファ版 API">
+    <p>これらの API は活発に開発中です。メソッドのシグネチャは v1.0 前に変更される可能性があります。本番環境でこれらの API に依存する場合は、拡張機能を特定の Quira バージョンにピン留めしてください。</p>
+  </Callout>
+
+  <h2 id="quira-graph-query" class="content-section"><code>quira.graph.query(question, options?)</code></h2>
+  <p>Context Graph に対して自然言語クエリを送信します。引用付きの AI 生成回答を返します。</p>
+  <table><thead><tr><th>パラメータ</th><th>型</th><th>説明</th></tr></thead><tbody>
+    <tr><td><code>question</code></td><td><code>string</code></td><td>自然言語の質問</td></tr>
+    <tr><td><code>options.maxNodes</code></td><td><code>number</code></td><td>考慮するコンテキストノードの最大数（デフォルト: 50）</td></tr>
+    <tr><td><code>options.dateRange</code></td><td><code>{'{ from: string, to: string }'}</code></td><td>ISO 8601 日付範囲フィルター</td></tr>
+  </tbody></table>
+  <p><strong>戻り値:</strong> <code>{'Promise<QueryResult>'}</code></p>
+  <pre><code>{`const result = await quira.graph.query(
+  "What did I read about WebGPU this week?",
+  { maxNodes: 20 }
+);
+
+// result.summary   -> AI 生成の回答文字列
+// result.sources   -> [{ url, title, visitedAt, dwellTime }]
+// result.nodes     -> [ContextNode] マッチしたノード
+// result.confidence -> number (0.0 - 1.0)`}</code></pre>
+
+  <h2 id="quira-graph-getrelated" class="content-section"><code>quira.graph.getRelated(url, options?)</code></h2>
+  <p>Context Graph のエッジを辿って、指定した URL に関連するノードを取得します。</p>
+  <table><thead><tr><th>パラメータ</th><th>型</th><th>説明</th></tr></thead><tbody>
+    <tr><td><code>url</code></td><td><code>string</code></td><td>ソースノードの URL</td></tr>
+    <tr><td><code>options.hops</code></td><td><code>number</code></td><td>エッジ探索の最大深度（デフォルト: 2）</td></tr>
+    <tr><td><code>options.limit</code></td><td><code>number</code></td><td>返すノードの最大数（デフォルト: 10）</td></tr>
+    <tr><td><code>options.minWeight</code></td><td><code>number</code></td><td>エッジの最小重み閾値（デフォルト: 0.0）</td></tr>
+  </tbody></table>
+  <p><strong>戻り値:</strong> <code>{'Promise<ContextNode[]>'}</code></p>
+  <pre><code>{`const related = await quira.graph.getRelated(
+  "https://docs.rs/wgpu/latest/wgpu/",
+  { hops: 2, limit: 5, minWeight: 0.3 }
+);`}</code></pre>
+
+  <h2 id="quira-graph-getnode" class="content-section"><code>quira.graph.getNode(id)</code></h2>
+  <p>ID を指定して単一の Context Graph ノードを取得します。</p>
+  <table><thead><tr><th>パラメータ</th><th>型</th><th>説明</th></tr></thead><tbody>
+    <tr><td><code>id</code></td><td><code>string</code></td><td>コンテキストノードの UUID v7</td></tr>
+  </tbody></table>
+  <p><strong>戻り値:</strong> <code>{'Promise<ContextNode | null>'}</code></p>
+  <pre><code>{`const node = await quira.graph.getNode("019503a1-b2c3-7def-8901-234567890abc");
+
+if (node) {
+  console.log(node.title);       // "WebGPU Best Practices"
+  console.log(node.ai_summary);  // "This article covers..."
+  console.log(node.ai_entities); // ["WebGPU", "WGSL", "compute shaders"]
+  console.log(node.dwell_time);  // 342 (seconds)
+}`}</code></pre>
+
+  <h2 id="quira-graph-search" class="content-section"><code>quira.graph.search(query, options?)</code></h2>
+  <p>FTS5 を使用した Context Graph ノードの全文検索です。<code>query()</code> とは異なり、AI 要約なしのキーワード検索を行います。</p>
+  <table><thead><tr><th>パラメータ</th><th>型</th><th>説明</th></tr></thead><tbody>
+    <tr><td><code>query</code></td><td><code>string</code></td><td>FTS5 検索クエリ文字列</td></tr>
+    <tr><td><code>options.limit</code></td><td><code>number</code></td><td>最大結果数（デフォルト: 20）</td></tr>
+    <tr><td><code>options.domain</code></td><td><code>string</code></td><td>ドメインでフィルタリング</td></tr>
+    <tr><td><code>options.dateRange</code></td><td><code>{'{ from: string, to: string }'}</code></td><td>ISO 8601 日付範囲フィルター</td></tr>
+  </tbody></table>
+  <p><strong>戻り値:</strong> <code>{'Promise<ContextNode[]>'}</code></p>
+  <pre><code>{`const results = await quira.graph.search("authentication OAuth", {
+  limit: 10,
+  domain: "docs.rs"
+});`}</code></pre>
+
+  <h2 id="quira-graph-export" class="content-section"><code>quira.graph.export(options?)</code></h2>
+  <p>Context Graph またはそのサブセットを JSON または Markdown 形式でエクスポートします。</p>
+  <table><thead><tr><th>パラメータ</th><th>型</th><th>説明</th></tr></thead><tbody>
+    <tr><td><code>options.format</code></td><td><code>"json" | "markdown"</code></td><td>エクスポート形式（デフォルト: "json"）</td></tr>
+    <tr><td><code>options.nodeIds</code></td><td><code>string[]</code></td><td>エクスポートする特定のノード ID（省略で全件）</td></tr>
+    <tr><td><code>options.includeEdges</code></td><td><code>boolean</code></td><td>エッジデータを含める（デフォルト: true）</td></tr>
+  </tbody></table>
+  <p><strong>戻り値:</strong> <code>{'Promise<string>'}</code></p>
+  <pre><code>{`// グラフ全体を JSON でエクスポート
+const json = await quira.graph.export({ format: "json" });
+
+// 特定のノードを Markdown でエクスポート（Obsidian インポート用）
+const md = await quira.graph.export({
+  format: "markdown",
+  nodeIds: ["019503a1-...", "019503a2-..."],
+  includeEdges: false
+});`}</code></pre>
+
+  <PrevNext prev={{ href: '/docs/ja/api/webextension-api/', title: 'WebExtension API' }} />
+</DocsLayout>

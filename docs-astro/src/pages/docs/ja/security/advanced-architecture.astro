@@ -1,0 +1,129 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'advanced-architecture', text: '先進セキュリティアーキテクチャ', depth: 2 },
+  { id: 'kpc', text: 'Knowledge Protection Classes (KPC)', depth: 2 },
+  { id: 'kpc-classes', text: '4つの保護クラス', depth: 3 },
+  { id: 'kpc-threat', text: '脅威モデルカバレッジ', depth: 3 },
+  { id: 'cseb', text: 'Context Security Event Bus (CSEB)', depth: 2 },
+  { id: 'cseb-events', text: 'イベントタイプとルール', depth: 3 },
+  { id: 'cseb-architecture', text: 'アーキテクチャ', depth: 3 },
+  { id: 'kqr', text: 'Knowledge Query Relay (KQR)', depth: 2 },
+  { id: 'pscs', text: 'Privilege-Separated Context Services (PSCS)', depth: 2 },
+  { id: 'skv', text: 'Sealed Knowledge Volume (SKV)', depth: 2 },
+  { id: 'cta', text: 'Context Trust Arbiter (CTA)', depth: 2 },
+  { id: 'asp', text: 'Adaptive Security Posture (ASP)', depth: 2 },
+  { id: 'implementation-priority', text: '実装優先順位', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="先進セキュリティアーキテクチャ" description="macOS深層メカニズムから着想を得た8つの新規セキュリティ構造 ― Knowledge Protection Classes、Context Security Event Busなど。" section="セキュリティ & プライバシー" headings={headings}>
+  <h1 id="advanced-architecture" class="content-section">先進セキュリティアーキテクチャ</h1>
+  <p><a href="/docs/ja/security/overview/">コアセキュリティレイヤー</a>を超えて、Quiraは既存のどのブラウザも実装していない、macOS深層メカニズムに着想を得た8つの新規セキュリティ構造を導入します。各構造は形式的脅威モデルに基づき、特定の敵対者クラスに対処します。</p>
+  <Callout type="info" title="研究段階">
+    <p>これらの構造は研究・設計段階です。<a href="/docs/ja/security/permission-system/">パーミッションシステム</a>と<a href="/docs/ja/security/privacy-architecture/">プライバシーアーキテクチャ</a>の基盤の上に構築されます。これらを拡張・組み合わせる8つの追加構造については<a href="/docs/ja/security/emergent-security/">エマージェントセキュリティ</a>を参照。</p>
+  </Callout>
+
+  <h2 id="kpc" class="content-section">Knowledge Protection Classes (KPC)</h2>
+  <p>iOS Data Protection Classes (A-D) に着想を得たKPCは、Context Graphに<strong>状態依存の段階的暗号化</strong>を適用します。Quiraの現在の暗号化（SQLCipher）はDB全体に対する単一鍵であり、iOS Class Cに相当します。KPCは認証状態に応じてデータのアクセシビリティが変化する4クラスを導入します。</p>
+
+  <h3 id="kpc-classes" class="content-section">4つの保護クラス</h3>
+  <table><thead><tr><th>クラス</th><th>対象</th><th>鍵の利用可能条件</th><th>鍵の破棄条件</th></tr></thead><tbody>
+    <tr><td><strong>KPC-A</strong>（Active Research）</td><td>アクティブSpaceのグラフデータ</td><td>Spaceがフォアグラウンド + 認証済み</td><td>Spaceがバックグラウンドになった瞬間</td></tr>
+    <tr><td><strong>KPC-B</strong>（Session）</td><td>当セッションでアクセスしたSpace</td><td>セッション内で一度認証後</td><td>ブラウザ終了時</td></tr>
+    <tr><td><strong>KPC-C</strong>（Index Only）</td><td>FTS5インデックス + グラフトポロジーの一部</td><td>マスターパスワード / 生体認証後</td><td>OSシャットダウン時</td></tr>
+    <tr><td><strong>KPC-D</strong>（Structural）</td><td>ノード数、Space名、タイムスタンプ</td><td>常時利用可能（UID由来の鍵）</td><td>リモートワイプのみ</td></tr>
+  </tbody></table>
+  <p>鍵階層はHKDF導出を使用: マスターキー（パスフレーズ + ハードウェアUIDからArgon2idで導出）から各レベルのクラス固有鍵を導出。</p>
+
+  <h3 id="kpc-threat" class="content-section">脅威モデルカバレッジ</h3>
+  <table><thead><tr><th>敵対者</th><th>攻撃</th><th>KPC防御</th></tr></thead><tbody>
+    <tr><td>OS レベル (A4)</td><td>メモリダンプ</td><td>アクティブSpaceのデータのみ復号状態 ― 被害がそのSpaceに限定</td></tr>
+    <tr><td>OS レベル (A4)</td><td>コールドブート攻撃</td><td>セッション鍵は揮発性メモリのみ ― 電源断で全鍵消失</td></tr>
+    <tr><td>OS レベル (A4)</td><td>ディスク窃取（電源OFF）</td><td>全クラスがマスターキーを必要 ― パスフレーズなしでは復号不可</td></tr>
+    <tr><td>拡張機能 (A3)</td><td>グラフ全体読取</td><td>非アクティブSpaceには復号鍵がメモリに存在しない</td></tr>
+  </tbody></table>
+
+  <h2 id="cseb" class="content-section">Context Security Event Bus (CSEB)</h2>
+  <p>macOSのEndpoint Security Frameworkに着想を得たCSEBは、全グラフ操作に対する<strong>プログラマブルなリアルタイムイベント監視システム</strong>です。シグネチャベースの検知とは異なり、AUTH（ブロッキング）とNOTIFY（観察のみ）の2モードを提供します。</p>
+  <Callout type="warning" title="世界初">
+    <p>内部グラフ操作に対するプログラマブルなセキュリティイベントバスを実装したブラウザは存在しません。CSEBはQuiraのアーキテクチャで最も新規性の高い構造です。</p>
+  </Callout>
+
+  <h3 id="cseb-events" class="content-section">イベントタイプとルール</h3>
+  <table><thead><tr><th>カテゴリ</th><th>イベントタイプ</th><th>モード</th><th>例</th></tr></thead><tbody>
+    <tr><td>Graph.Read</td><td>node.read, edge.read, query.execute</td><td>NOTIFY</td><td>拡張がノード内容を読取</td></tr>
+    <tr><td>Graph.Write</td><td>node.create, node.update, edge.create</td><td>AUTH</td><td>AIがエンティティを追加</td></tr>
+    <tr><td>Graph.Export</td><td>export.json, clipboard.copy</td><td>AUTH</td><td>データがブラウザ外へ</td></tr>
+    <tr><td>AI.Pipeline</td><td>ai.extract, ai.embed, ai.query</td><td>AUTH</td><td>AIパイプラインの各段階</td></tr>
+    <tr><td>Extension.API</td><td>ext.graph.read, ext.network.send</td><td>AUTH</td><td>拡張のAPI呼出し</td></tr>
+  </tbody></table>
+  <p>ルールはスタック可能（組込み + コミュニティ + ユーザー）で、アクション: ALLOW、DENY、THROTTLE、QUARANTINE。例: 拡張からの100ノードを超える一括エクスポートをブロック。</p>
+
+  <h3 id="cseb-architecture" class="content-section">アーキテクチャ</h3>
+  <p>全コンポーネントがロックフリーリングバッファにイベントを発行。ルールエンジンがリアルタイムで評価。AUTHイベントは判定が下されるまでブロック。追記専用の監査ログが全判定をフォレンジック分析用に記録。</p>
+
+  <h2 id="kqr" class="content-section">Knowledge Query Relay (KQR)</h2>
+  <p>iCloud Private Relay（MASQUE / ODoH）に着想を得たKQRは、Cloud AI利用時に<strong>アイデンティティとクエリ内容を構造的に分離</strong>します。</p>
+  <table><thead><tr><th>エンティティ</th><th>知っている情報</th><th>知らない情報</th></tr></thead><tbody>
+    <tr><td>Relay 1（Quira）</td><td>ユーザーID、サブスクリプション状態</td><td>クエリ内容、AI応答</td></tr>
+    <tr><td>Relay 2（独立第三者）</td><td>クエリ内容（平文）</td><td>ユーザーID、IPアドレス</td></tr>
+    <tr><td>AI Compute</td><td>クエリ内容</td><td>ユーザーID（Relay 2経由）</td></tr>
+  </tbody></table>
+  <p>認証にはRSAブラインド署名を使用 ― Relay 1はトークンを発行するが、どのトークンがどのクエリに使われたかを追跡できません。OHTTP（RFC 9458）とPrivacy Pass（RFC 9578）上に構築。</p>
+
+  <h2 id="pscs" class="content-section">Privilege-Separated Context Services (PSCS)</h2>
+  <p>macOS XPC Servicesに着想を得たPSCSは、セキュリティクリティカルなコンポーネントを<strong>最小権限の隔離マイクロサービス</strong>に分解します。</p>
+  <table><thead><tr><th>サービス</th><th>権限</th><th>アクセス不可</th></tr></thead><tbody>
+    <tr><td>Graph Engine</td><td>DB読書き、FTS5、KPC鍵</td><td>ネットワーク、GPU</td></tr>
+    <tr><td>AI Pipeline</td><td>モデル読取専用、GPU/CPU、一時メモリ</td><td>データベース、ネットワーク</td></tr>
+    <tr><td>Permission Manager</td><td>TCC DB、ポリシー評価、監査ログ</td><td>グラフデータ、ネットワーク</td></tr>
+    <tr><td>Export Service</td><td>グラフ読取（Graph Engine経由）、ファイル書込</td><td>ネットワーク</td></tr>
+    <tr><td>Extension Host</td><td>拡張ストレージ、IPC経由のグラフ</td><td>DB直接アクセス</td></tr>
+    <tr><td>Update Service</td><td>ネットワーク読取、コード署名検証</td><td>グラフデータ</td></tr>
+  </tbody></table>
+  <p>重要な制約: <strong>AI Pipelineはデータベースに直接アクセスできません。</strong>全グラフアクセスはGraph Engine IPC経由。プロンプトインジェクションがAI Pipelineを侵害しても、データベースへの書込みは不可能です。</p>
+
+  <h2 id="skv" class="content-section">Sealed Knowledge Volume (SKV)</h2>
+  <p>macOS Sealed System Volume (SSV) に着想を得たSKVは、特定時点のグラフ状態に対する<strong>暗号学的コミットメント</strong>を作成します。</p>
+  <ul>
+    <li><strong>研究優先性の証明</strong> ― Merkleパス + タイムスタンプ局（RFC 3161）により、時刻Tにナレッジノードが存在したことを証明</li>
+    <li><strong>非保有の証明 (Proof of Absence)</strong> ― Sparse Merkle Treeにより、時刻Tにあるトピックがグラフに存在しなかったことを証明</li>
+    <li><strong>増分シール</strong> ― グラフ全体ではなく、変更されたノード/エッジのみを再ハッシュ</li>
+  </ul>
+  <p>利用場面: 研究先行性の証明、法的紛争（特定情報への非アクセスの証明）、侵害後の整合性検証。</p>
+
+  <h2 id="cta" class="content-section">Context Trust Arbiter (CTA)</h2>
+  <p>macOS AMFI (Apple Mobile File Integrity) に着想を得たCTAは、<strong>全てのセキュリティ判定を一元化する判定デーモン</strong>です。各サブシステムが独立して信頼判定を行う代わりに、CTAが統一パイプラインで全リクエストを評価します:</p>
+  <ol>
+    <li>アイデンティティ検証（コード署名）</li>
+    <li>Capability評価</li>
+    <li>TCCパーミッションチェック</li>
+    <li>ポリシー評価（宣言的）</li>
+    <li>KPC状態チェック（保護クラス vs 認証レベル）</li>
+    <li>CSEBコンテキストチェック（直近のイベントパターン）</li>
+  </ol>
+  <p>短絡評価: 最初のDENYで即座に返却。ALLOWには全チェックの通過が必要。</p>
+
+  <h2 id="asp" class="content-section">Adaptive Security Posture (ASP)</h2>
+  <p>二値切替のLockdown Modeを超えて、ASPは環境シグナルに基づきセキュリティレベルを<strong>連続的に</strong>調整します。</p>
+  <table><thead><tr><th>ポスチャ範囲</th><th>レベル</th><th>動作の変化</th></tr></thead><tbody>
+    <tr><td>0.0–0.2</td><td>Lockdown</td><td>AI無効、エクスポート禁止、拡張無効</td></tr>
+    <tr><td>0.2–0.4</td><td>High Alert</td><td>Cloud AI禁止、ローカルAIのみ、エクスポートに確認要求</td></tr>
+    <tr><td>0.4–0.6</td><td>Elevated</td><td>拡張のレートリミット強化、KPC-A自動適用</td></tr>
+    <tr><td>0.6–0.8</td><td>Normal</td><td>デフォルト設定</td></tr>
+    <tr><td>0.8–1.0</td><td>Relaxed</td><td>承認済み環境、パフォーマンス優先のキャッシュ</td></tr>
+  </tbody></table>
+  <p>シグナル: ネットワーク種別（公衆WiFiでポスチャ低下）、認証経過時間、CSEB異常検知、OS更新状態、外部デバイス接続。</p>
+
+  <h2 id="implementation-priority" class="content-section">実装優先順位</h2>
+  <table><thead><tr><th>フェーズ</th><th>構造</th><th>理由</th></tr></thead><tbody>
+    <tr><td>Phase 1</td><td>PSCS, CSEB</td><td>基盤 ― プロセス分離とイベント監視が他の全構造を可能にする</td></tr>
+    <tr><td>Phase 2</td><td>KPC, CTA, SKV</td><td>核心的保護 ― 段階的暗号化、統一信頼判定、暗号学的コミットメント</td></tr>
+    <tr><td>Phase 3</td><td>ASP</td><td>適応的対応 ― CTAとCSEBが前提</td></tr>
+    <tr><td>Phase 4</td><td>KQR</td><td>Cloud AIプライバシー ― Cloud AI機能のリリース時に必要</td></tr>
+  </tbody></table>
+
+  <PrevNext prev={{ href: '/docs/ja/security/permission-system/', title: 'パーミッションシステム' }} next={{ href: '/docs/ja/security/emergent-security/', title: '創発的セキュリティ' }} />
+</DocsLayout>

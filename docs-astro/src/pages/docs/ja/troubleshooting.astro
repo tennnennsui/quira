@@ -1,0 +1,148 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import Callout from '../../../components/Callout.astro';
+import PrevNext from '../../../components/PrevNext.astro';
+const headings = [
+  { id: 'troubleshooting', text: 'トラブルシューティング', depth: 2 },
+  { id: 'installation-issues', text: 'インストールの問題', depth: 2 },
+  { id: 'ai-model-failures', text: 'AIモデルのダウンロード失敗', depth: 2 },
+  { id: 'context-graph-issues', text: 'Context Graphが構築されない', depth: 2 },
+  { id: 'performance-issues', text: 'パフォーマンスの問題', depth: 2 },
+  { id: 'build-from-source', text: 'ソースからのビルドエラー', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="トラブルシューティング" description="Quiraのインストール、パフォーマンス、設定に関する一般的な問題の解決策。" section="リソース" headings={headings}>
+  <h1 id="troubleshooting" class="content-section">トラブルシューティング</h1>
+  <p>このページでは、Quiraで発生する一般的な問題とその解決策を説明します。ここに記載されていない問題については、<a href="https://github.com/nicepkg/quira/issues" target="_blank">GitHub Issues</a>を確認するか、<a href="https://discord.gg/quira" target="_blank">Discord</a>でお問い合わせください。</p>
+
+  <h2 id="installation-issues" class="content-section">インストールの問題</h2>
+
+  <h3>macOS:「Quiraは開発元が不明なため開けません」</h3>
+  <p><strong>問題:</strong> アルファビルドにはまだApple Developer証明書で署名されていないため、macOSのGatekeeperがQuiraをブロックします。</p>
+  <p><strong>解決策:</strong></p>
+  <ol>
+    <li>FinderでQuiraアプリケーションを右クリック（またはControlクリック）</li>
+    <li>コンテキストメニューから「開く」を選択</li>
+    <li>確認ダイアログで「開く」をクリック</li>
+  </ol>
+  <p>または、システム設定 &gt; プライバシーとセキュリティ &gt; セキュリティでQuiraを許可できます。</p>
+
+  <h3>macOS: 起動時にクラッシュ（Apple Silicon）</h3>
+  <p><strong>問題:</strong> AIモデルランタイムにはAccelerateフレームワークが必要で、Xcode Command Line Toolsがインストールされていないと失敗する場合があります。</p>
+  <p><strong>解決策:</strong></p>
+  <pre><code>xcode-select --install</code></pre>
+
+  <h3>Linux: 共有ライブラリが見つからない</h3>
+  <p><strong>問題:</strong> QuiraはGTK4、WebKitGTK、その他のシステムライブラリに依存していますが、デフォルトでインストールされていない場合があります。</p>
+  <p><strong>解決策（Ubuntu/Debian）:</strong></p>
+  <pre><code>sudo apt install libgtk-4-dev libwebkitgtk-6.0-dev libssl-dev pkg-config</code></pre>
+  <p><strong>解決策（Fedora）:</strong></p>
+  <pre><code>sudo dnf install gtk4-devel webkitgtk6.0-devel openssl-devel pkg-config</code></pre>
+  <p><strong>解決策（Arch）:</strong></p>
+  <pre><code>sudo pacman -S gtk4 webkitgtk-6.0 openssl pkg-config</code></pre>
+  <Callout type="note" title="Wayland と X11">
+    <p>QuiraはWaylandとX11の両方をサポートしています。Waylandでレンダリングの問題が発生した場合は、<code>MOZ_ENABLE_WAYLAND=1 quira</code>で起動するか、<code>GDK_BACKEND=x11 quira</code>でX11にフォールバックしてください。</p>
+  </Callout>
+
+  <h2 id="ai-model-failures" class="content-section">AIモデルのダウンロード失敗</h2>
+
+  <h3>モデルのダウンロードが途中で停止または失敗する</h3>
+  <p><strong>問題:</strong> 初回のAIモデルダウンロード（モデルによって約2〜4 GB）が遅い接続や不安定な接続で失敗する場合があります。</p>
+  <p><strong>解決策:</strong></p>
+  <ol>
+    <li>インターネット接続の安定性を確認</li>
+    <li>ダウンロードを再試行 — Quiraは最後のチェックポイントからの再開をサポート</li>
+    <li>ダウンロードが繰り返し失敗する場合、モデルを手動でダウンロード:
+      <pre><code># モデルファイルを直接ダウンロード
+curl -L -o ~/.quira/models/phi-3-mini-4k.gguf \
+  https://models.quira.dev/phi-3-mini-4k-instruct-q4_k_m.gguf</code></pre>
+    </li>
+  </ol>
+
+  <h3>モデルの読み込み失敗:「メモリ不足」</h3>
+  <p><strong>問題:</strong> デフォルトモデル（Phi-3 Mini、4ビット量子化）は約3 GBのRAMが必要です。メモリが限られたシステムではモデルの読み込みに失敗する場合があります。</p>
+  <p><strong>解決策:</strong></p>
+  <ul>
+    <li>他のメモリを多用するアプリケーションを閉じる</li>
+    <li><code>quira://settings/ai/model</code>でより小さいモデルに切り替える</li>
+    <li>Apple Silicon Macでは、ユニファイドメモリが他のアプリで大量に消費されていないことを確認</li>
+  </ul>
+
+  <h2 id="context-graph-issues" class="content-section">Context Graphが構築されない</h2>
+
+  <h3>ページがContext Graphに表示されない</h3>
+  <p><strong>問題:</strong> ブラウジングしているのに、新しいページがグラフに追加されない。</p>
+  <p><strong>解決策:</strong> 以下の一般的な原因を確認してください:</p>
+  <ul>
+    <li><strong>Incognitoモード</strong> — Context GraphはIncognito/プライベートウィンドウでは設計上無効です。通常のウィンドウに切り替えてください。</li>
+    <li><strong>ドメイン除外</strong> — ページのドメインが除外リストに含まれている可能性があります。<code>quira://settings/security/exclusions</code>を確認してください。銀行、メール、医療サイトはデフォルトで除外されています（<a href="/docs/ja/security/content-filtering/">コンテンツフィルタリング</a>参照）。</li>
+    <li><strong>Context Spaceが一時停止</strong> — 現在のContext Spaceが一時停止している可能性があります。ツールバーのSpaceインジケーターを確認してください。</li>
+    <li><strong>ページが一時的すぎる</strong> — 3秒未満しか表示されていないページはデフォルトでグラフに追加されません。このしきい値は設定で調整できます。</li>
+  </ul>
+
+  <h3>Context Graphクエリが結果を返さない</h3>
+  <p><strong>問題:</strong> ブラウジング履歴があるのに、自然言語クエリが空の結果を返す。</p>
+  <p><strong>解決策:</strong></p>
+  <ul>
+    <li>インデクサーの完了を待つ — 再起動後、再インデックスに数分かかる場合があります</li>
+    <li><code>quira://settings/ai</code>でAIモデルのステータスを確認 — セマンティック検索にはモデルのロードが必要です</li>
+    <li>まず簡単なクエリや正確なキーワードを試して、データベースにアクセスできることを確認</li>
+  </ul>
+  <Callout type="warning" title="データベースの破損">
+    <p>Context Graphデータベースが破損した場合（停電などの後）、Quiraは次回起動時に自動復旧を試みます。復旧に失敗した場合、<code>quira://settings/data/rebuild-index</code>からインデックスを再構築できます。生のブラウジングデータは保持されます。検索インデックスのみが再構築されます。</p>
+  </Callout>
+
+  <h2 id="performance-issues" class="content-section">パフォーマンスの問題</h2>
+
+  <h3>メモリ使用量が高い</h3>
+  <p><strong>問題:</strong> 特に多くのタブを開いている場合、Quiraが予想以上のメモリを使用する。</p>
+  <p><strong>解決策:</strong></p>
+  <ul>
+    <li><strong>開いているタブを減らす</strong> — 各タブはページとそのコンテキスト用にメモリを消費します。Context Spacesを使って非アクティブなタブを整理・閉じてください。</li>
+    <li><strong>グラフの自動レンダリングを無効化</strong> — リアルタイムグラフ可視化は大量のメモリを消費する可能性があります。<code>quira://settings/graph/auto-render</code>で無効にし、必要に応じて開いてください。</li>
+    <li><strong>より小さいAIモデルを使用</strong> — 小さい量子化モデルは精度がわずかに低下しますが、メモリ使用量が少なくなります。</li>
+  </ul>
+
+  <h3>グラフレンダリングが遅い</h3>
+  <p><strong>問題:</strong> 大きなグラフで<a href="/docs/ja/features/graph-visualization/">グラフビジュアライゼーション</a>が遅い、または応答しない。</p>
+  <p><strong>解決策:</strong></p>
+  <ul>
+    <li><strong>WebGPUアクセラレーションを有効化</strong> — <code>quira://settings/graph/renderer</code>でWebGPUが有効になっていることを確認。GPUがWebGPUをサポートしていない場合はWebGL2にフォールバック。</li>
+    <li><strong>グラフスコープを縮小</strong> — 時間範囲やContext Spaceでフィルタリングして、表示ノード数を減らす</li>
+    <li><strong>フォースレイアウトのタイムアウトを増加</strong> — 大きなグラフはより多くのシミュレーションステップが必要な場合があります。<code>quira://settings/graph/layout-iterations</code>で調整</li>
+  </ul>
+
+  <h2 id="build-from-source" class="content-section">ソースからのビルドエラー</h2>
+
+  <h3>Rustコンパイル失敗:「error[E0658]: use of unstable library feature」</h3>
+  <p><strong>問題:</strong> Gecko統合レイヤーで使用されるいくつかの不安定な機能のため、QuiraにはRust nightlyが必要です。</p>
+  <p><strong>解決策:</strong></p>
+  <pre><code>rustup toolchain install nightly
+rustup override set nightly</code></pre>
+
+  <h3>Node.jsビルドステップが失敗</h3>
+  <p><strong>問題:</strong> UIレイヤーにはNode.js 20+と特定のnpmパッケージが必要です。</p>
+  <p><strong>解決策:</strong></p>
+  <pre><code># Node.jsバージョンを確認（20以上が必要）
+node --version
+
+# 依存関係をクリーンして再インストール
+rm -rf node_modules
+npm install
+
+# ビルドを再試行
+just build</code></pre>
+
+  <h3>Geckoビルド失敗: ディスク容量不足</h3>
+  <p><strong>問題:</strong> Geckoのソースからのビルドには、中間ビルドアーティファクト用に約30 GBのディスク容量が必要です。</p>
+  <p><strong>解決策:</strong></p>
+  <ul>
+    <li>ビルド開始前に少なくとも40 GBの空きディスク容量を確保</li>
+    <li>デバッグビルドの代わりに<code>just build --release</code>を使用してアーティファクトサイズを削減</li>
+    <li>ホームディレクトリの容量が制限されている場合、<code>CARGO_TARGET_DIR</code>をより容量のあるドライブに設定</li>
+  </ul>
+  <Callout type="tip" title="プレビルドバイナリ推奨">
+    <p>Quiraのコアエンジンにコントリビュートする場合を除き、<a href="/docs/ja/getting-started/installation/">インストール</a>ページのプレビルドバイナリの使用を推奨します。ソースからのビルドは主にコントリビューター向けです。</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/ja/use-cases/writers/', title: 'ライター向け' }} next={{ href: '/docs/ja/release-notes/', title: 'リリースノート' }} />
+</DocsLayout>

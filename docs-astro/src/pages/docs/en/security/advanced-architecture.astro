@@ -1,0 +1,129 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'advanced-architecture', text: 'Advanced Security Architecture', depth: 2 },
+  { id: 'kpc', text: 'Knowledge Protection Classes (KPC)', depth: 2 },
+  { id: 'kpc-classes', text: 'Four protection classes', depth: 3 },
+  { id: 'kpc-threat', text: 'Threat model coverage', depth: 3 },
+  { id: 'cseb', text: 'Context Security Event Bus (CSEB)', depth: 2 },
+  { id: 'cseb-events', text: 'Event types and rules', depth: 3 },
+  { id: 'cseb-architecture', text: 'Architecture', depth: 3 },
+  { id: 'kqr', text: 'Knowledge Query Relay (KQR)', depth: 2 },
+  { id: 'pscs', text: 'Privilege-Separated Context Services (PSCS)', depth: 2 },
+  { id: 'skv', text: 'Sealed Knowledge Volume (SKV)', depth: 2 },
+  { id: 'cta', text: 'Context Trust Arbiter (CTA)', depth: 2 },
+  { id: 'asp', text: 'Adaptive Security Posture (ASP)', depth: 2 },
+  { id: 'implementation-priority', text: 'Implementation priority', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Advanced Security Architecture" description="Eight novel security structures inspired by macOS deep mechanisms — Knowledge Protection Classes, Context Security Event Bus, and more." section="Security & Privacy" headings={headings}>
+  <h1 id="advanced-architecture" class="content-section">Advanced Security Architecture</h1>
+  <p>Beyond the <a href="/docs/en/security/overview/">core security layers</a>, Quira introduces eight novel security structures inspired by macOS deep mechanisms that no existing browser implements. Each is grounded in the formal threat model and addresses specific adversary classes.</p>
+  <Callout type="info" title="Research status">
+    <p>These structures are at the research and design stage. They build on the <a href="/docs/en/security/permission-system/">Permission System</a> and <a href="/docs/en/security/privacy-architecture/">Privacy Architecture</a> foundations. For eight additional emergent security structures that extend and combine these, see <a href="/docs/en/security/emergent-security/">Emergent Security</a>.</p>
+  </Callout>
+
+  <h2 id="kpc" class="content-section">Knowledge Protection Classes (KPC)</h2>
+  <p>Inspired by iOS Data Protection Classes (A-D), KPC applies <strong>state-dependent graduated encryption</strong> to the Context Graph. Quira's current encryption (SQLCipher) is a single key for the entire database — equivalent to iOS Class C. KPC introduces four classes where data accessibility depends on authentication state.</p>
+
+  <h3 id="kpc-classes" class="content-section">Four protection classes</h3>
+  <table><thead><tr><th>Class</th><th>Scope</th><th>Key available</th><th>Key destroyed</th></tr></thead><tbody>
+    <tr><td><strong>KPC-A</strong> (Active Research)</td><td>Active Space graph data</td><td>While Space is in foreground + authenticated</td><td>Immediately when Space goes to background</td></tr>
+    <tr><td><strong>KPC-B</strong> (Session)</td><td>Spaces accessed this session</td><td>After first auth per session</td><td>Browser exit</td></tr>
+    <tr><td><strong>KPC-C</strong> (Index Only)</td><td>FTS5 index + graph topology subset</td><td>After master password / biometric</td><td>OS shutdown</td></tr>
+    <tr><td><strong>KPC-D</strong> (Structural)</td><td>Node count, Space names, timestamps</td><td>Always (UID-derived key)</td><td>Remote wipe only</td></tr>
+  </tbody></table>
+  <p>The key hierarchy uses HKDF derivation: Master Key (Argon2id from passphrase + hardware UID) derives class-specific keys at each level.</p>
+
+  <h3 id="kpc-threat" class="content-section">Threat model coverage</h3>
+  <table><thead><tr><th>Adversary</th><th>Attack</th><th>KPC defense</th></tr></thead><tbody>
+    <tr><td>OS-level (A4)</td><td>Memory dump</td><td>Only active Space data is decrypted — damage limited to that Space</td></tr>
+    <tr><td>OS-level (A4)</td><td>Cold boot attack</td><td>Session keys exist only in volatile memory — power loss destroys all keys</td></tr>
+    <tr><td>OS-level (A4)</td><td>Disk theft (power off)</td><td>All classes require Master Key — no decryption without passphrase</td></tr>
+    <tr><td>Extension (A3)</td><td>Full graph read</td><td>Non-active Spaces have no decryption key in memory</td></tr>
+  </tbody></table>
+
+  <h2 id="cseb" class="content-section">Context Security Event Bus (CSEB)</h2>
+  <p>Inspired by macOS Endpoint Security Framework, CSEB is a <strong>programmable real-time event monitoring system</strong> for all graph operations. Unlike signature-based detection, CSEB provides AUTH (blocking) and NOTIFY (observe-only) modes.</p>
+  <Callout type="warning" title="World first">
+    <p>No browser implements a programmable security event bus for internal graph operations. CSEB is the most novel structure in Quira's architecture.</p>
+  </Callout>
+
+  <h3 id="cseb-events" class="content-section">Event types and rules</h3>
+  <table><thead><tr><th>Category</th><th>Event types</th><th>Mode</th><th>Example</th></tr></thead><tbody>
+    <tr><td>Graph.Read</td><td>node.read, edge.read, query.execute</td><td>NOTIFY</td><td>Extension reads node content</td></tr>
+    <tr><td>Graph.Write</td><td>node.create, node.update, edge.create</td><td>AUTH</td><td>AI adds entity</td></tr>
+    <tr><td>Graph.Export</td><td>export.json, clipboard.copy</td><td>AUTH</td><td>Data leaves browser</td></tr>
+    <tr><td>AI.Pipeline</td><td>ai.extract, ai.embed, ai.query</td><td>AUTH</td><td>Each AI pipeline stage</td></tr>
+    <tr><td>Extension.API</td><td>ext.graph.read, ext.network.send</td><td>AUTH</td><td>Extension API call</td></tr>
+  </tbody></table>
+  <p>Rules are stackable (built-in + community + user) with actions: ALLOW, DENY, THROTTLE, QUARANTINE. Example: block bulk exports over 100 nodes from extensions.</p>
+
+  <h3 id="cseb-architecture" class="content-section">Architecture</h3>
+  <p>All components emit events to a lock-free ring buffer. The rule engine evaluates in real time. AUTH events block until a decision is made. An append-only audit log records all decisions for forensic analysis.</p>
+
+  <h2 id="kqr" class="content-section">Knowledge Query Relay (KQR)</h2>
+  <p>Inspired by iCloud Private Relay (MASQUE / ODoH), KQR provides <strong>structural separation of identity and query content</strong> when using Cloud AI.</p>
+  <table><thead><tr><th>Entity</th><th>Knows</th><th>Does NOT know</th></tr></thead><tbody>
+    <tr><td>Relay 1 (Quira)</td><td>User ID, subscription status</td><td>Query content, AI response</td></tr>
+    <tr><td>Relay 2 (independent third party)</td><td>Query content (plaintext)</td><td>User ID, IP address</td></tr>
+    <tr><td>AI Compute</td><td>Query content</td><td>User identity (via Relay 2)</td></tr>
+  </tbody></table>
+  <p>Authentication uses RSA blind signatures — Relay 1 issues tokens but cannot track which token is used for which query. Built on OHTTP (RFC 9458) and Privacy Pass (RFC 9578).</p>
+
+  <h2 id="pscs" class="content-section">Privilege-Separated Context Services (PSCS)</h2>
+  <p>Inspired by macOS XPC Services, PSCS decomposes security-critical components into <strong>isolated microservices with minimum privileges</strong>.</p>
+  <table><thead><tr><th>Service</th><th>Capabilities</th><th>Cannot access</th></tr></thead><tbody>
+    <tr><td>Graph Engine</td><td>DB read/write, FTS5, KPC keys</td><td>Network, GPU</td></tr>
+    <tr><td>AI Pipeline</td><td>Model read-only, GPU/CPU, temp memory</td><td>Database, network</td></tr>
+    <tr><td>Permission Manager</td><td>TCC database, policy evaluation, audit log</td><td>Graph data, network</td></tr>
+    <tr><td>Export Service</td><td>Graph read (via Graph Engine), file write</td><td>Network</td></tr>
+    <tr><td>Extension Host</td><td>Extension storage, graph via IPC only</td><td>Direct DB access</td></tr>
+    <tr><td>Update Service</td><td>Network read, code signing verification</td><td>Graph data</td></tr>
+  </tbody></table>
+  <p>Critical constraint: <strong>AI Pipeline cannot directly access the database.</strong> All graph access goes through Graph Engine IPC. If prompt injection compromises the AI pipeline, it cannot write to the database.</p>
+
+  <h2 id="skv" class="content-section">Sealed Knowledge Volume (SKV)</h2>
+  <p>Inspired by macOS Sealed System Volume (SSV), SKV creates <strong>cryptographic commitments to graph state</strong> at a point in time.</p>
+  <ul>
+    <li><strong>Research priority proof</strong> — Prove a knowledge node existed at time T via Merkle path + timestamp authority (RFC 3161)</li>
+    <li><strong>Proof of absence</strong> — Prove a topic did NOT exist in your graph at time T using Sparse Merkle Trees</li>
+    <li><strong>Incremental sealing</strong> — Only re-hash changed nodes/edges, not the entire graph</li>
+  </ul>
+  <p>Use cases: proving research precedence, legal disputes (demonstrating non-access to certain information), integrity verification after compromise.</p>
+
+  <h2 id="cta" class="content-section">Context Trust Arbiter (CTA)</h2>
+  <p>Inspired by macOS AMFI (Apple Mobile File Integrity), CTA is a <strong>single point of decision for all security judgments</strong>. Instead of each subsystem making independent trust decisions, CTA evaluates every request through a unified pipeline:</p>
+  <ol>
+    <li>Identity verification (code signing)</li>
+    <li>Capability evaluation</li>
+    <li>TCC permission check</li>
+    <li>Policy evaluation (declarative)</li>
+    <li>KPC state check (protection class vs. auth level)</li>
+    <li>CSEB context check (recent event patterns)</li>
+  </ol>
+  <p>Short-circuit evaluation: first DENY returns immediately. ALLOW requires all checks to pass.</p>
+
+  <h2 id="asp" class="content-section">Adaptive Security Posture (ASP)</h2>
+  <p>Going beyond binary Lockdown Mode, ASP adjusts security level <strong>continuously</strong> based on environmental signals.</p>
+  <table><thead><tr><th>Posture range</th><th>Level</th><th>Behavior change</th></tr></thead><tbody>
+    <tr><td>0.0–0.2</td><td>Lockdown</td><td>AI disabled, exports blocked, extensions disabled</td></tr>
+    <tr><td>0.2–0.4</td><td>High Alert</td><td>Cloud AI blocked, local AI only, exports require confirmation</td></tr>
+    <tr><td>0.4–0.6</td><td>Elevated</td><td>Extension rate limits tightened, KPC-A auto-applied</td></tr>
+    <tr><td>0.6–0.8</td><td>Normal</td><td>Default settings</td></tr>
+    <tr><td>0.8–1.0</td><td>Relaxed</td><td>Approved environment, performance-optimized caching</td></tr>
+  </tbody></table>
+  <p>Signals: network type (public WiFi lowers posture), time since auth, CSEB anomaly detection, OS update status, external device connections.</p>
+
+  <h2 id="implementation-priority" class="content-section">Implementation priority</h2>
+  <table><thead><tr><th>Phase</th><th>Structure</th><th>Rationale</th></tr></thead><tbody>
+    <tr><td>Phase 1</td><td>PSCS, CSEB</td><td>Foundation — process separation and event monitoring enable all other structures</td></tr>
+    <tr><td>Phase 2</td><td>KPC, CTA, SKV</td><td>Core protection — graduated encryption, unified trust, cryptographic commitments</td></tr>
+    <tr><td>Phase 3</td><td>ASP</td><td>Adaptive response — requires CTA and CSEB in place</td></tr>
+    <tr><td>Phase 4</td><td>KQR</td><td>Cloud AI privacy — needed only when Cloud AI features launch</td></tr>
+  </tbody></table>
+
+  <PrevNext prev={{ href: '/docs/en/security/permission-system/', title: 'Permission System' }} next={{ href: '/docs/en/security/emergent-security/', title: 'Emergent Security' }} />
+</DocsLayout>

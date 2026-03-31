@@ -1,0 +1,28 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'rfc-process', text: 'RFC プロセス', depth: 2 },
+  { id: 'when-is-an-rfc-needed', text: 'RFC が必要な場合', depth: 2 },
+  { id: 'rfc-workflow', text: 'RFC ワークフロー', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="RFC プロセス" description="Request for Comments プロセスを通じて Quira への重要な変更を提案する方法。" section="コントリビュート" headings={headings}>
+  <h1 id="rfc-process" class="content-section">RFC プロセス</h1>
+  <p>すべての変更が<a href="/docs/ja/contributing/pull-requests/">標準的な PR</a> を通じて行われるわけではありません。Quira のアーキテクチャ、パブリック API、またはユーザー向けの動作に対する重要な変更には、RFC（Request for Comments）が必要です。</p>
+  <h2 id="when-is-an-rfc-needed" class="content-section">RFC が必要な場合</h2>
+  <ul>
+    <li>UI やユーザーワークフローを変更する新機能</li>
+    <li>Graph Query API または Plugin API の変更</li>
+    <li>アーキテクチャの変更（新しい依存関係、ストレージ形式の変更）</li>
+    <li>データモデルやプライバシー保証の変更</li>
+  </ul>
+  <h2 id="rfc-workflow" class="content-section">RFC ワークフロー</h2>
+  <ol>
+    <li><strong>提出</strong> — RFC テンプレートに従って <code>rfcs/</code> ディレクトリに PR を開きます。</li>
+    <li><strong>レビュー期間</strong> — コミュニティのフィードバックとディスカッションのための2週間のコメント期間。</li>
+    <li><strong>決定</strong> — メンテナーが承認、変更要求、または根拠とともに RFC をクローズします。</li>
+    <li><strong>実装</strong> — 承認された RFC は Issue として追跡され、コントリビューターに割り当てられます。</li>
+  </ol>
+  <PrevNext prev={{ href: '/docs/ja/contributing/pull-requests/', title: 'プルリクエスト' }} next={{ href: '/docs/ja/api/plugin-api/', title: 'Plugin API' }} />
+</DocsLayout>

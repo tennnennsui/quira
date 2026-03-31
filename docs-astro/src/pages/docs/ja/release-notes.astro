@@ -1,0 +1,87 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import Callout from '../../../components/Callout.astro';
+import PrevNext from '../../../components/PrevNext.astro';
+const headings = [
+  { id: 'release-notes', text: 'リリースノート', depth: 2 },
+  { id: 'v010-alpha', text: 'v0.1.0-alpha（2026年Q3予定）', depth: 2 },
+  { id: 'foundation-build', text: 'ファウンデーションビルド（2026年Q1）', depth: 2 },
+  { id: 'versioning', text: 'バージョニングポリシー', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="リリースノート" description="Quiraのリリース履歴、計画中の機能、破壊的変更。" section="リソース" headings={headings}>
+  <h1 id="release-notes" class="content-section">リリースノート</h1>
+  <p>このページではQuiraのリリース履歴と予定されているマイルストーンを追跡しています。Quiraは<a href="https://semver.org/" target="_blank">セマンティックバージョニング</a>に従っています。アルファおよびベータ段階では、マイナーバージョン間で破壊的変更が発生する場合があります。</p>
+
+  <h2 id="v010-alpha" class="content-section">v0.1.0-alpha（2026年Q3予定）</h2>
+  <Callout type="note" title="開発中のリリース">
+    <p>このリリースは現在開発中です。機能とタイムラインは変更される場合があります。</p>
+  </Callout>
+  <p>Quiraの最初のパブリックアルファリリースで、アーリーアダプターとコントリビューター向けです。</p>
+
+  <h3>コア機能</h3>
+  <ul>
+    <li><strong>Context Graphエンジン</strong> — 自動トピッククラスタリングとセマンティックリンキングによる完全なブラウジングコンテキストキャプチャ</li>
+    <li><strong>Context Spaces</strong> — GTDにインスパイアされたInbox、Active、Archiveステートによるタブ管理</li>
+    <li><strong>ローカルAI（Phi-3 Mini）</strong> — ページ要約、自然言語クエリ、トピック分類のためのオンデバイス推論</li>
+    <li><strong>AIプライバシーレベル</strong> — LOCALモード（デフォルト）、より重い推論タスク用のオプトインCLOUDモード</li>
+    <li><strong>自然言語クエリ</strong> — コマンドパレット（Ctrl+K / Cmd+K）でブラウジング履歴について質問</li>
+    <li><strong>グラフビジュアライゼーション</strong> — WebGPUアクセラレーションによるインタラクティブグラフ、フォースレイアウト、フィルタリング、タイムラインスクラビング</li>
+    <li><strong>Research Replay</strong> — 完全なコンテキスト復元による過去のリサーチセッションの再開</li>
+    <li><strong>エクスポート & インポート</strong> — Context GraphをJSON、Markdown、Mermaid図としてエクスポート、Chrome/Firefoxからインポート</li>
+  </ul>
+
+  <h3>プラットフォームサポート</h3>
+  <ul>
+    <li>macOS 13+（Apple SiliconおよびIntel）</li>
+    <li>Linux（Ubuntu 22.04+、Fedora 38+、Arch）</li>
+    <li>Windowsサポートはv0.2.0で計画</li>
+  </ul>
+
+  <h3>既知の制限</h3>
+  <ul>
+    <li>WebExtensionの互換性はMV2/MV3 APIのサブセットに限定（<a href="/docs/ja/api/webextension-api/">WebExtension API</a>参照）</li>
+    <li>グラフ可視化のパフォーマンスは約10,000ノードを超えると低下 — ページネーションまたは時間ベースのフィルタリングを推奨</li>
+    <li>クラウドAIモードにはサポートされたプロバイダー（OpenAI、Anthropic、またはローカルOllama）のAPIキーが必要</li>
+    <li>このリリースではデバイス間の同期なし</li>
+  </ul>
+
+  <h3>破壊的変更</h3>
+  <ul>
+    <li>なし（初回リリース）</li>
+  </ul>
+
+  <h2 id="foundation-build" class="content-section">ファウンデーションビルド（2026年Q1）</h2>
+  <p>ファウンデーションビルドは、パブリックアルファに先立つ内部開発マイルストーンを表します。このフェーズでコアアーキテクチャが確立されました。</p>
+
+  <h3>完了したマイルストーン</h3>
+  <table><thead><tr><th>マイルストーン</th><th>日付</th><th>説明</th></tr></thead><tbody>
+    <tr><td>Geckoフォークベースライン</td><td>2026年1月</td><td>Firefox/Geckoエンジンのフォーク、テレメトリの除去、<code>just</code>によるカスタムビルドパイプラインの確立</td></tr>
+    <tr><td>Context Graphストレージ</td><td>2026年1月</td><td>SQLite + SQLCipherデータベーススキーマ、FTS5全文検索とベクトル埋め込み（sqlite-vss）</td></tr>
+    <tr><td>Context Spaces UI</td><td>2026年2月</td><td>GTDにインスパイアされたワークフローによるタブ管理UI: Inbox、Active、Archiveステート</td></tr>
+    <tr><td>ローカルAIランタイム</td><td>2026年2月</td><td>llama.cpp（CPU）とMLX（Apple Silicon GPU）の統合によるオンデバイス推論</td></tr>
+    <tr><td>基本グラフ可視化</td><td>2026年3月</td><td>WebGPUコンピュートシェーダーによるフォースディレクテッドグラフレイアウト、Canvas 2Dフォールバック</td></tr>
+    <tr><td>セキュリティレイヤー</td><td>2026年3月</td><td>ネットワークファイアウォール、コンテンツフィルタリング、権限システム、脅威対策パイプライン</td></tr>
+  </tbody></table>
+
+  <h3>アーキテクチャの判断</h3>
+  <ul>
+    <li><strong>ChromiumよりGecko</strong> — より寛容なライセンス（MPL 2.0）とFirefoxの既存のプライバシーインフラストラクチャのために選択</li>
+    <li><strong>カスタムDBよりSQLite</strong> — 実績があり、組み込み可能で、優れた全文検索（FTS5）と新しいベクトル検索機能を持つ</li>
+    <li><strong>ローカルファーストAI</strong> — デフォルトモデルとしてPhi-3 Mini（4ビット量子化）、能力とリソース要件のバランスを取る</li>
+    <li><strong>コアにRust、UIにTypeScript</strong> — Rustがブラウザエンジン統合、グラフエンジン、AIランタイムを担当、TypeScriptがUIレイヤーを駆動</li>
+  </ul>
+
+  <h2 id="versioning" class="content-section">バージョニングポリシー</h2>
+  <p>Quiraはプレ1.0段階で以下の規約によるセマンティックバージョニングを使用します:</p>
+  <ul>
+    <li><strong>0.x.0</strong> — マイナーバージョンアップにはPlugin APIとデータスキーマの破壊的変更が含まれる場合があります</li>
+    <li><strong>0.x.y</strong> — パッチリリースにはバグ修正とセキュリティパッチのみが含まれ、破壊的変更はありません</li>
+    <li><strong>アルファ</strong> — パブリックアルファリリースには<code>-alpha</code>サフィックスが付きます。アルファ間でデータスキーマが変更される場合があります（移行ツールが提供されます）</li>
+    <li><strong>ベータ</strong> — ベータリリースではPlugin APIとデータスキーマが安定化します。破壊的変更には1リリース前の非推奨通知が必要です</li>
+  </ul>
+  <Callout type="warning" title="アルファデータの移行">
+    <p>アルファ段階では、リリース間でContext Graphデータベーススキーマが変更される場合があります。Quiraは自動移行を試みますが、新しいアルファバージョンにアップグレードする前に重要なリサーチデータをエクスポートすることを推奨します。</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/ja/troubleshooting/', title: 'トラブルシューティング' }} next={{ href: '/docs/ja/getting-started/what-is-quira/', title: 'Quira とは？' }} />
+</DocsLayout>

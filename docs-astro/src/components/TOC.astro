@@ -1,0 +1,33 @@
+---
+import { t, type Lang } from '../i18n/translations';
+
+interface Props {
+  headings?: Array<{ id: string; text: string; depth: number }>;
+  lang?: Lang;
+}
+
+const { headings = [], lang = 'en' } = Astro.props;
+const translations = t(lang);
+---
+
+{headings.length > 0 && (
+  <aside class="right-toc" style="width:280px;flex-shrink:0;padding:2rem 1.5rem;background-color:#262624;opacity:0;transition:opacity 0.2s ease;">
+    <nav id="toc-nav" style="position:sticky;top:80px;max-height:calc(100vh - 100px);overflow-y:auto;">
+      <p style="font-size:11px;color:#6B6A64;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem;padding-left:16px;">{translations.onThisPage}</p>
+      <div style="position:relative;">
+        <div class="toc-track"></div>
+        <div class="toc-thumb" id="toc-thumb"></div>
+        {headings.map((heading, i) => (
+          <a
+            href={`#${heading.id}`}
+            class={`toc-link ${i === 0 ? 'active' : ''}`}
+            data-toc-index={i}
+            style={heading.depth === 3 ? 'padding-left:28px;' : ''}
+          >
+            {heading.text}
+          </a>
+        ))}
+      </div>
+    </nav>
+  </aside>
+)}

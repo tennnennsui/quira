@@ -1,0 +1,36 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'plugin-api', text: 'Plugin API', depth: 2 },
+  { id: 'registration', text: '登録とライフサイクル', depth: 2 },
+  { id: 'permissions-model', text: 'パーミッションモデル', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="Plugin API" description="Context Graph、Spaces、AI 機能と連携するプラグインで Quira を拡張しましょう。" section="API リファレンス" headings={headings}>
+  <h1 id="plugin-api" class="content-section">Plugin API</h1>
+  <p>Quira は、拡張機能が <a href="/docs/ja/core-concepts/context-graph/">Context Graph</a>、<a href="/docs/ja/core-concepts/context-spaces/">Spaces</a>、<a href="/docs/ja/core-concepts/local-ai/">AI 機能</a>と連携できる Plugin API を公開しています。プラグインは標準的な <a href="/docs/ja/api/webextension-api/">WebExtensions</a> であり、<code>quira.*</code> 名前空間を通じて追加の Quira 固有 API を利用できます。</p>
+  <h2 id="registration" class="content-section">登録とライフサイクル</h2>
+  <pre><code>{`{
+  "manifest_version": 3,
+  "name": "My Quira Plugin",
+  "version": "1.0.0",
+  "permissions": [
+    "quira.graph.read",
+    "quira.graph.write",
+    "quira.spaces.read"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}`}</code></pre>
+  <h2 id="permissions-model" class="content-section">パーミッションモデル</h2>
+  <table><thead><tr><th>パーミッション</th><th>アクセス</th></tr></thead><tbody>
+    <tr><td><code>quira.graph.read</code></td><td>Context Graph のノードとエッジを読み取り</td></tr>
+    <tr><td><code>quira.graph.write</code></td><td>ノード、エッジ、タグの作成/更新</td></tr>
+    <tr><td><code>quira.spaces.read</code></td><td>Space のメタデータとタブリストを読み取り</td></tr>
+    <tr><td><code>quira.spaces.write</code></td><td>Space の作成/変更とタブの移動</td></tr>
+    <tr><td><code>quira.ai.query</code></td><td>ローカル AI に NL クエリを送信</td></tr>
+  </tbody></table>
+  <PrevNext prev={{ href: '/docs/ja/contributing/rfc-process/', title: 'RFC プロセス' }} next={{ href: '/docs/ja/api/webextension-api/', title: 'WebExtension API' }} />
+</DocsLayout>

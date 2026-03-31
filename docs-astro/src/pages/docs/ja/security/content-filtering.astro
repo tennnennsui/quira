@@ -1,0 +1,55 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'content-filtering', text: 'コンテンツフィルタリング', depth: 2 },
+  { id: 'filter-engine', text: 'フィルタエンジン', depth: 2 },
+  { id: 'filter-lists', text: 'フィルタリスト', depth: 2 },
+  { id: 'script-sandboxing', text: 'スクリプトサンドボックス', depth: 2 },
+  { id: 'cosmetic-filtering', text: 'コスメティックフィルタリング', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="コンテンツフィルタリング" description="Quiraの広告・トラッカーブロッカー、フィルタエンジン、スクリプトサンドボックスの仕組み。" section="セキュリティ & プライバシー" headings={headings}>
+  <h1 id="content-filtering" class="content-section">コンテンツフィルタリング</h1>
+  <p>Quiraの組み込みコンテンツフィルタは、広告、トラッカー、マルウェアスクリプトをネットワークリクエストの発行前にブロックします。</p>
+
+  <h2 id="filter-engine" class="content-section">フィルタエンジン</h2>
+  <p>フィルタエンジンはRustで構築され、adblock-rust crateをフォークしています。Aho-Corasickマルチパターンマッチングを使用して、数万のフィルタルールをサブミリ秒のレイテンシで処理します。</p>
+  <ul>
+    <li><strong>ネットワークフィルタ</strong> — リクエストURL + リソースタイプに基づくブロック/リダイレクト</li>
+    <li><strong>例外ルール</strong> — サイト別のホワイトリスト</li>
+    <li><strong>リダイレクトルール</strong> — プライバシー配慮したスタブでリソースを差し替え</li>
+    <li><strong>$csp ルール</strong> — Content-Security-Policyの注入でインライン悪意スクリプトをブロック</li>
+  </ul>
+
+  <h2 id="filter-lists" class="content-section">フィルタリスト</h2>
+  <p>Quiraには事前に選択されたフィルタリストが同梱されており、<code>quira://settings/security/filters</code>でカスタムリストを追加できます：</p>
+  <table><thead><tr><th>リスト</th><th>カバー範囲</th><th>更新</th></tr></thead><tbody>
+    <tr><td>Quira Default</td><td>広告 + トラッカー（キュレーション済み）</td><td>毎日</td></tr>
+    <tr><td>EasyList</td><td>広告ブロックルール</td><td>毎日</td></tr>
+    <tr><td>EasyPrivacy</td><td>トラッキング保護ルール</td><td>毎日</td></tr>
+    <tr><td>Malware Domains</td><td>既知のマルウェアドメイン</td><td>毎時</td></tr>
+    <tr><td>Annoyances</td><td>Cookie同意バナー、ニュースレターポップアップ</td><td>毎週</td></tr>
+  </tbody></table>
+
+  <h2 id="script-sandboxing" class="content-section">スクリプトサンドボックス</h2>
+  <p>フィルタルールだけでは防げないスクリプトに対して、Quiraはサンドボックスモードを備えています。すべてのスクリプト実行イベントは<a href="/docs/ja/security/advanced-architecture/#cseb">Context Security Event Bus (CSEB)</a>が監視し、アンチフィンガープリンティングは<a href="/docs/ja/security/emergent-security/#agtr">Adaptive Graph Topology Randomization (AGTR)</a>技術でさらに強化されます：</p>
+  <ul>
+    <li>疑わしいスクリプトは隔離されたWorkerコンテキストで実行（オリジナルDOMへのアクセスなし）</li>
+    <li>Navigator、Screen、Performance APIはファジングされた値を返却</li>
+    <li>ページ離脱時にスクリプトコンテキストは完全に破棄</li>
+  </ul>
+  <Callout type="tip" title="パフォーマンスへの影響">
+    <p>フィルタエンジンはリクエスト毎に平均0.2msで処理します。マッチした場合、リクエストはネットワーク使用量を節約してドロップされるため、ほとんどのサイトでフィルタリングにより実質的にブラウジングが高速化します。</p>
+  </Callout>
+
+  <h2 id="cosmetic-filtering" class="content-section">コスメティックフィルタリング</h2>
+  <p>ネットワークフィルタリングに加え、Quiraはコスメティックフィルタリング（要素非表示）を適用します：</p>
+  <ul>
+    <li><strong>CSSインジェクション</strong> — 宣言的な<code>display: none !important</code>ルールで広告用プレースホルダーを非表示</li>
+    <li><strong>スクリプトレット</strong> — 共通トラッキングメソッドを無害にオーバーライドする小さなJSスニペット</li>
+    <li><strong>手続き的コスメティック</strong> — 標準CSSセレクタを回避する要素に対するhas()、xpath()ベースのルール</li>
+  </ul>
+  <PrevNext prev={{ href: '/docs/ja/security/privacy-architecture/', title: 'プライバシーアーキテクチャ' }} next={{ href: '/docs/ja/security/threat-protection/', title: '脅威対策' }} />
+</DocsLayout>

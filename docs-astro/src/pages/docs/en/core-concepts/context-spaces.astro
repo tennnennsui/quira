@@ -1,0 +1,44 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'context-spaces', text: 'Context Spaces', depth: 2 },
+  { id: 'space-bar-ui', text: 'Space Bar UI', depth: 2 },
+  { id: 'inbox-space-gtd-model', text: 'Inbox Space (GTD model)', depth: 2 },
+  { id: 'environment-color-theming', text: 'Environment color theming', depth: 2 },
+  { id: 'keyboard-shortcuts', text: 'Keyboard shortcuts and interaction', depth: 2 },
+  { id: 'automatic-tab-suspension', text: 'Automatic tab suspension', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Context Spaces" description="Organize tabs by research context with Quira's Context Spaces." section="Core Concepts" headings={headings}>
+  <h1 id="context-spaces" class="content-section">Context Spaces</h1>
+  <p>The <a href="/docs/en/core-concepts/context-graph/">Context Graph</a> captures your browsing structure. Context Spaces let you organize it. They replace traditional tab groups with context-aware workspaces. Each Space is a collection of tabs, notes, <a href="/docs/en/core-concepts/local-ai/">AI summaries</a>, and a partial view of the Context Graph  Eorganized by project or topic.</p>
+  <pre><code>Space = Tabs + Notes + AI Summaries + Context Graph subview</code></pre>
+  <h2 id="space-bar-ui" class="content-section">Space Bar UI</h2>
+  <p>The Space Bar sits above the tab strip, creating a clear visual hierarchy: Spaces &gt; Tabs. On Day 1, it starts at a compact 28px height with background blending to feel non-intrusive. After you create 2+ Spaces, it expands to 36px.</p>
+  <h2 id="inbox-space-gtd-model" class="content-section">Inbox Space (GTD model)</h2>
+  <p>All new pages open in the <strong>Inbox</strong> Space by default. The Inbox is an unsorted landing zone  Ethink of it as your browser's GTD inbox. You triage pages into project Spaces when you're ready. Pages with no access for 3 days visually fade (but are never deleted), and the AI may suggest: "This page might belong in [Space name]."</p>
+  <h2 id="environment-color-theming" class="content-section">Environment color theming</h2>
+  <p>Each Space has a color theme that tints the tab strip and toolbar background:</p>
+  <table><thead><tr><th>Color</th><th>Hex</th><th>Suggested Use</th></tr></thead><tbody>
+    <tr><td>Navy</td><td><code>#0D1B2A</code></td><td>Default / Inbox</td></tr>
+    <tr><td>Amber</td><td><code>#E8A838</code></td><td>Active project</td></tr>
+    <tr><td>Teal</td><td><code>#2A9D8F</code></td><td>Research</td></tr>
+    <tr><td>Rose</td><td><code>#E76F51</code></td><td>Urgent</td></tr>
+    <tr><td>Violet</td><td><code>#7B2CBF</code></td><td>Creative</td></tr>
+    <tr><td>Green</td><td><code>#52B788</code></td><td>Personal</td></tr>
+    <tr><td>Slate</td><td><code>#6C757D</code></td><td>Archive</td></tr>
+    <tr><td>Sky</td><td><code>#48CAE4</code></td><td>Learning</td></tr>
+  </tbody></table>
+  <h2 id="keyboard-shortcuts" class="content-section">Keyboard shortcuts and interaction</h2>
+  <table><thead><tr><th>Action</th><th>Method</th></tr></thead><tbody>
+    <tr><td>Switch Space</td><td><code>Cmd+1</code> through <code>Cmd+9</code></td></tr>
+    <tr><td>Space Switcher</td><td><code>Cmd+Shift+Space</code></td></tr>
+    <tr><td>Move tab between Spaces</td><td>Drag-and-drop from tab strip to Space Bar</td></tr>
+    <tr><td>Create new Space</td><td><code>+</code> button on Space Bar or via Command Palette</td></tr>
+    <tr><td>Rename / Recolor Space</td><td>Right-click context menu</td></tr>
+  </tbody></table>
+  <h2 id="automatic-tab-suspension" class="content-section">Automatic tab suspension</h2>
+  <p>Tabs inactive for <strong>30 minutes</strong> are automatically suspended, freeing memory. Suspended tabs show a dimmed favicon indicator and restore instantly when clicked. The suspension timeout is user-configurable in settings.</p>
+  <PrevNext prev={{ href: '/docs/en/core-concepts/context-graph/', title: 'Context Graph' }} next={{ href: '/docs/en/core-concepts/local-ai/', title: 'Local AI' }} />
+</DocsLayout>

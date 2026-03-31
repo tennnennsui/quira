@@ -1,0 +1,27 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'gecko-engine', text: 'Gecko Engine', depth: 2 },
+  { id: 'why-gecko', text: 'なぜ Chromium ではなく Gecko なのか？', depth: 2 },
+  { id: 'servo-migration', text: '将来の Servo 移行パス', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="Gecko Engine" description="Quira が Chromium ではなく Gecko フォークを採用する理由と、将来の Servo 移行パス。" section="アーキテクチャ" headings={headings}>
+  <h1 id="gecko-engine" class="content-section">Gecko Engine</h1>
+  <p><a href="/docs/ja/architecture/technical-overview/">技術概要</a>で述べたように、Quira のすべてのレイヤーはレンダリングエンジンの上に位置しています。Quira は Chromium ではなく、Gecko（Mozilla のレンダリングエンジン）のソフトフォークを使用しています。</p>
+  <h2 id="why-gecko" class="content-section">なぜ Chromium ではなく Gecko なのか？</h2>
+  <ul>
+    <li><strong>エンジンの独立性</strong> — Chromium は 80% 以上の市場シェアを持っています。Gecko ベースのブラウザは Web エンジンの多様性に貢献します。</li>
+    <li><strong>WebExtensions MV2 + MV3</strong> — MV2 を完全に廃止した Chrome とは異なり、Gecko は両方のマニフェストバージョンを引き続きサポートしています。</li>
+    <li><strong>実証済みのフォークパス</strong> — Zen Browser と Floorp が、Gecko ソフトフォークで3〜6ヶ月以内にプロダクション品質のブラウザを出荷できることを実証しています。</li>
+    <li><strong>Servo コンポーネントの統合済み</strong> — Firefox には Servo 由来の Stylo（CSS エンジン）と WebRender（GPU レンダリング）が既に含まれています。</li>
+  </ul>
+  <h2 id="servo-migration" class="content-section">将来の Servo 移行パス</h2>
+  <table><thead><tr><th>フェーズ</th><th>エンジン</th><th>根拠</th></tr></thead><tbody>
+    <tr><td>Phase 1（0〜12ヶ月）</td><td>Gecko フォーク</td><td>出荷可能、完全な WebExtensions サポート</td></tr>
+    <tr><td>Phase 2（12〜24ヶ月）</td><td>Gecko + Servo サブビュー</td><td>AI 生成コンテンツビュー用の実験的 Servo</td></tr>
+    <tr><td>Phase 3（24ヶ月以降）</td><td>移行判断</td><td>WPT パス率が 90% を超えた場合、完全な Servo 移行</td></tr>
+  </tbody></table>
+  <PrevNext prev={{ href: '/docs/ja/architecture/technical-overview/', title: '技術概要' }} next={{ href: '/docs/ja/architecture/storage/', title: 'ストレージ (SQLite)' }} />
+</DocsLayout>

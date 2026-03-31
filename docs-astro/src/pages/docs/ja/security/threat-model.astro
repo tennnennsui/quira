@@ -1,0 +1,93 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'threat-model', text: '形式的脅威モデル', depth: 2 },
+  { id: 'knowledge-graph-definition', text: '知識グラフの定義', depth: 2 },
+  { id: 'compositional-sensitivity', text: '構成的機密性', depth: 3 },
+  { id: 'adversary-model', text: '敵対者モデル', depth: 2 },
+  { id: 'attack-surfaces', text: '攻撃面', depth: 2 },
+  { id: 'security-properties', text: 'セキュリティ特性', depth: 2 },
+  { id: 'defense-mapping', text: '攻撃-防御マッピング', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="形式的脅威モデル" description="Quira のセキュリティアーキテクチャ全体を支える敵対者・資産・安全性特性の形式的定義。" section="セキュリティ & プライバシー" headings={headings}>
+  <h1 id="threat-model" class="content-section">形式的脅威モデル</h1>
+  <p>Quira の全防御メカニズム — <a href="/docs/ja/security/permission-system/">ケーパビリティトークン</a>から<a href="/docs/ja/security/emergent-security/">創発的セキュリティ構造</a>まで — は、この形式的脅威モデルの上に構築されている。<strong>何を守るか</strong>、<strong>誰から守るか</strong>、<strong>どのような安全性を保証するか</strong>を定義する。</p>
+  <Callout type="info" title="研究ドキュメント">
+    <p>証明・定量的プライバシー分析を含む完全な形式的定義は <code>docs/security/threat-model.md</code>（約400行）を参照。本ページはWebアクセス可能な要約版。</p>
+  </Callout>
+
+  <h2 id="knowledge-graph-definition" class="content-section">知識グラフの定義</h2>
+  <p>Quira の Context Graph は5つ組として形式的に定義される。</p>
+  <p style="font-family:monospace;font-size:15px;text-align:center;padding:12px 0;">G = (V, E, &Sigma;, &Phi;, &Tau;)</p>
+  <table><thead><tr><th>記号</th><th>定義</th></tr></thead><tbody>
+    <tr><td><strong>V</strong></td><td>ノード集合 — 各ノードは1ページ訪問に対応</td></tr>
+    <tr><td><strong>E &sube; V &times; V &times; L</strong></td><td>ラベル付き有向エッジ（navigation, ai_inferred, user_created）</td></tr>
+    <tr><td><strong>&Sigma;: V &rarr; S</strong></td><td>各ノードの構造化属性（title, url, summary, entities, tags, notes, space_id）</td></tr>
+    <tr><td><strong>&Phi;: V &rarr; R<sup>384</sup></strong></td><td>各ノードの埋め込みベクトル（384次元）</td></tr>
+    <tr><td><strong>&Tau;: V &rarr; T</strong></td><td>時間メタデータ（訪問タイムスタンプ、滞在時間、訪問回数）</td></tr>
+  </tbody></table>
+
+  <h3 id="compositional-sensitivity" class="content-section">構成的機密性</h3>
+  <p>個々のデータポイントは低機密。しかし集約されたグラフは<strong>超加算的</strong> — 全体の機密度は個々の合計を大幅に超える。</p>
+  <table><thead><tr><th>資産</th><th>機密度</th><th>理由</th></tr></thead><tbody>
+    <tr><td>個別ノード要約</td><td>低</td><td>公開Webコンテンツ</td></tr>
+    <tr><td>エンティティ集合</td><td>中</td><td>部分的な関心プロファイル</td></tr>
+    <tr><td>ナビゲーションエッジ</td><td>高</td><td>完全な研究経路 = 思考の流れ</td></tr>
+    <tr><td>埋め込みベクトル</td><td>高</td><td>コンテンツ逆変換攻撃が可能</td></tr>
+    <tr><td>時間メタデータ</td><td>高</td><td>完全な行動タイムライン</td></tr>
+    <tr><td>グラフトポロジー</td><td>極高</td><td>個人を一意に識別可能（認知フィンガープリント）</td></tr>
+    <tr><td>グラフ全体 G</td><td>極高</td><td>個人知識の完全な表現</td></tr>
+  </tbody></table>
+
+  <h2 id="adversary-model" class="content-section">敵対者モデル</h2>
+  <p>5段階の敵対者クラス。各クラスは三つ組（能力, 目標, 事前知識）で定義。上位クラスは下位の能力を包含する。</p>
+  <table><thead><tr><th>クラス</th><th>名称</th><th>能力</th><th>例</th></tr></thead><tbody>
+    <tr><td><strong>A<sub>1</sub></strong></td><td>ネットワーク観察者</td><td>受動的トラフィック観察（DNS, TLS SNI, パケットタイミング）。暗号化ペイロードは読取不可。</td><td>ISP、公衆WiFi、国家監視</td></tr>
+    <tr><td><strong>A<sub>2</sub></strong></td><td>悪意あるWebコンテンツ</td><td>レンダラプロセス内で任意のHTML/CSS/JS実行。プロンプトインジェクション、エンティティポイズニング、埋め込み操作、認知フィンガープリント採取。</td><td>フィッシング、広告ネットワーク、情報操作</td></tr>
+    <tr><td><strong>A<sub>3</sub></strong></td><td>悪意ある拡張機能</td><td>宣言した権限内でWebExtensions APIアクセス。更新でコード注入可能。ネットワーク送信可能。</td><td>サプライチェーン攻撃、買収後の悪意注入</td></tr>
+    <tr><td><strong>A<sub>4</sub></strong></td><td>OS権限をもつ攻撃者</td><td>ファイルシステム読取（SQLite直接アクセス）、プロセスメモリダンプ、DMA/コールドブート攻撃。</td><td>マルウェア、物理窃取、フォレンジック</td></tr>
+    <tr><td><strong>A<sub>5</sub></strong></td><td>ブラウザベンダー自身</td><td>コード変更、テレメトリ追加、更新配布。OSS+再現可能ビルドで軽減。</td><td>買収、経営変更、法的強制</td></tr>
+  </tbody></table>
+
+  <Callout type="warning" title="AI固有の攻撃ベクトル (A2)">
+    <p>悪意あるWebコンテンツはQuiraのAIパイプラインを標的にできる: 要約汚染のプロンプトインジェクション (A2.1)、不可視テキストによるエンティティポイズニング (A2.2)、類似検索汚染のための埋め込み空間操作 (A2.3)、複数ページにわたるクラスタ重心シフト (A2.5)。詳細は<a href="/docs/ja/security/threat-protection/">脅威対策</a>を参照。</p>
+  </Callout>
+
+  <h2 id="attack-surfaces" class="content-section">攻撃面</h2>
+  <table><thead><tr><th>ID</th><th>攻撃面</th><th>敵対者</th><th>防御</th></tr></thead><tbody>
+    <tr><td>S1</td><td>ネットワーク層（DNS, TLS）</td><td>A<sub>1</sub></td><td><a href="/docs/ja/security/network-firewall/">ネットワークファイアウォール</a></td></tr>
+    <tr><td>S2</td><td>Webコンテンツ → AIパイプライン</td><td>A<sub>2</sub></td><td><a href="/docs/ja/security/threat-protection/">脅威対策</a>（4層防御）</td></tr>
+    <tr><td>S3</td><td>拡張機能 → Context Graph API</td><td>A<sub>3</sub></td><td><a href="/docs/ja/security/permission-system/">パーミッションシステム</a>（ケーパビリティトークン）</td></tr>
+    <tr><td>S4</td><td>ローカルファイルシステム（SQLite DB）</td><td>A<sub>4</sub></td><td><a href="/docs/ja/security/privacy-architecture/">プライバシーアーキテクチャ</a>（SQLCipher + TEE）</td></tr>
+    <tr><td>S5</td><td>埋め込みベクトル</td><td>A<sub>2</sub>-A<sub>4</sub></td><td>独立暗号化、TEE推論</td></tr>
+    <tr><td>S6</td><td>IPCチャネル（Gecko IPDL）</td><td>A<sub>2</sub></td><td>全IPC境界でのケーパビリティチェック</td></tr>
+    <tr><td>S7</td><td>グラフトポロジーメタデータ</td><td>A<sub>1</sub>-A<sub>4</sub></td><td><a href="/docs/ja/security/emergent-security/">AGTR</a> + ファントム知識難読化</td></tr>
+    <tr><td>S8</td><td>時間メタデータパターン</td><td>A<sub>1</sub>-A<sub>3</sub></td><td>バッチ処理、時間ノイズ注入</td></tr>
+    <tr><td>S9</td><td>更新/ビルドパイプライン</td><td>A<sub>5</sub></td><td>OSS + 再現可能ビルド + コード署名</td></tr>
+    <tr><td>S10</td><td>推論残留物（ノード削除後）</td><td>A<sub>3</sub>-A<sub>4</sub></td><td><a href="/docs/ja/security/emergent-security/">IRD + RSIP + CAV</a></td></tr>
+  </tbody></table>
+
+  <h2 id="security-properties" class="content-section">セキュリティ特性</h2>
+  <table><thead><tr><th>特性</th><th>定義</th><th>検証方法</th></tr></thead><tbody>
+    <tr><td><strong>グラフ機密性</strong></td><td>敵対者は認可されたケーパビリティトークンの範囲を超えてノード・エッジ・属性にアクセスできない。</td><td>形式的検証（CGAGのTLA+モデル）</td></tr>
+    <tr><td><strong>グラフ完全性</strong></td><td>グラフ構造の不正な変更が不可能。AIパイプラインはバリデーション層を通過しないと書込不可。</td><td>ハッシュチェーン（<a href="/docs/ja/security/emergent-security/">TCV</a>）</td></tr>
+    <tr><td><strong>削除完全性</strong></td><td>ユーザーがデータ削除時、全ての直接的・派生的アーティファクト（埋め込み、要約、推論残留物）が消去される。</td><td>暗号学的検証（<a href="/docs/ja/security/emergent-security/">CAV</a>）</td></tr>
+    <tr><td><strong>フロー分離</strong></td><td>ユーザーの明示的操作なしにセキュリティコンテキスト間でデータが流れない。IFCラベルは単調。</td><td>ラベル伝播監査</td></tr>
+    <tr><td><strong>時間的減衰</strong></td><td>パーミッションとセッションは期限切れする。永続的な付与は存在しない。</td><td>ケーパビリティトークンTTL強制</td></tr>
+  </tbody></table>
+
+  <h2 id="defense-mapping" class="content-section">攻撃-防御マッピング</h2>
+  <p>各敵対者クラスは特定の防御レイヤーにマッピングされる。</p>
+  <table><thead><tr><th>敵対者</th><th>主要防御</th><th>先進防御</th></tr></thead><tbody>
+    <tr><td>A<sub>1</sub>（ネットワーク）</td><td>DoH/DoT, ECH, TLS 1.3, <a href="/docs/ja/security/network-firewall/">ネットワークFW</a></td><td>PQC (ML-KEM hybrid)、バッチタイミング</td></tr>
+    <tr><td>A<sub>2</sub>（Webコンテンツ）</td><td><a href="/docs/ja/security/content-filtering/">コンテンツフィルタリング</a>、<a href="/docs/ja/security/threat-protection/">AI免疫システム</a></td><td><a href="/docs/ja/security/emergent-security/">KSCI</a>、敵対的ML、逆サンドボックス</td></tr>
+    <tr><td>A<sub>3</sub>（拡張機能）</td><td><a href="/docs/ja/security/permission-system/">ケーパビリティトークン、Context TCC</a></td><td><a href="/docs/ja/security/advanced-architecture/">CSEB</a>異常検知、行動監視</td></tr>
+    <tr><td>A<sub>4</sub>（OS権限）</td><td><a href="/docs/ja/security/privacy-architecture/">SQLCipher、キーチェーン、TEE</a></td><td><a href="/docs/ja/security/advanced-architecture/">SKV</a>、Context Lockdown、Dead Man's Switch</td></tr>
+    <tr><td>A<sub>5</sub>（ベンダー）</td><td>OSS、再現可能ビルド、オプトインテレメトリ</td><td>差分プライバシー（&epsilon;公開）、<a href="/docs/ja/security/emergent-security/">CAV</a></td></tr>
+  </tbody></table>
+
+  <PrevNext prev={{ href: '/docs/ja/security/overview/', title: 'セキュリティ概要' }} next={{ href: '/docs/ja/security/network-firewall/', title: 'ネットワークファイアウォール' }} />
+</DocsLayout>

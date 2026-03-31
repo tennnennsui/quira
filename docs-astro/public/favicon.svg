@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" fill="#080B14"/>
+
+  <!-- Q ring: arc from gap_end (65°) clockwise 325° to gap_start (30°) -->
+  <path
+    d="M318.5,390.1 A148,148 0 1,1 384.2,330.0"
+    fill="none"
+    stroke="#FFFFFF"
+    stroke-width="52"
+    stroke-linecap="round"
+  />
+  <!-- Q tail -->
+  <line
+    x1="384.2" y1="330.0"
+    x2="427.5" y2="355.0"
+    stroke="#FFFFFF"
+    stroke-width="52"
+    stroke-linecap="round"
+  />
+
+  <!-- Center dot -->
+  <circle cx="256" cy="256" r="35" fill="#FF8830"/>
+</svg>

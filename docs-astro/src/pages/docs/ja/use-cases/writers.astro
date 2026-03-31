@@ -1,0 +1,71 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'for-writers', text: 'ライター & コンテンツクリエイター向け', depth: 2 },
+  { id: 'research-pipeline', text: 'リサーチから記事へのパイプライン', depth: 2 },
+  { id: 'source-organization', text: 'ソース素材の整理', depth: 2 },
+  { id: 'fact-checking', text: 'ファクトチェックワークフロー', depth: 2 },
+  { id: 'example-blog', text: '実例: 技術ブログ記事の執筆', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="ライター & コンテンツクリエイター向け" description="ライターやコンテンツクリエイターがQuiraを使ってリサーチを整理し、ソースを追跡し、執筆プロセスを効率化する方法。" section="ユースケース" headings={headings}>
+  <h1 id="for-writers" class="content-section">ライター & コンテンツクリエイター向け</h1>
+  <p>よくリサーチされたコンテンツを書くには、多くのソースから情報を収集し、一貫した構造に整理し、すべての主張をその出典まで追跡できる必要があります。Quiraはブラウザを、情報収集プロセス全体をキャプチャするリサーチワークベンチに変えます。</p>
+
+  <h2 id="research-pipeline" class="content-section">リサーチから記事へのパイプライン</h2>
+  <p>ほとんどの執筆プロジェクトは、広くリサーチし、絞り込み、アウトラインを作り、下書きし、検証するというパターンに従います。Quiraは各段階をサポートします:</p>
+  <table><thead><tr><th>段階</th><th>Quiraの活用</th></tr></thead><tbody>
+    <tr><td>広域リサーチ</td><td>自由にブラウジング — Quiraが<a href="/docs/ja/core-concepts/context-graph/">Context Graph</a>にすべてをキャプチャ</td></tr>
+    <tr><td>絞り込み</td><td><a href="/docs/ja/features/graph-visualization/">グラフビジュアライゼーション</a>で最も接続の多いクラスタを特定 — これが主要テーマ</td></tr>
+    <tr><td>アウトライン作成</td><td>AI生成のトピッククラスタが自然に記事のセクションにマッピング</td></tr>
+    <tr><td>下書き</td><td>特定の事実をグラフにクエリ:「Xについてどんな統計を見つけた？」</td></tr>
+    <tr><td>検証</td><td>すべての主張をワンクリックでソースページまで追跡</td></tr>
+  </tbody></table>
+
+  <h2 id="source-organization" class="content-section">ソース素材の整理</h2>
+  <p>ライターはリサーチ中に数十のタブを管理しがちで、どのソースが何を言っていたか見失うことがあります。Quiraはこれをいくつかの方法で解決します:</p>
+  <ul>
+    <li><strong>自動カテゴリ分け</strong> — ローカルAIがソースをトピック別にグループ化し、「統計」ソース、「専門家の引用」、「反論」を別々のクラスタで確認できます</li>
+    <li><strong>ソースメタデータ</strong> — Context Graphの各ノードにはページタイトル、URL、訪問タイムスタンプ、AI生成サマリーが保存されます</li>
+    <li><strong>エクスポート可能な参考文献</strong> — リサーチグラフをリンクとサマリー付きのMarkdownファイルとして<a href="/docs/ja/features/export-import/">エクスポート</a>し、参考文献セクションとして使用できます</li>
+    <li><strong>クロスリファレンス検出</strong> — 複数のソースが同じ研究や主張を参照している場合、グラフがこれらの収束点を示し、一次情報源の特定を支援します</li>
+  </ul>
+  <Callout type="tip" title="記事ごとに1つのSpace">
+    <p>各記事やコンテンツプロジェクトごとに専用の<a href="/docs/ja/core-concepts/context-spaces/">Context Space</a>を作成しましょう。執筆が完了すると、Spaceはリサーチトレイルの恒久的なアーカイブとなり、後で記事の更新やファクトチェックが容易になります。</p>
+  </Callout>
+
+  <h2 id="fact-checking" class="content-section">ファクトチェックワークフロー</h2>
+  <p>Quiraはリサーチ全体を通じて主張をソースにリンクすることで、ファクトチェックを高速化します:</p>
+  <ol>
+    <li>下書き内の検証が必要な<strong>主張を特定</strong></li>
+    <li><strong>Context Graphにクエリ</strong> — 「[特定の主張]についてどこで読んだ？」</li>
+    <li><strong>Quiraが取得</strong> — 元のソースページと、主張を確認または反論する関連ページ</li>
+    <li><strong>チェーンをたどる</strong> — ソース自体が別の研究を引用している場合、グラフがその接続も表示</li>
+  </ol>
+  <p>このワークフローにより、事実を覚えているが元のソースを見つけられないという一般的な問題が解消されます。</p>
+
+  <h2 id="example-blog" class="content-section">実例: 技術ブログ記事の執筆</h2>
+  <p>「本番環境のWebAssembly」についてブログ記事を作成するテクニカルライターは、Quiraを次のように使用できます:</p>
+  <ol>
+    <li><strong>Context Spaceを作成</strong> — 「Wasmブログ記事」と名付ける</li>
+    <li><strong>リサーチフェーズ</strong>（2-3時間）:
+      <ul>
+        <li>Figma、Shopify、CloudflareのWasm使用ケーススタディをブラウジング</li>
+        <li>WebAssembly仕様とMDNドキュメントを読む</li>
+        <li>ブログ記事やGitHubリポジトリのベンチマーク比較をレビュー</li>
+        <li>最近のカンファレンストークとスライドデッキを確認</li>
+      </ul>
+    </li>
+    <li><strong>Quiraがキャプチャ</strong> — 31ページを自動的にクラスタリング:「パフォーマンスベンチマーク」「実世界のケーススタディ」「ツールチェーン」「制限事項」</li>
+    <li><strong>クラスタからアウトライン</strong> — 各クラスタがブログ記事のセクションに</li>
+    <li><strong>参照付きで執筆</strong> — 下書き中に「Figmaのロード時間の改善はどれくらいだった？」とクエリし、Quiraが統計のあるブログ記事を返す</li>
+    <li><strong>ファクトチェック</strong> — 公開前に、各主張をグラフを通じて一次情報源まで追跡して検証</li>
+    <li><strong>ソースのエクスポート</strong> — 最も重要なソースへのリンク付き「参考文献」セクションを生成</li>
+  </ol>
+  <Callout type="note" title="コンテンツはローカルに保存">
+    <p>リサーチグラフ、下書き、ソース素材はすべてデバイス上に保存されます。Quiraはブラウジングデータを外部サーバーに送信しないため、公開前の情報や機密情報を含むリサーチも安全に行えます。</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/ja/use-cases/researchers/', title: '研究者向け' }} next={{ href: '/docs/ja/troubleshooting/', title: 'トラブルシューティング' }} />
+</DocsLayout>

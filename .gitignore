@@ -1,0 +1,48 @@
+# Build
+/target/
+/dist/
+/build/
+
+# Dependencies
+/node_modules/
+/.cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*
+
+# Logs
+*.log
+
+# LLM Models (large files)
+/models/
+*.gguf
+
+# Internal planning
+tasks/
+references/
+grants/
+.claudeignore
+*.bin
+
+# Grants (internal)
+/grants/
+docs-vitepress/node_modules/
+docs-vitepress/.vitepress/dist/
+docs-vitepress/.vitepress/cache/
+docs-astro/node_modules/
+docs-astro/dist/
+docs-astro/.astro/
+docs-astro/.dev.vars
+docs-astro/.wrangler/

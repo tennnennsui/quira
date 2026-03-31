@@ -1,0 +1,21 @@
+---
+interface Props {
+  prev?: { href: string; title: string };
+  next?: { href: string; title: string };
+}
+
+const { prev, next } = Astro.props;
+---
+
+<div style="display:flex;justify-content:space-between;margin-top:3rem;padding-top:1.5rem;border-top:1px solid rgba(222,220,209,0.15);">
+  {prev ? (
+    <a href={prev.href} class="prev-link" style="font-size:14px;color:#C2C0B6;text-decoration:none;">
+      &larr; Previous: {prev.title}
+    </a>
+  ) : <div />}
+  {next ? (
+    <a href={next.href} class="next-link" style="font-size:14px;color:#E8A838;text-decoration:none;">
+      Next: {next.title} &rarr;
+    </a>
+  ) : <div />}
+</div>

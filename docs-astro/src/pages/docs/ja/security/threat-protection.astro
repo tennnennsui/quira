@@ -1,0 +1,86 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'threat-protection', text: '脅威対策', depth: 2 },
+  { id: 'ai-immune-system', text: 'AI免疫システム', depth: 2 },
+  { id: 'adversarial-ml-defense', text: '敵対的ML防御', depth: 2 },
+  { id: 'ai-pipeline-defense', text: 'AIパイプライン4層防御', depth: 3 },
+  { id: 'living-security', text: 'リビングセキュリティ', depth: 2 },
+  { id: 'phishing-detection', text: 'フィッシング検知', depth: 2 },
+  { id: 'malware-blocking', text: 'マルウェアURLブロック', depth: 2 },
+  { id: 'certificate-validation', text: '証明書バリデーション', depth: 2 },
+  { id: 'download-scanning', text: 'ダウンロードスキャン', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="脅威対策" description="AI免疫システム、敵対的ML防御、リビングセキュリティ、リアルタイム脅威検知。" section="セキュリティ & プライバシー" headings={headings}>
+  <h1 id="threat-protection" class="content-section">脅威対策</h1>
+  <p>Quiraの脅威対策は従来のブロックリストやヒューリスティクスを超えます。ブラウザの行動をベースライニングしリアルタイムで異常を検知する<strong>AI免疫システム</strong>と、Webコンテンツによるブラウザ自身のAI操作を防ぐ<strong>敵対的ML防御</strong>を導入します。</p>
+
+  <h2 id="ai-immune-system" class="content-section">AI免疫システム</h2>
+  <p>生物の免疫システムにインスパイアされた、QuiraのAI防御レイヤーはブラウザの挙動を継続的に監視し、ブロックリストにない新種のゼロデイ攻撃も自律的に検知します。AI免疫システムの全セキュリティイベントは<a href="/docs/ja/security/advanced-architecture/#cseb">Context Security Event Bus (CSEB)</a>にフィードされ、プログラマブルなルール評価とフォレンジック監査が行われます。</p>
+  <table><thead><tr><th>コンポーネント</th><th>機能</th><th>例</th></tr></thead><tbody>
+    <tr><td>行動ベースライニング</td><td>リソース使用、ネットワークパターン、グラフアクセスにおける各ユーザーの正常パターンを学習</td><td>侵害された拡張機能が突然通常の100倍のグラフデータにアクセスすることを検知</td></tr>
+    <tr><td>拡張機能モニタリング</td><td>宣言されたCapabilityに対する拡張機能の挙動を継続プロファイリング</td><td>アローリスト外のドメインへのネットワークアクセスを要求する拡張機能をフラグ</td></tr>
+    <tr><td>異常スコアリング</td><td>アクティブなプロセス、タブ、拡張機能にリアルタイムの脅威スコアを割り当て</td><td>JavaScriptが高速でクリップボード読み取りを行うタブを隔離</td></tr>
+    <tr><td>自己修復</td><td>侵害されたCapabilityトークンを自動失効し、影響を受けたSpaceを隔離</td><td>拡張機能の脅威スコアがしきい値を超えた場合、トークンが失効され拡張機能が一時停止</td></tr>
+  </tbody></table>
+  <Callout type="info" title="すべての分析はローカル">
+    <p>AI免疫システムは完全にデバイス上で実行されます。行動モデルはローカルであなたのパターンから学習し、デバイスから出ることはありません。閲覧行動が外部サービスに送信されることはありません。</p>
+  </Callout>
+
+  <h2 id="adversarial-ml-defense" class="content-section">敵対的ML防御</h2>
+  <p>QuiraのAIはContext Graphを構築するためにWebコンテンツを処理します ― つまりWebページがAIを操作しようとする可能性があります。これはブラウザ固有のプロンプトインジェクションであり、Quiraは専用の対策で防御します。</p>
+  <ul>
+    <li><strong>不可視テキスト除去</strong> ― AI要約を汚染するために設計された隠しテキスト（CSS非表示、ゼロ幅文字、白地に白）を検知し除去</li>
+    <li><strong>Unicode正規化</strong> ― ホモグラフベースのエンティティ混同を防ぐために、AI処理前にすべてのテキストを正規化</li>
+    <li><strong>エンティティ検証</strong> ― 抽出されたエンティティを既存のContext Graphと照合し、信じがたい注入を検知</li>
+    <li><strong>埋め込み異常検知</strong> ― ページの可視コンテンツと比較して統計的外れ値となる埋め込みベクトルをフラグ</li>
+  </ul>
+
+  <h3 id="ai-pipeline-defense" class="content-section">AIパイプライン4層防御</h3>
+  <p>QuiraのAIパイプラインに入るすべてのWebコンテンツは4つの独立した防御レイヤーを通過します:</p>
+  <table><thead><tr><th>レイヤー</th><th>機能</th><th>検知対象</th></tr></thead><tbody>
+    <tr><td>L1 ― コンテンツサニタイゼーション</td><td>隠しテキスト除去、Unicode正規化、注入された命令の除去</td><td>プロンプトインジェクション、不可視SEOスパム、敵対的テキスト</td></tr>
+    <tr><td>L2 ― 権限フレーミング</td><td>AIが処理する前にすべてのWebコンテンツを明示的な「信頼できないソース」としてフレーミング</td><td>システム命令を偽装しようとするコンテンツ</td></tr>
+    <tr><td>L3 ― 出力スキーマ検証</td><td>AI出力を厳格なスキーマで検証 ― 構造化データのみ受け入れ</td><td>フリーテキスト操作、幻覚エンティティ、アクション注入</td></tr>
+    <tr><td>L4 ― Capability分離</td><td>AI推論プロセスはCapabilityトークンを持たない ― グラフを直接読み書き不能</td><td>AIが完全に侵害されてもデータ流出不能</td></tr>
+  </tbody></table>
+
+  <h2 id="living-security" class="content-section">リビングセキュリティ</h2>
+  <p>Quiraにおけるセキュリティは静的な設定ではなく、継続的に適応するシステムです。リビングセキュリティにより<strong>セキュリティヘルススコア</strong>を導入します。</p>
+  <ul>
+    <li><strong>セキュリティヘルススコア</strong> ― ツールバーに表示されるリアルタイムの複合スコア (0-100)。現在のセキュリティ態勢を反映: 拡張機能リスク、パーミッション膨張、ブロックリスト更新状況など</li>
+    <li><strong>適応的推奨</strong> ― スコアが低下すると、Quiraは具体的なアクションを提案: 未使用パーミッションの取り消し、ブロックリスト更新、疑わしい拡張機能の除去</li>
+    <li><strong>脅威メモリ</strong> ― AI免疫システムは過去の脅威パターンを記憶し、元の脅威シグネチャが変化した後も変種を認識可能</li>
+  </ul>
+
+  <h2 id="phishing-detection" class="content-section">フィッシング検知</h2>
+  <p>Quiraはマルチシグナルアプローチでフィッシングページを検知します:</p>
+  <ul>
+    <li><strong>URLヒューリスティクス</strong> ― ホモグラフ攻撃、過度なサブドメイン、既知のフィッシングURL構造を検知</li>
+    <li><strong>ローカルブロックリスト</strong> ― 定期更新される確認済みフィッシングドメインリスト、完全にデバイス上でチェック</li>
+    <li><strong>視覚的類似性</strong> ― デバイス上MLモデルがページレイアウトを既知のログインページと比較し、なりすましをフラグ</li>
+    <li><strong>証明書年齢</strong> ― 発行から7日未満の証明書を持つドメインでログインページにアクセスすると警告</li>
+  </ul>
+  <Callout type="warning" title="データはデバイスから出ません">
+    <p>Chrome Safe BrowsingやFirefox Phishing Protectionとは異なり、Quiraのフィッシング検知は完全にデバイス上で実行されます。URLやページコンテンツが外部サーバーに送信されることはありません。</p>
+  </Callout>
+
+  <h2 id="malware-blocking" class="content-section">マルウェアURLブロック</h2>
+  <p>既知のマルウェア配布URLは差分同期で更新されるローカルブロックリストを使用してネットワーク層でブロックされます。ソースにはURLhaus、PhishTank、Quira独自の脅威インテリジェンスフィードが含まれます。</p>
+
+  <h2 id="certificate-validation" class="content-section">証明書バリデーション</h2>
+  <table><thead><tr><th>チェック</th><th>説明</th></tr></thead><tbody>
+    <tr><td>CTログ検証</td><td>少なくとも2つのCertificate Transparencyログに証明書が含まれていることを検証</td></tr>
+    <tr><td>TOFUピンニング</td><td>Trust-on-first-use: サイトの証明書発行者が予期せず変更された場合に警告</td></tr>
+    <tr><td>CAレピュテーション</td><td>誤発行の履歴があるCAからの証明書をフラグ</td></tr>
+    <tr><td>失効チェック</td><td>OCSPステープリング優先; ローカルキャッシュ付きCRLフォールバック</td></tr>
+  </tbody></table>
+
+  <h2 id="download-scanning" class="content-section">ダウンロードスキャン</h2>
+  <p>ダウンロードされたファイルは保存前に既知のマルウェアハッシュに対してチェックされます。実行可能ファイルはデジタル署名ステータスとソースドメインレピュテーションを表示する追加の警告ダイアログをトリガーします。</p>
+
+  <PrevNext prev={{ href: '/docs/ja/security/content-filtering/', title: 'コンテンツフィルタリング' }} next={{ href: '/docs/ja/security/permission-system/', title: 'パーミッションシステム' }} />
+</DocsLayout>

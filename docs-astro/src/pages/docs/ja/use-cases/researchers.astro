@@ -1,0 +1,72 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'for-researchers', text: '研究者向け', depth: 2 },
+  { id: 'literature-review', text: '文献レビューワークフロー', depth: 2 },
+  { id: 'paper-trail', text: '論文トレイルの追跡', depth: 2 },
+  { id: 'cross-discipline', text: '学際的なつながりの発見', depth: 2 },
+  { id: 'citation-network', text: '引用ネットワークの構築', depth: 2 },
+  { id: 'example-crispr', text: '実例: CRISPR遺伝子治療論文のレビュー', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="研究者向け" description="学術・産業研究者がQuiraを使って文献レビュー管理、引用追跡、学際的な発見を行う方法。" section="ユースケース" headings={headings}>
+  <h1 id="for-researchers" class="content-section">研究者向け</h1>
+  <p>研究とは本質的に、ソース間のアイデアをつなげることです。Quiraの<a href="/docs/ja/core-concepts/context-graph/">Context Graph</a>は、研究者が実際に考える方法 — 引用チェーンをたどり、論文間の方法論を比較し、数十のソースにまたがるメンタルモデルを構築すること — を反映しています。</p>
+
+  <h2 id="literature-review" class="content-section">文献レビューワークフロー</h2>
+  <p>文献レビューでは通常、Google Scholar、PubMed、arXiv、IEEE Xploreで論文を読み、複数のデータベースにまたがる参照チェーンをたどります。Quiraはこのプロセス全体をキャプチャします:</p>
+  <ul>
+    <li><strong>自動ソースマッピング</strong> — すべての論文、プレプリント、データセットページがContext Graphのノードになります</li>
+    <li><strong>引用チェーン追跡</strong> — 論文Aから論文Bへの参照リンクをクリックすると、Quiraはこれを有向エッジとして記録し、自動的に引用グラフを構築します</li>
+    <li><strong>時間的コンテキスト</strong> — どの論文を最初に読んだか、どの論文が理解を変えたか、どこで最も時間を費やしたかがわかります</li>
+    <li><strong>AI要約</strong> — <a href="/docs/ja/core-concepts/local-ai/">ローカルAI</a>が各ページの短い要約を生成し、再読なしで主要な知見をすばやく思い出せます</li>
+  </ul>
+  <Callout type="tip" title="専用リサーチスペース">
+    <p>各文献レビューや研究プロジェクトごとに<a href="/docs/ja/core-concepts/context-spaces/">Context Space</a>を作成しましょう。無関係なブラウジングがリサーチグラフを汚染するのを防ぎ、後で発見を簡単にエクスポートできます。</p>
+  </Callout>
+
+  <h2 id="paper-trail" class="content-section">論文トレイルの追跡</h2>
+  <p>研究者は長い参照チェーンをたどることがよくあります — ある論文が別の論文を引用し、それがデータセットを参照し、それが方法論の論文にリンクしています。Quiraはこれらのチェーンをグラフ内のナビゲーション可能なパスとして保存します:</p>
+  <ol>
+    <li>Google Scholarでシード論文から始める</li>
+    <li>「引用元」リンクをたどって後続の研究を見つける</li>
+    <li>参照されているデータセットと方法論の論文を開く</li>
+    <li>Quiraがすべてのステップを接続されたサブグラフとして記録</li>
+  </ol>
+  <p>後で<a href="/docs/ja/features/nl-query/">自然言語クエリ</a>を使って「Smith 2023の研究を引用した論文は？」や「機械学習の論文で言及されたデータセットは？」のような質問ができます。</p>
+
+  <h2 id="cross-discipline" class="content-section">学際的なつながりの発見</h2>
+  <p>最も価値ある研究のインサイトは、分野間の予期しないつながりから生まれることがあります。Quiraのグラフ可視化がこれらのつながりを見るのに役立ちます:</p>
+  <ul>
+    <li><a href="/docs/ja/features/graph-visualization/">グラフビジュアライゼーション</a>は関連ページのクラスタを表示し、2つのクラスタがエッジを共有している場合、学際的な重なりを示します</li>
+    <li>ローカルAIは概念を共有しているが異なる用語を使用しているページ間のつながりを提案できます（例: CSの「強化学習」と心理学の「オペラント条件づけ」）</li>
+    <li>期間、ドメイン、キーワードでグラフをフィルタリングして、特定の接続パターンに焦点を当てられます</li>
+  </ul>
+
+  <h2 id="citation-network" class="content-section">引用ネットワークの構築</h2>
+  <p>学術ソースをブラウジングする際、Quiraは可視化とエクスポートが可能な引用ネットワークを構築します:</p>
+  <ul>
+    <li><strong>前方引用</strong> — あなたのソースを引用している論文（Google Scholarの「引用元」リンク経由）</li>
+    <li><strong>後方引用</strong> — 論文に記載されている参考文献で、あなたがたどったもの</li>
+    <li><strong>共引用クラスタ</strong> — 頻繁に一緒に引用される論文で、関連する方法論やトピックを示します</li>
+  </ul>
+  <p>引用ネットワークをJSONまたはMarkdownとしてエクスポートし、ZoteroやMendeley などの文献管理ツールで使用したり、文献レビュー文書に直接含めることができます。</p>
+
+  <h2 id="example-crispr" class="content-section">実例: CRISPR遺伝子治療論文のレビュー</h2>
+  <p>CRISPR遺伝子治療の論文をレビューする生物医学研究者は、Quiraを次のように使用できます:</p>
+  <ol>
+    <li><strong>Context Spaceを作成</strong> — 「CRISPR遺伝子治療レビュー」と名付ける</li>
+    <li><strong>PubMedで開始</strong> — 最近のCRISPR遺伝子治療臨床試験を検索</li>
+    <li><strong>引用チェーンをたどる</strong> — 基礎論文（Doudna & Charpentier、Zhang et al.）を読み、臨床応用へ前方追跡</li>
+    <li><strong>クロスリファレンス</strong> — 論文からリンクされているClinicalTrials.govのエントリ、FDA ガイダンス文書、バイオエシックスのディスカッションを訪問</li>
+    <li><strong>Quiraがキャプチャ</strong> — PubMed、Nature、Science、ClinicalTrials.gov、bioRxivにわたる83ページを、クラスタに整理:「デリバリーメカニズム」「オフターゲット効果」「臨床試験」「規制の状況」</li>
+    <li><strong>グラフにクエリ</strong> — 「2025年の試験で最も効率の良いデリバリーメカニズムは？」 — Quiraが関連する論文を表示し、主要なつながりをハイライト</li>
+    <li><strong>エクスポート</strong> — Quiraの要約を注釈として構造化された参考文献リストを生成</li>
+  </ol>
+  <Callout type="warning" title="機密性の高い医療データ">
+    <p>患者関連の医療ポータルをブラウジングする場合は、<a href="/docs/ja/security/privacy-architecture/">Strictプライバシーモード</a>または専用のIncognitoスペースを使用して、Context Graphに機密データがキャプチャされないようにしましょう。</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/ja/use-cases/developers/', title: '開発者向け' }} next={{ href: '/docs/ja/use-cases/writers/', title: 'ライター向け' }} />
+</DocsLayout>

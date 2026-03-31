@@ -1,0 +1,103 @@
+﻿---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import Callout from '../../../components/Callout.astro';
+import PrevNext from '../../../components/PrevNext.astro';
+
+const headings = [
+  { id: 'welcome-to-quira', text: 'Quira へようこそ', depth: 2 },
+  { id: 'explore-the-documentation', text: 'ドキュメントを探す', depth: 2 },
+  { id: 'architecture-at-a-glance', text: 'アーキテクチャ概要', depth: 2 },
+  { id: 'join-the-community', text: 'コミュニティに参加', depth: 2 },
+];
+---
+
+<DocsLayout lang="ja" title="Quira へようこそ" description="Quira Browser のドキュメント — ブラウジングをクエリ可能なナレッジグラフに変換するローカルファーストブラウザ。" section="はじめに" headings={headings}>
+
+  <h1 id="welcome-to-quira" class="content-section">Quira へようこそ</h1>
+
+  <p>Quira は、ブラウジング活動を構造化されたクエリ可能なナレッジグラフに変換するローカルファーストブラウザです。従来のブラウザがタブを使い捨てとして扱うのとは異なり、Quira はリサーチのコンテキスト（何を読んだか、トピック同士がどう繋がるか、調査がどこで中断したか）を自動的にキャプチャします。ブラウザに何でも質問でき、あなた自身の経験に基づいた回答が得られます。</p>
+
+  <p>このドキュメントでは、Quira の使い方、コアコンセプトの理解、API を使った開発、そしてプロジェクトへの貢献方法をすべてカバーしています。</p>
+
+  <Callout type="tip" title="Quira が初めてですか？">
+    <p><a href="/docs/ja/getting-started/quick-start/">クイックスタート</a>ガイドから始めて5分以内にセットアップし、<a href="/docs/ja/core-concepts/context-graph/">コアコンセプト</a>で Quira がブラウジングコンテキストをどのように構造化するかを理解しましょう。</p>
+  </Callout>
+
+  <hr>
+
+  <h2 id="explore-the-documentation" class="content-section">ドキュメントを探す</h2>
+
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:2rem;">
+    <a href="/docs/ja/getting-started/quick-start/" style="display:block;border:1px solid rgba(222,220,209,0.15);border-radius:12px;padding:20px;text-decoration:none;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8A838" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span style="color:#E8A838;font-size:14px;font-weight:500;">はじめに</span>
+      </div>
+      <p style="font-size:14px;color:#C2C0B6;line-height:1.5;margin:0;">Quira をインストールし、ローカル AI モデルを設定し、数分でコンテキストグラフの構築を開始しましょう。</p>
+    </a>
+    <a href="/docs/ja/core-concepts/context-graph/" style="display:block;border:1px solid rgba(222,220,209,0.15);border-radius:12px;padding:20px;text-decoration:none;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8A838" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/><circle cx="4" cy="18" r="2"/><circle cx="20" cy="18" r="2"/><line x1="6" y1="7" x2="10" y2="10"/><line x1="14" y1="10" x2="18" y2="7"/><line x1="6" y1="17" x2="10" y2="14"/><line x1="14" y1="14" x2="18" y2="17"/></svg>
+        <span style="color:#E8A838;font-size:14px;font-weight:500;">コアコンセプト</span>
+      </div>
+      <p style="font-size:14px;color:#C2C0B6;line-height:1.5;margin:0;">コンテキストグラフ、スペース、ローカル AI 統合、そして Quira がリサーチフローをどのようにマッピングするかを理解しましょう。</p>
+    </a>
+    <a href="/docs/ja/contributing/dev-setup/" style="display:block;border:1px solid rgba(222,220,209,0.15);border-radius:12px;padding:20px;text-decoration:none;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8A838" stroke-width="2" stroke-linecap="round"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>
+        <span style="color:#E8A838;font-size:14px;font-weight:500;">コントリビューション</span>
+      </div>
+      <p style="font-size:14px;color:#C2C0B6;line-height:1.5;margin:0;">開発環境のセットアップ、コード規約の習得、そして初めてのプルリクエストの提出。</p>
+    </a>
+    <a href="/docs/ja/api/graph-query-api/" style="display:block;border:1px solid rgba(222,220,209,0.15);border-radius:12px;padding:20px;text-decoration:none;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8A838" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <span style="color:#E8A838;font-size:14px;font-weight:500;">API リファレンス</span>
+      </div>
+      <p style="font-size:14px;color:#C2C0B6;line-height:1.5;margin:0;">Plugin API、WebExtension 互換レイヤー、Graph Query API を使ったエクステンション開発。</p>
+    </a>
+  </div>
+
+  <hr>
+
+  <h2 id="architecture-at-a-glance" class="content-section">アーキテクチャ概要</h2>
+
+  <pre><code>{`+------------------------------------------------+
+|                  Quira Browser                  |
++-------------+-------------------+---------------+
+|  UI Layer   |  Context Layer    |  Agent Layer  |
+|  (Rust/GPU) |  (Local Graph DB) |  (Local LLM)  |
++-------------+-------------------+---------------+
+|           Gecko-based Rendering Engine           |
+|         (Phase 1: Gecko -> Phase 3: Servo)       |
++------------------------------------------------+
+|         WebGPU  |  WASM  |  Post-Quantum TLS    |
++------------------------------------------------+`}</code></pre>
+
+  <table>
+    <thead><tr><th>レイヤー</th><th>技術</th><th>理由</th></tr></thead>
+    <tbody>
+      <tr><td>レンダリング</td><td>Gecko (Phase 1)</td><td>完全な Web 互換性、WebExtensions サポート</td></tr>
+      <tr><td>UI</td><td>Rust + WebGPU</td><td>ネイティブパフォーマンス、低メモリ</td></tr>
+      <tr><td>コンテキストグラフ</td><td>SQLite + FTS5 + sqlite-vec</td><td>ゼロ依存、オフラインファースト</td></tr>
+      <tr><td>ローカル LLM</td><td>llama.cpp / MLX</td><td>GPU アクセラレーション、プライバシー保護</td></tr>
+      <tr><td>拡張機能</td><td>WebExtensions (MV2+MV3)</td><td>MV2 拡張機能を含む広範なエコシステム互換性</td></tr>
+      <tr><td>同期</td><td>CRDT ベースの P2P</td><td>サーバーレス、コンフリクトフリー</td></tr>
+    </tbody>
+  </table>
+
+  <hr>
+
+  <h2 id="join-the-community" class="content-section">コミュニティに参加</h2>
+
+  <p>Quira はオープンソースでコミュニティ主導です。参加方法は以下の通りです：</p>
+
+  <ul>
+    <li><a href="https://github.com/tennnennsui/quira">GitHub リポジトリ</a> — プロジェクトにスターを付け、Issue を報告し、<a href="/docs/ja/contributing/pull-requests/">プルリクエスト</a>を送信</li>
+    <li>Discord サーバー — チームや他のコントリビューターとチャット</li>
+    <li><a href="/docs/ja/contributing/rfc-process/">RFC プロセス</a> — 重要な変更を提案・議論</li>
+    <li>ロードマップ — 計画中・進行中の機能を確認</li>
+  </ul>
+
+  <PrevNext next={{ href: '/docs/ja/getting-started/what-is-quira/', title: 'Quira とは？' }} />
+</DocsLayout>

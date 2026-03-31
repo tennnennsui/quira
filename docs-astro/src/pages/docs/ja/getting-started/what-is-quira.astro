@@ -1,0 +1,49 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'what-is-quira', text: 'Quira とは？', depth: 2 },
+  { id: 'core-features', text: 'コア機能', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="Quira とは？" description="Quira の背景にあるアイデアを理解しましょう — ブラウジングコンテキストをクエリ可能なナレッジグラフに変換する Gecko ベースのブラウザです。" section="はじめに" headings={headings}>
+  <h1 id="what-is-quira" class="content-section">Quira とは？</h1>
+  <p>セットアップに入る前に、プロダクトの背景にあるアイデアを理解しておきましょう。Quira は、シンプルな観察に基づいて構築された Gecko ベースのブラウザです：<strong>AI は知識を無料にしましたが、あなたのコンテキストはあなただけのものです。</strong>ChatGPT は世界のあらゆることを知っています。Quira は<em>あなた</em>のすべてを知っています — 何を読んだか、リサーチがどう進化したか、どの調査の糸口がまだ探索されていないか。</p>
+  <p>この2つは競合しません。補完関係にあります。Quira は、クラウド AI がアクセスできないパーソナルコンテキストを提供することで、あらゆる LLM を10倍便利にします。</p>
+  <h2 id="core-features" class="content-section">コア機能</h2>
+  <div style="display:flex;flex-direction:column;gap:1rem;margin-bottom:2rem;">
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:#141413;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><span style="color:#E8A838;font-size:12px;font-weight:600;">1</span></div>
+      <div>
+        <p style="color:#FAF9F5;font-size:15px;font-weight:500;margin:0 0 4px;"><a href="/docs/ja/core-concepts/context-graph/">Context Graph</a></p>
+        <p style="font-size:14px;color:#C2C0B6;line-height:1.6;margin:0;">ブラウジングを自動的にキャプチャし、クエリ可能なナレッジグラフに構造化します。30秒以上滞在したページがコンテキストノードとなり、実際の調査パスによって接続されます。</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:#141413;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><span style="color:#E8A838;font-size:12px;font-weight:600;">2</span></div>
+      <div>
+        <p style="color:#FAF9F5;font-size:15px;font-weight:500;margin:0 0 4px;"><a href="/docs/ja/core-concepts/local-ai/">ローカルファースト AI</a></p>
+        <p style="font-size:14px;color:#C2C0B6;line-height:1.6;margin:0;">Phi-3.5 Mini を完全にデバイス上で実行します。ページの要約、エンティティ抽出、ブラウジング履歴に対する<a href="/docs/ja/features/nl-query/">自然言語クエリ</a>への回答を行います。データがデバイスの外に出ることはありません。</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:#141413;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><span style="color:#E8A838;font-size:12px;font-weight:600;">3</span></div>
+      <div>
+        <p style="color:#FAF9F5;font-size:15px;font-weight:500;margin:0 0 4px;"><a href="/docs/ja/core-concepts/context-spaces/">Context Spaces</a></p>
+        <p style="font-size:14px;color:#C2C0B6;line-height:1.6;margin:0;">タブを位置ではなく、リサーチコンテキストで整理します。各 Space にはタブ、ノート、AI 要約、そして Context Graph の部分ビューが含まれます。ブラウザのための GTD と考えてください。</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:#141413;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><span style="color:#E8A838;font-size:12px;font-weight:600;">4</span></div>
+      <div>
+        <p style="color:#FAF9F5;font-size:15px;font-weight:500;margin:0 0 4px;"><a href="/docs/ja/core-concepts/research-replay/">Research Replay</a></p>
+        <p style="font-size:14px;color:#C2C0B6;line-height:1.6;margin:0;">過去のあらゆる調査を中断した場所からそのまま再開できます。AI が何を調べたか、どんな結論に至ったか、何がまだ未探索かを教えてくれます。</p>
+      </div>
+    </div>
+  </div>
+  <Callout type="note" title="プライバシー・バイ・デザイン">
+    <p>すべての Context Graph データは、暗号化された<a href="/docs/ja/architecture/storage/">ローカル SQLite データベース</a>に保存されます。クラウド AI を有効にした場合（オプトイン）でも、送信されるのはクエリテキストと要約のみで、生のブラウジング履歴やページコンテンツが送信されることはありません。詳細は <a href="/docs/ja/features/ai-privacy/">AI プライバシーレベル</a>をご覧ください。</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/ja/', title: 'ようこそ' }} next={{ href: '/docs/ja/getting-started/quick-start/', title: 'クイックスタート' }} />
+</DocsLayout>

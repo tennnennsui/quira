@@ -1,0 +1,26 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'export-import', text: 'エクスポート & インポート', depth: 2 },
+  { id: 'export-formats', text: 'エクスポート形式', depth: 2 },
+  { id: 'import-from-chrome', text: 'Chrome からのインポート', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="エクスポート & インポート" description="完全なデータポータビリティ — Context Graph を JSON や Markdown にエクスポートし、Chrome からインポート。" section="機能" headings={headings}>
+  <h1 id="export-import" class="content-section">エクスポート &amp; インポート</h1>
+  <p><a href="/docs/ja/core-concepts/context-graph/">Context Graph</a> のデータは価値があります。Quira は完全なデータポータビリティを信条としており、いつでもエクスポートでき、他のブラウザからインポートすることもできます。エクスポートされたデータは Obsidian などのツールで利用でき、<a href="/docs/ja/api/graph-query-api/">Graph Query API</a> で取り込むことも可能です。</p>
+  <h2 id="export-formats" class="content-section">エクスポート形式</h2>
+  <ul>
+    <li><strong>JSON</strong> — ノード、エッジ、メタデータ、埋め込みを含む完全な Context Graph エクスポート。他のツールとの統合に適した機械可読形式です。</li>
+    <li><strong>Markdown</strong> — タイトル、要約、タグ、リンク付きのノードを人間が読める形式でエクスポート。Obsidian、Notion、その他のノートアプリと互換性があります。</li>
+  </ul>
+  <h2 id="import-from-chrome" class="content-section">Chrome からのインポート</h2>
+  <p>初回起動時に、Quira は Chrome データのインポートを提案します：</p>
+  <ul>
+    <li><strong>ブックマーク</strong> — インポートされ、オプションで Context Graph ノードに変換</li>
+    <li><strong>開いているタブ</strong> — Chrome の現在のタブを新しい Space にインポート可能</li>
+    <li><strong>拡張機能</strong> — <a href="/docs/ja/api/webextension-api/">WebExtension 互換</a>（MV2+MV3）の拡張機能はそのまま動作</li>
+  </ul>
+  <PrevNext prev={{ href: '/docs/ja/features/graph-visualization/', title: 'グラフビジュアライゼーション' }} next={{ href: '/docs/ja/architecture/technical-overview/', title: '技術概要' }} />
+</DocsLayout>

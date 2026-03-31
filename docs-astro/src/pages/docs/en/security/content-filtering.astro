@@ -1,0 +1,50 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'content-filtering', text: 'Content Filtering', depth: 2 },
+  { id: 'filter-engine', text: 'Filter engine', depth: 2 },
+  { id: 'filter-lists', text: 'Built-in filter lists', depth: 2 },
+  { id: 'script-sandboxing', text: 'Script sandboxing', depth: 2 },
+  { id: 'cosmetic-filtering', text: 'Cosmetic filtering', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Content Filtering" description="Block ads, trackers, and malicious scripts with Quira's built-in content filter engine." section="Security & Privacy" headings={headings}>
+  <h1 id="content-filtering" class="content-section">Content Filtering</h1>
+  <p>Quira includes a high-performance content filtering engine built directly into the browser's networking pipeline. It blocks unwanted content — ads, trackers, cryptominers, and malicious scripts — before they load, saving bandwidth and protecting privacy.</p>
+
+  <h2 id="filter-engine" class="content-section">Filter engine</h2>
+  <p>The content filter engine uses a Rust-based implementation that evaluates filter rules against network requests in constant time using compiled Aho-Corasick automata. This approach is significantly faster than regex-based engines used by traditional browser extensions.</p>
+  <ul>
+    <li><strong>Network-level blocking</strong> — Requests are blocked before any data is downloaded</li>
+    <li><strong>Cosmetic filtering</strong> — CSS-based element hiding removes visual remnants</li>
+    <li><strong>Scriptlet injection</strong> — Neutralizes anti-adblock scripts safely</li>
+    <li><strong>CNAME uncloaking</strong> — Resolves CNAME records to detect disguised trackers</li>
+  </ul>
+
+  <h2 id="filter-lists" class="content-section">Built-in filter lists</h2>
+  <table><thead><tr><th>List</th><th>Purpose</th><th>Default</th></tr></thead><tbody>
+    <tr><td>EasyList</td><td>Ad blocking</td><td>Enabled</td></tr>
+    <tr><td>EasyPrivacy</td><td>Tracker blocking</td><td>Enabled</td></tr>
+    <tr><td>Quira Shield List</td><td>Cryptominers, malware domains, fingerprinting scripts</td><td>Enabled</td></tr>
+    <tr><td>Fanboy's Annoyances</td><td>Cookie banners, social widgets, notifications</td><td>Optional</td></tr>
+    <tr><td>Regional lists</td><td>Country-specific ad/tracker lists</td><td>Auto-detected</td></tr>
+  </tbody></table>
+
+  <h2 id="script-sandboxing" class="content-section">Script sandboxing</h2>
+  <p>Third-party scripts are evaluated in a restricted sandbox that limits their access to browser APIs. All script execution events are monitored by the <a href="/docs/en/security/advanced-architecture/#cseb">Context Security Event Bus (CSEB)</a>, and anti-fingerprinting behavior is further strengthened by the <a href="/docs/en/security/emergent-security/#agtr">Adaptive Graph Topology Randomization (AGTR)</a> technique. Scripts from untrusted origins cannot:</p>
+  <ul>
+    <li>Access the clipboard or file system</li>
+    <li>Open popups or navigate the main frame</li>
+    <li>Access cross-origin storage</li>
+    <li>Use fingerprinting APIs (Canvas, WebGL readback, AudioContext) without user consent</li>
+  </ul>
+
+  <h2 id="cosmetic-filtering" class="content-section">Cosmetic filtering</h2>
+  <p>After network-level blocking removes the bulk of unwanted content, cosmetic rules hide any remaining visual artifacts. Quira applies CSS <code>display: none</code> rules and uses a MutationObserver to catch dynamically inserted elements. Cosmetic rules are page-specific and do not degrade rendering performance.</p>
+  <Callout type="tip" title="Per-site allowlist">
+    <p>If content filtering breaks a specific site, you can disable filtering for that origin at <code>quira://settings/security/filters</code> or via the shield icon in the address bar.</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/en/security/privacy-architecture/', title: 'Privacy Architecture' }} next={{ href: '/docs/en/security/threat-protection/', title: 'Threat Protection' }} />
+</DocsLayout>

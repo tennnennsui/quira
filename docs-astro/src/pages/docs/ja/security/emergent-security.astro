@@ -1,0 +1,278 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'emergent-security', text: '創発的相互作用セキュリティ', depth: 2 },
+  { id: 'ksci', text: '1. Knowledge Supply Chain Integrity (KSCI)', depth: 2 },
+  { id: 'ksci-model', text: '形式モデル', depth: 3 },
+  { id: 'ksci-scenarios', text: '攻撃シナリオ', depth: 3 },
+  { id: 'ksci-defense', text: '防御アーキテクチャ', depth: 3 },
+  { id: 'ird', text: '2. Inference Residue Defense (IRD)', depth: 2 },
+  { id: 'ird-classification', text: '残留物の分類', depth: 3 },
+  { id: 'ird-architecture', text: 'パージ・アーキテクチャ', depth: 3 },
+  { id: 'sbrc', text: '3. Semantic Blast Radius Containment (SBRC)', depth: 2 },
+  { id: 'sbrc-zones', text: '封じ込めゾーン', depth: 3 },
+  { id: 'sbrc-sdi', text: 'Semantic Damage Index', depth: 3 },
+  { id: 'agtr', text: '4. Adversarial Graph Topology Resistance (AGTR)', depth: 2 },
+  { id: 'agtr-attacks', text: 'トポロジー攻撃', depth: 3 },
+  { id: 'agtr-defense', text: 'Topological Invariant Monitor', depth: 3 },
+  { id: 'tcv', text: '5. Temporal Causality Verification (TCV)', depth: 2 },
+  { id: 'tcv-chain', text: 'ハッシュチェーン構築', depth: 3 },
+  { id: 'cselp', text: '6. Cross-Session Entropy Leakage Prevention (CSELP)', depth: 2 },
+  { id: 'cselp-decorrelation', text: '脱相関技術', depth: 3 },
+  { id: 'rsip', text: '7. Retroactive Sanitization with Inference Purging (RSIP)', depth: 2 },
+  { id: 'rsip-pipeline', text: '遡及パイプライン', depth: 3 },
+  { id: 'cav', text: '8. Contextual Amnesia Verification (CAV)', depth: 2 },
+  { id: 'cav-proof', text: 'Proof of Forgetting', depth: 3 },
+  { id: 'cav-subsystems', text: 'サブシステム別忘却', depth: 3 },
+  { id: 'priority-map', text: '実装優先度', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="創発的相互作用セキュリティ" description="認知・AI・グラフの相互作用から生じる脅威に対処する8つの新規セキュリティ構造 — Knowledge Supply Chain、Inference Residue Defense、Semantic Blast Radiusなど。" section="セキュリティ & プライバシー" headings={headings}>
+  <h1 id="emergent-security" class="content-section">創発的相互作用セキュリティ</h1>
+  <p>Quiraの既存セキュリティ層は個別コンポーネントを保護する — 暗号化、サンドボックス、IFCラベル、ケイパビリティベースのアクセス制御。しかし、ある種の脅威はユーザーの認知パターン、AI推論パイプライン、Knowledge Graphの構造進化という<strong>3つのシステムの相互作用</strong>からのみ出現する。</p>
+  <p>本ページでは<strong>ナレッジライフサイクル</strong>を対象とした8つの新規構造を文書化する — ナレッジがグラフにどう入り、AIが推論を行うと何が起き、意味的漏洩をどう測定・封じ込め、すでに処理済みのデータに対してポリシー変更をどう遡及的に適用するか。</p>
+  <Callout type="info" title="リサーチステータス">
+    <p>これらの構造は<a href="/docs/ja/security/advanced-architecture/">先進アーキテクチャ</a>の基盤（KPC、CSEB、SKVなど）の上に構築され、形式的脅威モデルの敵対者クラスを7つの新しい攻撃ベクトルで拡張する。</p>
+  </Callout>
+
+  <!-- ═══════════════ KSCI ═══════════════ -->
+  <h2 id="ksci" class="content-section">1. Knowledge Supply Chain Integrity (KSCI)</h2>
+  <p>ソフトウェアサプライチェーン攻撃（SolarWinds、Log4Shell）は正規の配布チャネルを通じて悪意のあるコードを注入する。KSCIはこの概念を<strong>ナレッジ領域</strong>に適用する：攻撃者は正規のウェブサイトに<em>事実として正確だが方向性にバイアスのかかった</em>コンテンツを戦略的に配置し、ユーザーのKnowledge Graphを汚染する。</p>
+  <p>これはフィッシング（偽サイト）やプロンプトインジェクション（隠された指示）とは根本的に異なる。KSCIが対象とするのは<strong>目に見える、もっともらしいコンテンツ</strong>であり、その目的はグラフ構造の操作である。</p>
+  <Callout type="warning" title="既存防御との違い">
+    <p>Context GatekeeperとXProtectは悪意のあるコードや既知の悪性シグネチャを検出する。KSCIは<strong>戦略的に配置されたナレッジ</strong> — 技術的に正しいがユーザーのナレッジ構造をシフトさせるよう設計されたコンテンツ — を検出する。</p>
+  </Callout>
+
+  <h3 id="ksci-model" class="content-section">形式モデル</h3>
+  <p>ナレッジサプライチェーンは <code>KSC = (S, T, &pi;, &iota;)</code> としてモデル化される。Sは情報源の集合、Tは信頼スコア関数、&pi;は来歴追跡、&iota;は完全性検証である。</p>
+  <p>各ナレッジノードは<strong>複合信頼スコア</strong>を受け取る：</p>
+  <table><thead><tr><th>コンポーネント</th><th>測定対象</th><th>例</th></tr></thead><tbody>
+    <tr><td><strong>ソース信頼</strong></td><td>ドメインの評判、HTTPS、コンテンツの安定性</td><td>mayoclinic.org = 0.95、random-blog.xyz = 0.2</td></tr>
+    <tr><td><strong>裏付け</strong></td><td>同じ主張を確認する独立情報源</td><td>3つの独立情報源 = 0.85</td></tr>
+    <tr><td><strong>時間的安定性</strong></td><td>時間経過に伴うコンテンツの一貫性</td><td>2年間変更なし = 0.9、昨日編集 = 0.3</td></tr>
+  </tbody></table>
+  <p><strong>汚染検出：</strong>3つの条件が同時に満たされた場合にアラートが発生する：(1) 最近のコンテンツ変更（低い時間的安定性）、(2) 以前のバージョンからの大きな意味的シフト、(3) ユーザーの既存グラフ構造との不自然に高い親和性。</p>
+
+  <h3 id="ksci-scenarios" class="content-section">攻撃シナリオ</h3>
+  <table><thead><tr><th>シナリオ</th><th>手法</th><th>KSCI防御</th></tr></thead><tbody>
+    <tr><td>漸進的グラフ汚染</td><td>攻撃者がStack Overflowで評判を構築し、ユーザーの研究テーマに関する回答を編集してバイアスを導入</td><td>時間的安定性がコンテンツ変更を検出。裏付けエンジンが主張を独立情報源と照合</td></tr>
+    <tr><td>ナレッジクラスター標的化</td><td>攻撃者が複数サイトに微妙にバイアスのかかったコンテンツを配置。ユーザーの自然な検索が結論への誘導を蓄積</td><td>ソース独立性検証が協調配置を検出。グラフ親和性異常が不自然にフィットするコンテンツをフラグ</td></tr>
+    <tr><td>引用チェーン操作</td><td>互いに循環参照するページチェーンを作成し、偽の裏付けを製造</td><td>来歴トラッカーが循環引用グラフを検出。独立性スコアリングが共同所有ソースにペナルティ</td></tr>
+  </tbody></table>
+
+  <h3 id="ksci-defense" class="content-section">防御アーキテクチャ</h3>
+  <p>2つのコアコンポーネント：</p>
+  <ul>
+    <li><strong>来歴トラッカー (Provenance Tracker)</strong> — ソースメタデータを記録：ドメインのWhois履歴、コンテンツスナップショット（Wayback Machine比較）、TLS証明書の経過年数、編集タイムスタンプ。Webコンテンツを<em>サプライチェーンアーティファクト</em>として扱う。</li>
+    <li><strong>裏付けエンジン (Corroboration Engine)</strong> — 同じ主張（エンティティ＋関係）が独立した情報源で確認されていることを検証。単一ソースのノードは低い信頼スコアを受け、UIで視覚的に区別される。</li>
+  </ul>
+  <p><strong>脅威モデルマッピング：</strong>敵対者A2（悪意のあるWebコンテンツ）— 既存のA2.1–A2.5ベクトルを超えて拡張。新ベクトル<strong>A2.8 Knowledge Supply Chain Poisoning</strong>は隠された指示ではなく、目に見えるコンテンツを標的とする。</p>
+
+  <!-- ═══════════════ IRD ═══════════════ -->
+  <h2 id="ird" class="content-section">2. Inference Residue Defense (IRD)</h2>
+  <p>ユーザーがKnowledge Graphからノードを削除すると、データはディスクから消去される。しかし、そのノードに基づいた<strong>AI生成の推論</strong>は他のノードの属性、エンティティ関係、埋め込みインデックス、クラスター統計に生き残る可能性がある。これが<em>推論残留物</em>である。</p>
+  <Callout type="warning" title="ゴースト問題">
+    <p>ユーザーがすべてのHIV治療ページを削除する。しかしAIは以前「免疫学に関心あり」と推論し、関連ノードにそのタグを追加していた。元のデータは消えたが、その<strong>ゴースト</strong> — 推論 — が残存し、悪用される可能性がある。</p>
+  </Callout>
+
+  <h3 id="ird-classification" class="content-section">残留物の分類</h3>
+  <table><thead><tr><th>タイプ</th><th>定義</th><th>例</th><th>検出難易度</th></tr></thead><tbody>
+    <tr><td><strong>直接残留物</strong></td><td>削除されたノードを参照する明示的なエッジ/属性</td><td>「[削除済みノード]に関連」タグ</td><td>低</td></tr>
+    <tr><td><strong>伝播残留物</strong></td><td>削除されたノードに間接的に影響された推論</td><td>削除データによるクラスター重心のシフト</td><td>中</td></tr>
+    <tr><td><strong>埋め込み残留物</strong></td><td>削除されたノードの埋め込みが類似度計算に影響</td><td>変化した類似度ランキング</td><td>高</td></tr>
+    <tr><td><strong>統計的残留物</strong></td><td>削除されたノードのトピック分布やクラスター統計への影響</td><td>歪んだトピック分布</td><td>非常に高い</td></tr>
+  </tbody></table>
+
+  <h3 id="ird-architecture" class="content-section">パージ・アーキテクチャ</h3>
+  <p>IRDは<strong>推論依存グラフ（Inference Dependency Graph: IDG）</strong>を導入する — どの入力ノードがどのAI生成出力に寄与したかを記録する有向非巡回グラフ。</p>
+  <p>ノードが削除された時：</p>
+  <ol>
+    <li><strong>直接残留物：</strong>即座に削除（明示的参照）</li>
+    <li><strong>伝播残留物：</strong>削除されたノードを入力から除外して再推論をキューイング</li>
+    <li><strong>埋め込み残留物：</strong>影響を受けた類似度インデックスを再構築</li>
+    <li><strong>統計的残留物：</strong>削除されたノードを除外してトピック統計を再計算</li>
+  </ol>
+  <p>IDGは推論時に約2%のオーバーヘッドで依存関係を記録する。各エントリはコンパクト（ノードID + オペレーションID）。</p>
+  <p><strong>脅威モデルマッピング：</strong>敵対者A3（拡張機能）およびA4（OSレベル）。新ベクトル<strong>A3.6 推論残留物エクスプロイト</strong>。</p>
+
+  <!-- ═══════════════ SBRC ═══════════════ -->
+  <h2 id="sbrc" class="content-section">3. Semantic Blast Radius Containment (SBRC)</h2>
+  <p>従来の侵害指標は漏洩レコード数、影響ユーザー数、露出バイト数を数える。しかしKnowledge Graphでは、<strong>料理ノード100件の漏洩 ≠ 精神科治療ノード100件の漏洩</strong>である。意味的ダメージは桁違いに異なる。</p>
+  <p>SBRCは侵害の影響を<strong>意味単位</strong>で測定し、意味空間に封じ込め境界を定義する。</p>
+
+  <h3 id="sbrc-zones" class="content-section">封じ込めゾーン</h3>
+  <p>グラフは意味的封じ込めゾーンに分割され、各ゾーンにダメージバジェットが設定される：</p>
+  <table><thead><tr><th>ゾーン</th><th>基本感度</th><th>ダメージバジェット</th><th>カテゴリ例</th></tr></thead><tbody>
+    <tr><td>ゾーン1（医療）</td><td>1.0</td><td>50</td><td>診断、治療、処方箋</td></tr>
+    <tr><td>ゾーン2（金融）</td><td>0.9</td><td>40</td><td>銀行、投資、与信</td></tr>
+    <tr><td>ゾーン3（個人）</td><td>0.8</td><td>35</td><td>人間関係、プライベートメッセージ</td></tr>
+    <tr><td>ゾーン4（仕事）</td><td>0.3</td><td>20</td><td>コード、プロジェクト、会議</td></tr>
+    <tr><td>ゾーン5（一般）</td><td>0.1</td><td>5</td><td>ニュース、レシピ、チュートリアル</td></tr>
+  </tbody></table>
+  <p><strong>ゾーン間エッジの抽象化：</strong>ゾーン間のエッジは抽象化されたラベルを持つ。「医学論文のために糖尿病を研究中」（ゾーン1→ゾーン4）はゾーン境界で「健康関連の仕事」となる。これにより仕事ゾーンの侵害から医療ゾーンの具体的な内容が明らかになることを防ぐ。</p>
+
+  <h3 id="sbrc-sdi" class="content-section">Semantic Damage Index</h3>
+  <p>侵害が検出されると、SBRCは生のノード数ではなく<strong>Semantic Damage Index (SDI)</strong>を算出する：</p>
+  <p><code>SDI(breach) = &Sigma; sensitivity(node) &times; linkability(node) &times; uniqueness(node)</code></p>
+  <ul>
+    <li><strong>感度 (Sensitivity)：</strong>カテゴリベース（医療 = 1.0、一般 = 0.1）に特異性（ノードの詳細度）を乗算</li>
+    <li><strong>連結性 (Linkability)：</strong>機密カテゴリを接続する高次数ノードはダメージを増幅</li>
+    <li><strong>一意性 (Uniqueness)：</strong>「Pythonの構文」（一般知識）と「患者Xの処方箋」（個人特定）の差異</li>
+  </ul>
+  <p>侵害レポートは「高感度の医療ノード3件と一般ノード12件が漏洩。推定プライバシー影響度：<strong>高</strong>」と表示される — 単純な「15ノードが漏洩」ではない。</p>
+  <Callout type="info" title="関係: SBRCとSpace-Scopedセキュリティ">
+    <p>SBRC封じ込めゾーンは<a href="/docs/ja/security/permission-system/#space-scoped-security">Space-Scopedセキュリティ</a>の<strong>意味的上位集合</strong>である。Spacesは管理境界（ユーザーが作成した組織単位）であり、SBRCはセキュリティ境界（意味的感度に基づく自動分類）として機能する。1つのSpaceが複数のSBRCゾーンにまたがり得る（例：仕事Spaceに金融ノードと一般ノードの両方が含まれる場合）。SBRCはIFCラベルを使用してゾーン間データフローを制御し、SpaceとSBRCが<strong>直交する保護レイヤー</strong>を形成する。</p>
+  </Callout>
+
+  <!-- ═══════════════ AGTR ═══════════════ -->
+  <h2 id="agtr" class="content-section">4. Adversarial Graph Topology Resistance (AGTR)</h2>
+  <p>既存の攻撃は<em>個別のノード</em>を標的とする（プロンプトインジェクション、エンティティ汚染、埋め込み操作）。AGTRは新しい脅威クラスに対処する：<strong>グラフのトポロジー（構造）自体</strong>への攻撃。</p>
+  <p>攻撃者はノードの内容ではなく<strong>接続パターン</strong>を操作する — グラフ構造を通じてユーザーを識別、追跡、または操作するために。</p>
+
+  <h3 id="agtr-attacks" class="content-section">トポロジー攻撃</h3>
+  <table><thead><tr><th>攻撃</th><th>メカニズム</th><th>目標</th></tr></thead><tbody>
+    <tr><td><strong>構造的透かし</strong></td><td>特定のリンク構造を持つk個のページを配置。ユーザーが訪問すると、Knowledge Graphに識別可能なサブグラフ（透かし）が形成される。</td><td>ユーザー識別。後でグラフへの部分的アクセスにより透かしが明らかになる。</td></tr>
+    <tr><td><strong>ブリッジノード注入</strong></td><td>分離されたクラスター間にブリッジノードを作成するコンテンツを注入。</td><td>AI推論を感度境界を越えて伝播させる。</td></tr>
+    <tr><td><strong>モチーフフィンガープリンティング</strong></td><td>メタデータからグラフ構造（次数分布、クラスタリング係数、スペクトル特性）を観測。</td><td>固有の構造パターンにより集団中のユーザーを識別。</td></tr>
+  </tbody></table>
+
+  <h3 id="agtr-defense" class="content-section">Topological Invariant Monitor</h3>
+  <p>AGTRは構造的特性を継続的に追跡する<strong>Topological Invariant Monitor (TIM)</strong>を配備する：</p>
+  <ul>
+    <li><strong>構造ドリフト検出：</strong>グラフのトポロジー特徴ベクトル（次数列、クラスタリング、モチーフ頻度、スペクトル特性）がタイムステップ間で閾値を超えて変化した場合にアラート。</li>
+    <li><strong>透かしパターンマッチング：</strong>最近追加されたノードが識別可能なサブグラフパターンを形成していないかチェック。</li>
+    <li><strong>エクスポート時の構造ノイズ：</strong>グラフデータのエクスポート前にダミーエッジ追加、ランダムエッジ削除、囮サブ構造注入を行い、エクスポートされたトポロジー ≠ 実際のトポロジーとする。</li>
+  </ul>
+  <p><strong>脅威モデルマッピング：</strong>敵対者A2。新ベクトル<strong>A2.6 構造的透かし</strong>と<strong>A2.7 ブリッジノード注入</strong>。</p>
+
+  <!-- ═══════════════ TCV ═══════════════ -->
+  <h2 id="tcv" class="content-section">5. Temporal Causality Verification (TCV)</h2>
+  <p>Knowledge Graph内のナレッジには<strong>因果的取得順序</strong>がある：ユーザーはAを学び、次にBを学び、A+BからCを推論した。この因果連鎖は信頼評価と不正検出に不可欠だが、既存のTemporal Securityパラダイムはタイムスタンプと時間ベースのアクセスのみを保護し、<strong>因果順序そのもの</strong>は保護しない。</p>
+
+  <h3 id="tcv-chain" class="content-section">ハッシュチェーン構築</h3>
+  <p>各ノード追加はハッシュチェーンエントリを生成する：</p>
+  <p><code>h<sub>i</sub> = SHA-256(h<sub>i-1</sub> || content(v<sub>i</sub>) || timestamp(v<sub>i</sub>) || causal_refs(v<sub>i</sub>))</code></p>
+  <p><strong>保証：</strong></p>
+  <ul>
+    <li><strong>順序不変性：</strong>チェーンの途中にノードを挿入すると、後続のすべてのハッシュが無効になる。</li>
+    <li><strong>因果参照検証：</strong>別のノードへの依存を主張するノードは検証可能 — 参照されるノードはチェーン内でより早く出現する必要がある。</li>
+    <li><strong>削除検出：</strong>ノードの削除はチェーンを破壊する。</li>
+  </ul>
+  <table><thead><tr><th>シナリオ</th><th>TCV無し</th><th>TCV有り</th></tr></thead><tbody>
+    <tr><td>因果偽造</td><td>バイアスのかかったコンテンツv1がリンク経由で「客観的」コンテンツv2にユーザーを誘導 — v2は独立に見える</td><td>因果チェーンがv1→v2のナビゲーションを記録し、非独立性をフラグ</td></tr>
+    <tr><td>ナレッジバックデート</td><td>悪意のある拡張機能がノードのタイムスタンプを改ざんし「事前の知識」を捏造</td><td>ハッシュチェーンがタイムスタンプの不整合を検出</td></tr>
+    <tr><td>リサーチの先行性</td><td>ナレッジ取得時期の暗号学的証拠がない</td><td>Merkleルート + RFC 3161タイムスタンプ局により証明可能な先行性を実現</td></tr>
+  </tbody></table>
+
+  <!-- ═══════════════ CSELP ═══════════════ -->
+  <h2 id="cselp" class="content-section">6. Cross-Session Entropy Leakage Prevention (CSELP)</h2>
+  <p>セッション内の分離が完璧であっても、Knowledge Graphは<strong>セッションをまたぐ永続的構造</strong>である。各セッションのアクティビティはグラフの成長パターンとして蓄積され、その成長パターンの系列は強力なフィンガープリントとなる。</p>
+  <Callout type="info" title="グラフ成長フィンガープリンティング">
+    <p>セッション1：+50ノード（ML、Python）。セッション2：+3ノード（料理）。セッション3：+80ノード（ML、PyTorch）。このパターンは「料理をするMLエンジニア」を識別する — 各セッションは単体では無害だが、系列として見ると一意に識別可能。</p>
+  </Callout>
+
+  <h3 id="cselp-decorrelation" class="content-section">脱相関技術</h3>
+  <table><thead><tr><th>技術</th><th>破壊する相関</th><th>方法</th></tr></thead><tbody>
+    <tr><td><strong>グラフ成長バッチ処理</strong></td><td>セッション固有の成長パターン</td><td>ノード追加をバッファリングし、セッションごとではなく固定間隔（1時間ごと）でコミット</td></tr>
+    <tr><td><strong>トピック分布平滑化</strong></td><td>セッションのトピックシグネチャ</td><td>セッションごとのトピック分布にラプラスノイズを追加</td></tr>
+    <tr><td><strong>クエリタイミングジッター</strong></td><td>認知リズムのフィンガープリント</td><td>NLクエリの発行タイムスタンプにランダム遅延を追加</td></tr>
+    <tr><td><strong>ファントムセッション注入</strong></td><td>セッション系列の相関</td><td>実セッション間にダミーセッション（バックグラウンドグラフ操作）を挿入</td></tr>
+  </tbody></table>
+  <p><strong>防御目標：</strong>任意の2つのセッションのメタデータベクトル間の相互情報量は閾値 &epsilon;<sub>session</sub> 以下に保つ。セッションNのメタデータを観測する者は、セッションN-1またはN+1について最大 &epsilon;<sub>session</sub> ビットの情報しか得られない。</p>
+  <p><strong>脅威モデルマッピング：</strong>敵対者A1（ネットワーク監視者）およびA3（拡張機能 — A3.5メタデータ収集）。新ベクトル<strong>A3.7 クロスセッション・メタデータ相関</strong>。</p>
+
+  <!-- ═══════════════ RSIP ═══════════════ -->
+  <h2 id="rsip" class="content-section">7. Retroactive Sanitization with Inference Purging (RSIP)</h2>
+  <p>ユーザーがセキュリティポリシーを変更した場合（例：医療データの感度を最大に引き上げ）、新しいポリシーは<strong>将来の</strong>データだけでなく、<strong>すでに収集・処理されたすべてのデータ</strong>にも適用されなければならない。これは見た目以上に困難である：</p>
+  <ol>
+    <li>データはすでにAIパイプラインで処理済み</li>
+    <li>推論は他のノードに伝播済み（IRDの問題）</li>
+    <li>埋め込みが情報をエンコード済み</li>
+    <li>クラスター統計とトピックモデルに影響済み</li>
+  </ol>
+  <Callout type="info" title="法的な整合性">
+    <p>RSIPはGDPRの「忘れられる権利」およびCCPAの消費者データ削除権に対する技術的メカニズムを提供する — 削除を超えて<strong>遡及的な再分類と再制限</strong>に拡張。</p>
+  </Callout>
+
+  <h3 id="rsip-pipeline" class="content-section">遡及パイプライン</h3>
+  <p>ポリシー &Pi;<sub>old</sub> が &Pi;<sub>new</sub> に変更された時：</p>
+  <ol>
+    <li><strong>影響ノードの特定：</strong>R = &#123;&Pi;<sub>new</sub> が &Pi;<sub>old</sub> より制限的なノード&#125;</li>
+    <li><strong>新ポリシーの直接適用：</strong>Rのラベル、アクセス制限、暗号化レベルを更新</li>
+    <li><strong>推論依存関係の走査：</strong>IRDの推論依存グラフを使用してRから派生したすべての推論を発見</li>
+    <li><strong>R除外での再推論：</strong>影響を受けた属性とエッジをRのデータ無しで再計算</li>
+    <li><strong>埋め込みの再構築：</strong>Rの埋め込みを更新または削除し、類似度インデックスを再構築</li>
+    <li><strong>統計の再計算：</strong>Rを除外してトピック分布とクラスター集約を再計算</li>
+    <li><strong>完全性の検証：</strong>非Rノードがいかなるノードに対しても依存度 > 0を持たないことを確認</li>
+  </ol>
+  <table><thead><tr><th>最適化</th><th>アプローチ</th><th>トレードオフ</th></tr></thead><tbody>
+    <tr><td>段階的パージ（デフォルト）</td><td>最高依存度の項目から処理し、閾値以下で停止</td><td>制御可能な計算量。わずかな残留物が残る可能性</td></tr>
+    <tr><td>遅延再推論</td><td>影響を受けた属性にフラグを立て、次回アクセス時に再計算</td><td>アクセスされるまで旧値が残存</td></tr>
+    <tr><td>バッチ処理</td><td>夜間に完全な再計算を実行</td><td>ポリシーが完全に適用されるまで遅延</td></tr>
+    <tr><td>完全パージ（ユーザー選択）</td><td>依存グラフ全体を即座に走査</td><td>CPU集約的だが完全性を保証</td></tr>
+  </tbody></table>
+  <p><strong>脅威モデルマッピング：</strong>すべての敵対者クラス。新ベクトル<strong>A-cross 遡及的ポリシー回避</strong>。</p>
+
+  <!-- ═══════════════ CAV ═══════════════ -->
+  <h2 id="cav" class="content-section">8. Contextual Amnesia Verification (CAV)</h2>
+  <p>ユーザーが「このデータを忘れて」と言った時、従来のシステムは<em>削除が実行された</em>ことを確認する。CAVはさらに進んで、すべてのサブシステムにわたって<strong>復元が不可能であることの暗号学的証明</strong>を提供する。</p>
+
+  <h3 id="cav-proof" class="content-section">Proof of Forgetting</h3>
+  <p>Proof of Forgetting (PoF) はトリプルである：<code>(commitment, deletion_proof, absence_proof)</code>。</p>
+  <ol>
+    <li><strong>Commitment：</strong>データが存在する間、データがグラフ内にあることを示すMerkleコミットメントを記録。</li>
+    <li><strong>Deletion proof：</strong>削除後、新しいMerkleルートにより削除データへの有効なMerkleパスが存在しないことを証明。</li>
+    <li><strong>Absence proof：</strong>更新されたグラフ内のいかなるノードも削除データとの埋め込み類似度が閾値を超えないことを検証 — すなわち情報がエンコードされた形で生存していないことを確認。</li>
+  </ol>
+
+  <h3 id="cav-subsystems" class="content-section">サブシステム別忘却</h3>
+  <p>同じデータが複数のサブシステムに存在する。PoFは<strong>すべて</strong>をカバーしなければならない：</p>
+  <table><thead><tr><th>サブシステム</th><th>データ形式</th><th>忘却方法</th><th>検証</th></tr></thead><tbody>
+    <tr><td>Graph DB (SQLite)</td><td>ノード + エッジ</td><td>DELETE + VACUUM</td><td>不在のMerkle証明</td></tr>
+    <tr><td>埋め込みインデックス</td><td>ベクトル</td><td>インデックス再構築</td><td>max<sub>v</sub> sim(&Phi;(v), &Phi;(d)) &lt; &tau;</td></tr>
+    <tr><td>推論キャッシュ</td><td>AI出力</td><td>IDGベースのパージ（IRD）</td><td>IDG依存エッジの不在</td></tr>
+    <tr><td>監査ログ</td><td>テキストレコード</td><td>エントリを暗号化し、鍵を破棄</td><td>構造的完全性を維持、内容は復元不可</td></tr>
+    <tr><td>エクスポート履歴</td><td>エクスポートレコード</td><td>レコード削除</td><td>—（外部に送信済みのデータは復元不可）</td></tr>
+  </tbody></table>
+  <p><strong>Composite PoF</strong>はすべてのサブシステム別証明の論理積である。いずれかのサブシステムが検証に失敗した場合、ユーザーに通知される：「忘却未完了 — [サブシステム]でデータ残留物が検出されました。」</p>
+  <Callout type="warning" title="ログのジレンマ">
+    <p>監査ログはデータがアクセスされたことを証明する — しかしログ自体がデータの存在を明らかにする。解決策：ログエントリは<strong>書き込み時に暗号化</strong>される。忘却時にはログの暗号化鍵が破棄される。ログエントリは残る（完全性を維持）がその内容は復元不可となる。</p>
+  </Callout>
+  <p><strong>脅威モデルマッピング：</strong>敵対者A4（OSレベル — 削除後データ復元）およびA5（ベンダー — ログベースの再構築）。新ベクトル<strong>A4.3 削除後データ復元</strong>。</p>
+
+  <!-- ═══════════════ PRIORITY MAP ═══════════════ -->
+  <h2 id="priority-map" class="content-section">実装優先度</h2>
+  <table><thead><tr><th>フェーズ</th><th>構造</th><th>根拠</th></tr></thead><tbody>
+    <tr><td>フェーズ2（即時）</td><td>IRD、TCV</td><td>IRDの推論依存グラフはRSIPとCAVの前提条件。TCVのハッシュチェーンは早期開始が望ましい — チェーンが長いほど検証が強力。</td></tr>
+    <tr><td>フェーズ2</td><td>KSCI、SBRC</td><td>来歴トラッカー（KSCI基本）とSemantic Zone Analyzer（SBRC）はIFCラベル拡張として構築可能。</td></tr>
+    <tr><td>フェーズ3（成熟期）</td><td>RSIP、CAV</td><td>IRDのIDGが十分なデータを蓄積する必要がある。CAVはすべてのサブシステムが忘却インターフェースを公開する必要がある。</td></tr>
+    <tr><td>フェーズ3</td><td>AGTR、CSELP</td><td>Topological Invariant Monitor（AGTR）の検証にはユーザーベースが必要。Session Metadata Decorrelator（CSELP）は計算コストが高い。</td></tr>
+  </tbody></table>
+
+  <h3>依存関係グラフ</h3>
+  <table><thead><tr><th>構造</th><th>依存先</th><th>有効化対象</th></tr></thead><tbody>
+    <tr><td>IRD</td><td>—</td><td>RSIP、CAV</td></tr>
+    <tr><td>TCV</td><td>—</td><td>KSCI（強化）</td></tr>
+    <tr><td>KSCI</td><td>—</td><td>AGTR（サプライチェーンにトポロジーを含む）</td></tr>
+    <tr><td>SBRC</td><td>IFCラベル</td><td>—</td></tr>
+    <tr><td>RSIP</td><td>IRD</td><td>CAV</td></tr>
+    <tr><td>CAV</td><td>IRD、RSIP</td><td>—</td></tr>
+    <tr><td>AGTR</td><td>—</td><td>—</td></tr>
+    <tr><td>CSELP</td><td>—</td><td>—</td></tr>
+  </tbody></table>
+
+  <h3>新規脅威モデル攻撃ベクトル</h3>
+  <table><thead><tr><th>ベクトル</th><th>敵対者</th><th>防御構造</th></tr></thead><tbody>
+    <tr><td>A2.6 構造的透かし</td><td>A2（Webコンテンツ）</td><td>AGTR</td></tr>
+    <tr><td>A2.7 ブリッジノード注入</td><td>A2（Webコンテンツ）</td><td>AGTR</td></tr>
+    <tr><td>A2.8 Knowledge Supply Chain Poisoning</td><td>A2（Webコンテンツ）</td><td>KSCI</td></tr>
+    <tr><td>A3.6 推論残留物エクスプロイト</td><td>A3（拡張機能）</td><td>IRD</td></tr>
+    <tr><td>A3.7 クロスセッション・メタデータ相関</td><td>A3（拡張機能）</td><td>CSELP</td></tr>
+    <tr><td>A4.3 削除後データ復元</td><td>A4（OSレベル）</td><td>CAV</td></tr>
+    <tr><td>A-cross 遡及的ポリシー回避</td><td>全クラス</td><td>RSIP</td></tr>
+  </tbody></table>
+
+  <PrevNext prev={{ href: '/docs/ja/security/advanced-architecture/', title: '先進アーキテクチャ' }} next={{ href: '/docs/ja/security/hardening/', title: 'セキュリティ強化策' }} />
+</DocsLayout>

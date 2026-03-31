@@ -1,0 +1,49 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'storage-sqlite', text: 'Storage (SQLite)', depth: 2 },
+  { id: 'data-model', text: 'Data model', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Storage (SQLite)" description="How Quira stores the Context Graph in an encrypted local SQLite database." section="Architecture" headings={headings}>
+  <h1 id="storage-sqlite" class="content-section">Storage (SQLite)</h1>
+  <p>The <a href="/docs/en/core-concepts/context-graph/">Context Graph</a> needs a home. All data is stored in a local, encrypted SQLite database with three key extensions: FTS5 for full-text search, sqlite-vec for vector similarity queries, and WAL mode for crash-safe writes.</p>
+  <h2 id="data-model" class="content-section">Data model</h2>
+  <p>The database contains five core entities:</p>
+  <ul>
+    <li><strong>ContextNode</strong>  EPages captured in the graph (URL, title, AI summary, entities, embedding, dwell time, tags)</li>
+    <li><strong>ContextEdge</strong>  EConnections between nodes (type, weight, timestamps)</li>
+    <li><strong>Space</strong>  EContext workspaces (name, color, icon, position)</li>
+    <li><strong>Tab</strong>  EIndividual browser tabs (URL, title, suspension state, position within Space)</li>
+    <li><strong>ResearchSession</strong>  EDetected research clusters (node IDs, status, AI summary)</li>
+  </ul>
+  <pre><code>{`-- Core table: Context Graph nodes
+CREATE TABLE context_node (
+    id              TEXT PRIMARY KEY,   -- UUID v7
+    url             TEXT NOT NULL,
+    title           TEXT NOT NULL,
+    domain          TEXT NOT NULL,
+    ai_summary      TEXT,
+    ai_entities     TEXT,               -- JSON array
+    ai_embedding    BLOB,               -- 384-dim float32 vector
+    visit_count     INTEGER DEFAULT 1,
+    total_dwell_time INTEGER DEFAULT 0,
+    first_visited   TEXT NOT NULL,
+    last_visited    TEXT NOT NULL,
+    user_tags       TEXT,               -- JSON array
+    space_id        TEXT REFERENCES space(id),
+    is_excluded     INTEGER DEFAULT 0
+);
+
+-- Full-text search index
+CREATE VIRTUAL TABLE context_node_fts USING fts5(
+    title, url, ai_summary, ai_entities, user_notes,
+    content=context_node
+);`}</code></pre>
+  <Callout type="note" title="Encryption at rest">
+    <p>The SQLite database is encrypted with a user-derived key. WAL (Write-Ahead Logging) mode ensures no data loss on unexpected shutdown. Periodic session state snapshots provide crash recovery.</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/en/architecture/gecko-engine/', title: 'Gecko Engine' }} next={{ href: '/docs/en/architecture/llm-integration/', title: 'LLM Integration' }} />
+</DocsLayout>

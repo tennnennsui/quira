@@ -1,0 +1,206 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'frontier-security', text: 'フロンティアセキュリティ研究', depth: 2 },
+  { id: 'gaps', text: 'アーキテクチャギャップ', depth: 3 },
+  { id: 'n1', text: 'N1. 暗号グラフシュレッディング (CGS)', depth: 2 },
+  { id: 'n1-model', text: 'ノード単位鍵導出', depth: 3 },
+  { id: 'n1-proof', text: '暗号的削除証明', depth: 3 },
+  { id: 'n2', text: 'N2. フォレンジック完全性層 (FIL)', depth: 2 },
+  { id: 'n2-arch', text: 'L8アーキテクチャ', depth: 3 },
+  { id: 'n2-privacy', text: 'プライバシー保護フォレンジック', depth: 3 },
+  { id: 'n3', text: 'N3. 投機的実行ファイアウォール (SEF)', depth: 2 },
+  { id: 'n3-layers', text: '4層緩和策', depth: 3 },
+  { id: 'n4', text: 'N4. グラフエクスポート匿名化 (GEAP)', depth: 2 },
+  { id: 'n4-pipeline', text: '匿名化パイプライン', depth: 3 },
+  { id: 'n5', text: 'N5. 検証可能サプライチェーン (VSCA)', depth: 2 },
+  { id: 'n5-slsa', text: 'SLSA Level 3 + Sigstore', depth: 3 },
+  { id: 'n6', text: 'N6. 形式的セキュリティ不変条件エンジン (FSIE)', depth: 2 },
+  { id: 'n6-tla', text: 'TLA+仕様', depth: 3 },
+  { id: 'n6-pbt', text: 'プロパティベーステスト', depth: 3 },
+  { id: 'n7', text: 'N7. 認知クエリ正規化 (CQN)', depth: 2 },
+  { id: 'n7-attack', text: 'クエリ文体攻撃', depth: 3 },
+  { id: 'n7-pipeline', text: '高度な正規化', depth: 3 },
+  { id: 'n8', text: 'N8. DP予算コントローラ (DPBC)', depth: 2 },
+  { id: 'n8-budget', text: '予算モデル', depth: 3 },
+  { id: 'n8-ui', text: 'プライバシー予算UI', depth: 3 },
+  { id: 'priority-map', text: '優先度マップ', depth: 2 },
+  { id: 'coverage-improvement', text: 'カバレッジ改善', depth: 3 },
+];
+---
+<DocsLayout lang="ja" title="フロンティアセキュリティ研究" description="既存アーキテクチャのギャップを埋める8つの新規セキュリティ構造 — 暗号グラフシュレッディング、フォレンジック完全性層、投機的実行ファイアウォールなど。" section="セキュリティ & プライバシー" headings={headings}>
+  <h1 id="frontier-security" class="content-section">フロンティアセキュリティ研究</h1>
+  <p>既存26概念 + 6つの強化策を監査した結果、現在のアーキテクチャがまったくカバーしていない<strong>8つの防御領域</strong>を特定した。これらは既存概念の拡張ではなく、重大なギャップを埋めるまったく新しい構造である。</p>
+
+  <Callout type="info" title="リサーチステータス">
+    <p><a href="/docs/ja/security/hardening/">セキュリティ強化策</a>の基盤の上に構築される。前提条件: E1 &rarr; N1、E3 &rarr; N2、E5 &rarr; N7。</p>
+  </Callout>
+
+  <h3 id="gaps" class="content-section">アーキテクチャギャップ</h3>
+  <table><thead><tr><th>#</th><th>ギャップ</th><th>影響</th><th>解決策</th></tr></thead><tbody>
+    <tr><td>G1</td><td>暗号的削除なし</td><td>GDPR 17条 非準拠</td><td>N1: CGS</td></tr>
+    <tr><td>G2</td><td>フォレンジック層なし</td><td>侵害範囲を特定不可</td><td>N2: FIL</td></tr>
+    <tr><td>G3</td><td>マイクロアーキテクチャサイドチャネル</td><td>LLM推論でのキャッシュタイミング</td><td>N3: SEF</td></tr>
+    <tr><td>G4</td><td>エクスポート再特定</td><td>グラフ構造 = ユーザー指紋</td><td>N4: GEAP</td></tr>
+    <tr><td>G5</td><td>サプライチェーン検証なし</td><td>SolarWinds型脆弱性</td><td>N5: VSCA</td></tr>
+    <tr><td>G6</td><td>形式検証なし</td><td>バグがセキュリティ不変条件を破壊</td><td>N6: FSIE</td></tr>
+    <tr><td>G7</td><td>認知クエリ指紋</td><td>NLクエリによるユーザー特定</td><td>N7: CQN</td></tr>
+    <tr><td>G8</td><td>DP予算管理なし</td><td>未定義の&epsilon;値と枯渇挙動</td><td>N8: DPBC</td></tr>
+  </tbody></table>
+
+  <!-- ═══════════════ N1 ═══════════════ -->
+  <h2 id="n1" class="content-section">N1. 暗号グラフシュレッディング (CGS)</h2>
+  <p>GDPR 17条 / CCPAの削除要求はSQL DELETEだけでは満たせない — WALログ、FTS5インデックス、Embeddingベクトル、ファイルシステムセクタにデータが残留する。CGSは削除を<strong>暗号的に不可逆</strong>にする。</p>
+
+  <h3 id="n1-model" class="content-section">ノード単位鍵導出</h3>
+  <p>各ノード v<sub>i</sub> はHKDFで導出された固有の暗号鍵を取得: <code>k<sub>i</sub> = HKDF(master_key, node_id || epoch)</code>。すべてのノードデータはAES-256-GCMでk<sub>i</sub>を使って暗号化される。<strong>削除 = 鍵の破壊</strong>は <code>SecureZeroMemory(k<sub>i</sub>)</code> で実行。暗号文はディスク上に残るが、暗号的に復元不可能。</p>
+  <p>鍵は保存時に保管されない — 必要に応じてマスター鍵から再導出される。Key Ledgerは導出メタデータと検証用鍵ハッシュのみを保存。</p>
+
+  <h3 id="n1-proof" class="content-section">暗号的削除証明</h3>
+  <p>削除後、破壊された鍵で復号を試行 &rarr; 失敗が削除完全性の暗号的証拠として記録される。CAVのProof of Forgettingと統合。</p>
+  <p><strong>新規性:</strong> &#9733;&#9733;&#9733;&#9733; — Crypto-shreddingはGoogle/AWSスケールで存在するが、個人ナレッジグラフにおけるEmbedding + 推論残留物をカバーするノード粒度のシュレッディングは世界初。</p>
+  <p><strong>敵対者:</strong> A4（ディスク窃取）、A5（法的強制）。<strong>Phase:</strong> 1–2。</p>
+
+  <!-- ═══════════════ N2 ═══════════════ -->
+  <h2 id="n2" class="content-section">N2. フォレンジック完全性層 (FIL)</h2>
+  <p>現在の7層セキュリティモデル（L1–L7）には<strong>侵害後分析層</strong>がない。侵害発生後、「何が漏洩し、いつ、どの程度か」を証明する方法がない。FILはE3（不変監査コミットメント）の上にL8を追加する。</p>
+
+  <h3 id="n2-arch" class="content-section">L8アーキテクチャ</h3>
+  <p>FIL AnalyzerがE3の追記専用監査バッファを処理: パターン検出（頻度・タイミング異常）、影響範囲推定（SBRC統合）、証拠保全、オプションのSIEMエクスポート（ArcSight、Splunk、QRadar向けCEF/JSON形式）。</p>
+
+  <h3 id="n2-privacy" class="content-section">プライバシー保護フォレンジック</h3>
+  <p>コア原則: <strong>行動パターンを記録し、ナレッジ内容は決して記録しない</strong>。FILはイベント種別、影響ノード数、CSEBルールID、判定、姿勢レベルを記録する — ノードID、コンテンツ、クエリ、エンティティ、URLは記録しない。</p>
+  <p><strong>新規性:</strong> &#9733;&#9733;&#9733;&#9733;&#9733; — 個人ブラウザにおけるプライバシー保護フォレンジックは世界初。</p>
+  <p><strong>敵対者:</strong> A2–A5。<strong>Phase:</strong> 2。</p>
+
+  <!-- ═══════════════ N3 ═══════════════ -->
+  <h2 id="n3" class="content-section">N3. 投機的実行ファイアウォール (SEF)</h2>
+  <p>Spectre系攻撃はGecko FissionのSite Isolationでは完全に緩和されない。LLM推論とContext Graph読み取りが同一プロセスに共存すると、キャッシュタイミング攻撃によりEmbeddingベクトルが漏洩する可能性がある。</p>
+
+  <h3 id="n3-layers" class="content-section">4層緩和策</h3>
+  <table><thead><tr><th>層</th><th>メカニズム</th><th>タイミング</th></tr></thead><tbody>
+    <tr><td>ビルド時</td><td>retpoline, SLH, LVI強化</td><td>全ビルド</td></tr>
+    <tr><td>推論分離</td><td>L1/L2キャッシュフラッシュ + メモリバリア + COWスナップショット</td><td>推論呼び出し毎</td></tr>
+    <tr><td>高セキュリティモード</td><td>推論中の拡張機能停止、タイマー解像度制限、SharedArrayBuffer無効化</td><td>ASP &ge; Elevated</td></tr>
+    <tr><td>ランタイム検出</td><td>キャッシュタイミング異常検出器（zスコアベース）</td><td>継続的</td></tr>
+  </tbody></table>
+  <p><strong>新規性:</strong> &#9733;&#9733;&#9733; — retpoline/SLHは既存だが、ブラウザ内LLM推論に特化したSpectre緩和の適用は新規。</p>
+  <p><strong>敵対者:</strong> A4。<strong>Phase:</strong> 2–3。</p>
+
+  <!-- ═══════════════ N4 ═══════════════ -->
+  <h2 id="n4" class="content-section">N4. グラフエクスポート匿名化 (GEAP)</h2>
+  <p>ユーザーがリサーチセッションをエクスポートまたは共有する際、グラフ構造自体が指紋として機能する。次数分布、クラスタリング係数、スペクトル特性は個人に固有（Narayanan &amp; Shmatikov, 2009）。</p>
+
+  <h3 id="n4-pipeline" class="content-section">匿名化パイプライン</h3>
+  <p>エクスポート時に適用される4段階の構造的摂動:</p>
+  <table><thead><tr><th>段階</th><th>メカニズム</th><th>効果</th></tr></thead><tbody>
+    <tr><td>Edge DP</td><td>&epsilon;-DPエッジフリッピング（デフォルト &epsilon; = 1.0）</td><td>コミュニティ構造を保持しつつ個別エッジを隠蔽</td></tr>
+    <tr><td>次数キャッピング</td><td>最大次数制限（デフォルト10）</td><td>高次数外れ値シグナルの除去</td></tr>
+    <tr><td>ダミー注入</td><td>PKOファントムノード + ランダムエッジ（10–20%）</td><td>構造的一意性の希釈</td></tr>
+    <tr><td>時間的シャッフル</td><td>タイムスタンプへのラプラスノイズ</td><td>時間的行動推論の防止</td></tr>
+  </tbody></table>
+  <p>AGTRのTopological Invariant Monitorがエクスポート前にグラフの特定可能性をスコアリングし、GEAP摂動強度を自動調整する。</p>
+  <p><strong>新規性:</strong> &#9733;&#9733;&#9733;&#9733; — Graph DPは学術的に存在するが、個人ナレッジグラフ向けの完全なエクスポート匿名化プロトコルは初。</p>
+  <p><strong>敵対者:</strong> A1, A3。<strong>Phase:</strong> 2–3。</p>
+
+  <!-- ═══════════════ N5 ═══════════════ -->
+  <h2 id="n5" class="content-section">N5. 検証可能サプライチェーン (VSCA)</h2>
+  <p>Quiraはllama.cpp、ONNX Runtime、SQLite、OpenSSLを組み込む。完全性検証がなければ、SolarWinds型攻撃がすべてのユーザーを侵害する。VSCAはA5（ベンダー不信）への防御も提供する。</p>
+
+  <h3 id="n5-slsa" class="content-section">SLSA Level 3 + Sigstore</h3>
+  <table><thead><tr><th>コンポーネント</th><th>実装</th></tr></thead><tbody>
+    <tr><td>SBOM</td><td>全依存関係のSHA-256ハッシュ付きCycloneDXマニフェスト</td></tr>
+    <tr><td>署名</td><td>Sigstoreキーレス署名 + Rekor CTログ</td></tr>
+    <tr><td>再現可能ビルド</td><td>同じコミットから第三者がバイト同一のバイナリを構築可能</td></tr>
+    <tr><td>LLMランタイム検証</td><td>llama.cpp/ONNXバージョンピンニング + ビルド時ソースハッシュ検証 + ロード時バイナリハッシュ</td></tr>
+  </tbody></table>
+  <p><strong>新規性:</strong> &#9733;&#9733;&#9733; — SLSA/Sigstoreは確立済みだが、ブラウザ内LLMランタイムをカバーするSBOMは初。</p>
+  <p><strong>敵対者:</strong> A5。<strong>Phase:</strong> 1–2。</p>
+
+  <!-- ═══════════════ N6 ═══════════════ -->
+  <h2 id="n6" class="content-section">N6. 形式的セキュリティ不変条件エンジン (FSIE)</h2>
+  <p>CBSケイパビリティトークン判定、IFCラベル伝播、CTA信頼判定はすべて実装バグで破壊される可能性がある。FSIEは<strong>TLA+形式検証</strong>を使って、セキュリティ不変条件が数学的に成り立つことを証明する。</p>
+
+  <h3 id="n6-tla" class="content-section">TLA+仕様</h3>
+  <p>Context Graph Access Gateway (CGAG) のステートマシンが4つの主要不変条件とともにTLA+で記述される:</p>
+  <table><thead><tr><th>不変条件</th><th>記述</th></tr></thead><tbody>
+    <tr><td>INV-1</td><td>取り消されたトークンは常にDENYになる</td></tr>
+    <tr><td>INV-2</td><td>Lockdown中、すべてのアクセスはDENY</td></tr>
+    <tr><td>INV-3</td><td>拡張機能はスコープ外のノードにアクセスできない</td></tr>
+    <tr><td>INV-4</td><td>KPC-Sealedノードへのアクセスはskv経由のみ</td></tr>
+  </tbody></table>
+
+  <h3 id="n6-pbt" class="content-section">プロパティベーステスト</h3>
+  <p>CIラン毎に10K+のランダムリクエストシーケンスで、Rust実装がTLA+仕様と一致することを検証。TLCモデルチェッカーが全PRで実行される。</p>
+  <p><strong>新規性:</strong> &#9733;&#9733;&#9733;&#9733; — AWSはSDN/S3にTLA+を使用するが、ブラウザケイパビリティモデルへの適用は初。</p>
+  <p><strong>敵対者:</strong> 全クラス（実装バグの防止）。<strong>Phase:</strong> 1。</p>
+
+  <!-- ═══════════════ N7 ═══════════════ -->
+  <h2 id="n7" class="content-section">N7. 認知クエリ正規化 (CQN)</h2>
+  <p>NLクエリの言語パターン（語彙、構文、略語頻度）は95%超の精度でユーザーを特定する（Narayanan &amp; Shmatikov, 2008 文体分析）。CQNはE5の基本的な正規化を完全な認知指紋防御システムに拡張する。</p>
+
+  <h3 id="n7-attack" class="content-section">クエリ文体攻撃</h3>
+  <p>言語的指紋の特徴: 語彙分布、構文木の深さ、略語率、クエリ長分布、トピック遷移パターン — 最後の要素が最も強力な識別子。</p>
+
+  <h3 id="n7-pipeline" class="content-section">高度な正規化</h3>
+  <p>E5の基本パイプラインに加え、CQNは以下を追加: (1) ローカルLLMによるドメイン適応型同義語辞書、(2) クエリを「スタイル中立形」に変換するMLベースのスタイル中立化、(3) ダミー注入を伴う確率的クエリバッチ処理、(4) 急激なトピック変化からのパターン検出を防ぐブリッジクエリ挿入によるトピック遷移平滑化。</p>
+  <p>すべての正規化は<strong>デバイス上</strong>で実行される。正規化されたクエリのみがデバイスを離れる。</p>
+  <p><strong>新規性:</strong> &#9733;&#9733;&#9733;&#9733;&#9733; — 体系的なクエリ言語指紋消去はどのブラウザにも検索エンジンにも存在しない。</p>
+  <p><strong>敵対者:</strong> A1, A5。<strong>Phase:</strong> 2。</p>
+
+  <!-- ═══════════════ N8 ═══════════════ -->
+  <h2 id="n8" class="content-section">N8. DP予算コントローラ (DPBC)</h2>
+  <p>既存概念（AGTR, CSELP）は「DPノイズを注入」と述べるが、&epsilon;値、累積予算追跡、枯渇挙動を未定義のまま残している。DP保証は<strong>累積的に劣化する</strong> — 予算管理なしのDPはセキュリティシアターである。</p>
+
+  <h3 id="n8-budget" class="content-section">予算モデル</h3>
+  <p>デフォルト月間予算: &epsilon; = 1.0（Appleの2–8とGoogle RAPPORの ln(3) &approx; 1.1 の間）。最も厳密な保証のための<strong>zCDP</strong>（ゼロ濃縮差分プライバシー）による合成追跡（&rho;<sub>i</sub> = &epsilon;<sub>i</sub>&sup2;/2）。</p>
+  <table><thead><tr><th>予算使用率</th><th>挙動</th></tr></thead><tbody>
+    <tr><td>&lt; 70%</td><td>許可（通常運用）</td></tr>
+    <tr><td>70–90%</td><td>スロットル（&epsilon;自動削減、ユーザーに通知）</td></tr>
+    <tr><td>90–100%</td><td>警告（オプトイン確認が必要）</td></tr>
+    <tr><td>&ge; 100%</td><td>拒否（翌月までデータ収集停止）</td></tr>
+  </tbody></table>
+
+  <h3 id="n8-ui" class="content-section">プライバシー予算UI</h3>
+  <p><code>quira://settings/privacy/budget</code> にリアルタイム予算ゲージを表示 — コンポーネント別消費（AGTR, CSELP, GEAP）、残り&epsilon;、リセット日。すべてのノイズ注入は<strong>デバイス上</strong>で実行 — サーバーは&epsilon;を知りえない。</p>
+  <p><strong>新規性:</strong> &#9733;&#9733;&#9733;&#9733; — クロスコンポーネントzCDP予算を管理するプライバシー予算UIを統合したブラウザは存在しない。</p>
+  <p><strong>敵対者:</strong> A1, A5。<strong>Phase:</strong> 2。</p>
+
+  <!-- ═══════════════ Priority Map ═══════════════ -->
+  <h2 id="priority-map" class="content-section">優先度マップ</h2>
+  <table><thead><tr><th>ID</th><th>構造</th><th>&#9733;</th><th>Phase</th><th>敵対者</th></tr></thead><tbody>
+    <tr><td>N1</td><td>CGS — 暗号グラフシュレッディング</td><td>&#9733;4</td><td>1–2</td><td>A4, A5</td></tr>
+    <tr><td>N2</td><td>FIL — フォレンジック完全性層</td><td>&#9733;5</td><td>2</td><td>A2–A5</td></tr>
+    <tr><td>N3</td><td>SEF — 投機的実行ファイアウォール</td><td>&#9733;3</td><td>2–3</td><td>A4</td></tr>
+    <tr><td>N4</td><td>GEAP — グラフエクスポート匿名化</td><td>&#9733;4</td><td>2–3</td><td>A1, A3</td></tr>
+    <tr><td>N5</td><td>VSCA — 検証可能サプライチェーン</td><td>&#9733;3</td><td>1–2</td><td>A5</td></tr>
+    <tr><td>N6</td><td>FSIE — 形式的セキュリティ不変条件エンジン</td><td>&#9733;4</td><td>1</td><td>全</td></tr>
+    <tr><td>N7</td><td>CQN — 認知クエリ正規化</td><td>&#9733;5</td><td>2</td><td>A1, A5</td></tr>
+    <tr><td>N8</td><td>DPBC — DP予算コントローラ</td><td>&#9733;4</td><td>2</td><td>A1, A5</td></tr>
+  </tbody></table>
+
+  <h3 id="coverage-improvement" class="content-section">カバレッジ改善</h3>
+  <table><thead><tr><th>敵対者</th><th>改善前</th><th>+E1–E6</th><th>+N1–N8</th><th>向上</th></tr></thead><tbody>
+    <tr><td>A1 — ネットワーク</td><td>40%</td><td>50%</td><td>70%</td><td>+30%</td></tr>
+    <tr><td>A2 — Webコンテンツ</td><td>80%</td><td>85%</td><td>90%</td><td>+10%</td></tr>
+    <tr><td>A3 — 拡張機能</td><td>75%</td><td>80%</td><td>90%</td><td>+15%</td></tr>
+    <tr><td>A4 — OSレベル</td><td>60%</td><td>70%</td><td>85%</td><td>+25%</td></tr>
+    <tr><td>A5 — ベンダー</td><td>30%</td><td>40%</td><td>65%</td><td>+35%</td></tr>
+  </tbody></table>
+
+  <h3>新規攻撃ベクトル</h3>
+  <table><thead><tr><th>ベクトル</th><th>敵対者</th><th>防御</th></tr></thead><tbody>
+    <tr><td>A4.4 ディスク窃取によるEmbedding逆変換</td><td>A4</td><td>N1 (CGS) + E1</td></tr>
+    <tr><td>A4.5 LLM推論へのSpectre-BHB</td><td>A4</td><td>N3 (SEF)</td></tr>
+    <tr><td>A5.3 バイナリサプライチェーン改竄</td><td>A5</td><td>N5 (VSCA)</td></tr>
+    <tr><td>A5.4 クエリ文体特定</td><td>A5</td><td>N7 (CQN) + E5</td></tr>
+    <tr><td>A-cross 監査ログ改竄</td><td>全</td><td>N2 (FIL) + E3</td></tr>
+    <tr><td>A-cross グラフ再特定</td><td>A1, A3</td><td>N4 (GEAP)</td></tr>
+    <tr><td>A-cross DP予算枯渇</td><td>A1, A5</td><td>N8 (DPBC)</td></tr>
+    <tr><td>A-cross セキュリティ不変条件違反</td><td>全</td><td>N6 (FSIE)</td></tr>
+  </tbody></table>
+
+  <PrevNext prev={{ href: '/docs/ja/security/hardening/', title: 'セキュリティ強化策' }} next={{ href: '/docs/ja/use-cases/developers/', title: '開発者向け' }} />
+</DocsLayout>

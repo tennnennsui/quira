@@ -1,0 +1,69 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'for-developers', text: 'For Developers', depth: 2 },
+  { id: 'technical-research', text: 'Technical research workflow', depth: 2 },
+  { id: 'api-docs', text: 'API documentation browsing', depth: 2 },
+  { id: 'deep-dives', text: 'Stack Overflow & GitHub deep dives', depth: 2 },
+  { id: 'code-review', text: 'Code review context retention', depth: 2 },
+  { id: 'example-rsc', text: 'Example: Researching React Server Components', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="For Developers" description="How developers use Quira's Context Graph to accelerate technical research, API exploration, and code review." section="Use Cases" headings={headings}>
+  <h1 id="for-developers" class="content-section">For Developers</h1>
+  <p>Developers spend a significant portion of their day researching — reading documentation, debugging Stack Overflow threads, exploring GitHub repositories, and reviewing pull requests. Quira's <a href="/docs/en/core-concepts/context-graph/">Context Graph</a> captures the connections between all these sources automatically, so you never lose the trail of a complex investigation.</p>
+
+  <h2 id="technical-research" class="content-section">Technical research workflow</h2>
+  <p>When you start researching a new library, framework, or architectural pattern, Quira builds a graph of every page you visit. Unlike browser history — a flat, chronological list — the Context Graph captures <strong>how</strong> you navigated between pages, which tabs were open simultaneously, and what you searched for.</p>
+  <ul>
+    <li><strong>Automatic topic clustering</strong> — Pages about the same technology are grouped into clusters by the <a href="/docs/en/core-concepts/local-ai/">Local AI</a></li>
+    <li><strong>Cross-session continuity</strong> — Return to a research topic days later and see exactly where you left off via <a href="/docs/en/core-concepts/research-replay/">Research Replay</a></li>
+    <li><strong>Semantic search</strong> — Ask questions like "what were the performance trade-offs I read about?" using <a href="/docs/en/features/nl-query/">Natural Language Query</a></li>
+  </ul>
+  <Callout type="tip" title="Context Spaces for projects">
+    <p>Create a dedicated <a href="/docs/en/core-concepts/context-spaces/">Context Space</a> for each project or technology spike. This keeps your research isolated and easy to revisit, similar to topic branches in Git.</p>
+  </Callout>
+
+  <h2 id="api-docs" class="content-section">API documentation browsing</h2>
+  <p>API documentation often requires jumping between multiple pages — function signatures, type definitions, examples, changelogs. Quira tracks these navigation patterns and surfaces related API pages when you return to a documentation site.</p>
+  <ul>
+    <li>The graph links API endpoints to the examples you viewed alongside them</li>
+    <li>When you revisit a docs site, Quira suggests previously explored sections</li>
+    <li>Export your exploration path as Markdown for team documentation</li>
+  </ul>
+
+  <h2 id="deep-dives" class="content-section">Stack Overflow & GitHub deep dives</h2>
+  <p>A typical debugging session might span dozens of Stack Overflow answers, GitHub issues, and blog posts. Quira preserves the entire investigation trail:</p>
+  <ol>
+    <li>You search for an error message on Stack Overflow</li>
+    <li>Follow links to GitHub issues referenced in answers</li>
+    <li>Read related pull requests and commit messages</li>
+    <li>Visit blog posts linked in comments</li>
+  </ol>
+  <p>Each of these pages becomes a node in the Context Graph, with edges representing your actual navigation flow. Later, you can query: "show me everything I found about that memory leak in React 18" and Quira retrieves the entire subgraph.</p>
+
+  <h2 id="code-review" class="content-section">Code review context retention</h2>
+  <p>During code reviews, you often research unfamiliar patterns — checking documentation, reading related issues, or looking up best practices. Quira links these research pages to the PR you were reviewing:</p>
+  <ul>
+    <li>The Context Graph automatically associates pages visited during a review session with the PR URL</li>
+    <li>When you return to a PR, Quira surfaces the background research you did</li>
+    <li>Export your review context as notes attached to your code review comments</li>
+  </ul>
+
+  <h2 id="example-rsc" class="content-section">Example: Researching React Server Components</h2>
+  <p>Here is a realistic scenario showing Quira's value for a developer researching React Server Components:</p>
+  <ol>
+    <li><strong>Create a Context Space</strong> called "RSC Research"</li>
+    <li><strong>Start browsing</strong> — React docs, Next.js docs, RFC discussions on GitHub</li>
+    <li><strong>Quira captures</strong> — 47 pages across 8 domains, automatically clustered into subtopics: "data fetching", "streaming SSR", "bundle size", "migration path"</li>
+    <li><strong>Two days later</strong>, resume with Research Replay — Quira shows your last session's graph and highlights unread tabs</li>
+    <li><strong>Ask a question</strong> — "what did the RFC say about streaming?" — Quira finds the exact GitHub discussion and highlights the relevant section</li>
+    <li><strong>Export</strong> — Generate a Markdown summary of your research for a team ADR (Architecture Decision Record)</li>
+  </ol>
+  <Callout type="note" title="Privacy during research">
+    <p>All Context Graph data stays on your device. Your research patterns, visited pages, and AI-generated summaries are never sent to external servers in <a href="/docs/en/features/ai-privacy/">LOCAL mode</a>.</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/en/security/permission-system/', title: 'Permission System' }} next={{ href: '/docs/en/use-cases/researchers/', title: 'For Researchers' }} />
+</DocsLayout>

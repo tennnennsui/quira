@@ -1,0 +1,29 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'llm-integration', text: 'LLM Integration', depth: 2 },
+  { id: 'how-nl-query-works', text: 'How NL Query works internally', depth: 2 },
+  { id: 'ai-capability-latencies', text: 'AI capability latencies', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="LLM Integration" description="How Quira's RAG pipeline works under the hood." section="Architecture" headings={headings}>
+  <h1 id="llm-integration" class="content-section">LLM Integration</h1>
+  <p>The <a href="/docs/en/core-concepts/local-ai/">Local AI</a> section covered what the AI does. This section explains how it works under the hood. Quira's AI capabilities are powered by llama.cpp (cross-platform) and MLX (Apple Silicon). The model is downloaded on first run and stored locally.</p>
+  <h2 id="how-nl-query-works" class="content-section">How NL Query works internally</h2>
+  <p>When you submit a natural language query, Quira uses a RAG (Retrieval-Augmented Generation) pipeline over your Context Graph:</p>
+  <ol>
+    <li><strong>Query embedding</strong>  EYour question is converted to a 384-dimensional embedding vector.</li>
+    <li><strong>Retrieval</strong>  Esqlite-vec finds the most semantically similar nodes. FTS5 supplements with keyword matches.</li>
+    <li><strong>Context assembly</strong>  ERetrieved node summaries, entities, and metadata are assembled into a context window for the LLM.</li>
+    <li><strong>Generation with citations</strong>  EThe LLM generates a response grounded in the retrieved context, with mandatory source citations.</li>
+  </ol>
+  <h2 id="ai-capability-latencies" class="content-section">AI capability latencies</h2>
+  <table><thead><tr><th>AI Capability</th><th>Trigger</th><th>Target Latency</th></tr></thead><tbody>
+    <tr><td>Page summarization</td><td>Automatic on node creation</td><td>&lt; 2s</td></tr>
+    <tr><td>Entity extraction</td><td>Automatic on node creation</td><td>&lt; 1s</td></tr>
+    <tr><td>Embedding generation</td><td>Automatic on node creation</td><td>&lt; 500ms</td></tr>
+    <tr><td>NL Query (100 nodes)</td><td>User-initiated via Command Palette</td><td>&lt; 3s</td></tr>
+  </tbody></table>
+  <PrevNext prev={{ href: '/docs/en/architecture/storage/', title: 'Storage (SQLite)' }} next={{ href: '/docs/en/contributing/dev-setup/', title: 'Development Setup' }} />
+</DocsLayout>

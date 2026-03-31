@@ -1,0 +1,53 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'quick-start', text: 'Quick Start', depth: 2 },
+  { id: 'steps', text: 'Steps', depth: 2 },
+  { id: 'querying-the-context-graph', text: 'Querying the Context Graph', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Quick Start" description="Get Quira up and running in under five minutes with your Context Graph building automatically." section="Getting Started" headings={headings}>
+  <h1 id="quick-start" class="content-section">Quick Start</h1>
+  <p>Now that you know <a href="/docs/en/getting-started/what-is-quira/">what Quira is</a>, let's get it running. You'll have your <a href="/docs/en/core-concepts/context-graph/">Context Graph</a> building in under five minutes.</p>
+  <h2 id="steps" class="content-section">Steps</h2>
+  <h3>1. Download and install</h3>
+  <p>Grab the latest release for your platform. Quira currently supports macOS (Apple Silicon and Intel) and Linux.</p>
+  <pre><code>{`# macOS (Apple Silicon)
+curl -fsSL https://get.qu-ira.com | sh
+
+# Linux (Debian/Ubuntu)
+wget -qO- https://get.qu-ira.com/linux | sudo sh`}</code></pre>
+  <h3>2. Set up your local AI</h3>
+  <p>On first launch, Quira will download the Phi-3.5 Mini model (~2.3 GB). You can browse normally while the download completes in the background.</p>
+  <h3>3. Browse naturally</h3>
+  <p>Use Quira like any browser. Pages you spend 30+ seconds on are automatically captured as context nodes. You'll see dots appear in the ambient sidebar as your Context Graph grows.</p>
+  <h3>4. Ask your browser</h3>
+  <p>Open the Command Palette with <code>Cmd+Shift+P</code> and ask a question in plain English. Quira searches your Context Graph and returns answers with cited sources.</p>
+  <hr>
+  <h2 id="querying-the-context-graph" class="content-section">Querying the Context Graph</h2>
+  <p>With Quira installed and your Context Graph growing, here's a taste of what you can build on top of it. The <a href="/docs/en/api/graph-query-api/">Graph Query API</a> lets extensions and <a href="/docs/en/api/plugin-api/">plugins</a> search the Context Graph programmatically.</p>
+  <pre><code>{`// Query your browsing context
+const results = await quira.graph.query("What did I read about React this week?");
+
+console.log(results.nodes);    // Related context nodes
+console.log(results.sources);  // Original page URLs
+console.log(results.summary);  // AI-generated summary`}</code></pre>
+  <p>The response includes full citation data  Eevery claim in the summary links back to the original page you visited, along with timestamps and dwell time. This is the zero-hallucination guarantee: Quira only answers from what you've actually read.</p>
+  <pre><code>{`// Get nodes related to the current page
+const related = await quira.graph.getRelated(currentUrl, {
+  hops: 2,          // Traverse up to 2 edges
+  limit: 10,         // Maximum nodes to return
+  minWeight: 0.3,    // Minimum edge weight
+});
+
+// Filter by entity type
+const techNodes = related.filter(n =>
+  n.entities.some(e => e.type === "technology")
+);`}</code></pre>
+  <Callout type="warning" title="API is in alpha">
+    <p>The Graph Query API is under active development. Method signatures may change before the v1.0 stable release. Pin your extension to a specific Quira version if you depend on these APIs in production.</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/en/getting-started/what-is-quira/', title: 'What is Quira?' }} next={{ href: '/docs/en/getting-started/installation/', title: 'Installation' }} />
+</DocsLayout>

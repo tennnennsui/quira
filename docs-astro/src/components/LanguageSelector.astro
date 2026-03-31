@@ -1,0 +1,48 @@
+---
+import { languages, getLangFromPath, switchLangPath, type Lang } from '../i18n/translations';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const currentPath = Astro.url.pathname;
+const currentLabel = languages[lang].label;
+const otherLangs = (Object.keys(languages) as Lang[]).filter(l => l !== lang);
+
+const englishUrl = lang === 'en' ? currentPath : switchLangPath(currentPath, 'en');
+const japaneseUrl = lang === 'ja' ? currentPath : switchLangPath(currentPath, 'ja');
+---
+
+<div style="position:relative;" id="lang-dropdown">
+  <button class="lang-btn" style="display:flex;align-items:center;gap:6px;padding:6px 10px;font-size:14px;color:#C2C0B6;background:none;border:1px solid rgba(222,220,209,0.15);border-radius:8px;cursor:pointer;font-family:inherit;">
+    <span id="current-lang">{currentLabel}</span>
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+  <div id="lang-menu" style="display:none;position:absolute;top:calc(100% + 4px);right:0;background:#1F1E1D;border:1px solid rgba(222,220,209,0.15);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.4);overflow:hidden;min-width:150px;z-index:200;">
+    <a href={englishUrl} class="lang-option" style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:14px;color:#FAF9F5;text-decoration:none;">
+      English
+    </a>
+    <a href={japaneseUrl} class="lang-option" style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:14px;color:#FAF9F5;text-decoration:none;">
+      日本語
+    </a>
+  </div>
+</div>
+
+<script is:inline>
+  (function() {
+    if (window.__langSelectorInit) return;
+    window.__langSelectorInit = true;
+    document.addEventListener('click', function(e) {
+      var langMenu = document.getElementById('lang-menu');
+      if (!langMenu) return;
+      var langBtn = document.querySelector('.lang-btn');
+      if (langBtn && langBtn.contains(e.target)) {
+        e.stopPropagation();
+        langMenu.style.display = langMenu.style.display !== 'none' ? 'none' : 'block';
+      } else {
+        langMenu.style.display = 'none';
+      }
+    });
+  })();
+</script>

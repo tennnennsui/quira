@@ -1,0 +1,38 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'graph-visualization', text: 'グラフビジュアライゼーション', depth: 2 },
+  { id: 'visual-language', text: 'ビジュアル言語', depth: 2 },
+  { id: 'filtering-and-controls', text: 'フィルタリングとコントロール', depth: 2 },
+  { id: 'performance-targets', text: 'パフォーマンス目標', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="グラフビジュアライゼーション" description="quira://graph の WebGPU 搭載フルグラフエクスプローラーで Context Graph を60fps で視覚的に探索しましょう。" section="機能" headings={headings}>
+  <h1 id="graph-visualization" class="content-section">グラフビジュアライゼーション</h1>
+  <p>テキストで <a href="/docs/ja/features/nl-query/">Context Graph をクエリ</a>してきました。次はそれを視覚的に見てみましょう。<code>quira://graph</code> にあるフルグラフエクスプローラーは、<a href="/docs/ja/core-concepts/context-graph/">Context Graph</a> 全体を WebGPU でレンダリングし、1,000 以上のノードで 60fps を実現します。</p>
+  <h2 id="visual-language" class="content-section">ビジュアル言語：Neural Network x Constellation</h2>
+  <ul>
+    <li>暗い背景に浮かぶ発光ノード</li>
+    <li>ノードの色は訪問頻度を表します（寒色から暖色のグラデーション）</li>
+    <li>エッジは光の経路として描画され、クラスターは星雲のエフェクトを表示</li>
+    <li>新しいノードの出現は「星の誕生」アニメーションをトリガー</li>
+    <li>Calm Tech ブランドアイデンティティとの一貫性</li>
+  </ul>
+  <h2 id="filtering-and-controls" class="content-section">フィルタリングとコントロール</h2>
+  <ul>
+    <li><strong>日付範囲フィルター</strong> — 特定の期間にフォーカス</li>
+    <li><strong>ドメインフィルター</strong> — 特定のウェブサイトのノードのみ表示</li>
+    <li><strong>タグフィルター</strong> — ユーザーが割り当てたタグでフィルタリング</li>
+    <li><strong>タイムラインスライダー</strong> — 時間をスクラブしてグラフの変化を確認</li>
+    <li><strong>ズーム/パン</strong> — ナビゲーション用の標準キャンバスコントロール</li>
+    <li><strong>ドメイン除外</strong> — 任意のノードを右クリックして遡及的に除外</li>
+  </ul>
+  <h2 id="performance-targets" class="content-section">パフォーマンス目標</h2>
+  <table><thead><tr><th>パフォーマンス指標</th><th>目標</th></tr></thead><tbody>
+    <tr><td>グラフレンダリング（1,000 ノード）</td><td>60fps（WebGPU）</td></tr>
+    <tr><td>ノード検索（FTS5）</td><td>&lt; 100ms</td></tr>
+    <tr><td>埋め込み類似検索（10K ベクトルの k-NN）</td><td>&lt; 500ms</td></tr>
+  </tbody></table>
+  <PrevNext prev={{ href: '/docs/ja/features/ai-privacy/', title: 'AI プライバシーレベル' }} next={{ href: '/docs/ja/features/export-import/', title: 'エクスポート & インポート' }} />
+</DocsLayout>

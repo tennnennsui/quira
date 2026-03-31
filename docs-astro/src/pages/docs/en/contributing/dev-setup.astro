@@ -1,0 +1,35 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'development-setup', text: 'Development Setup', depth: 2 },
+  { id: 'prerequisites', text: 'Prerequisites', depth: 2 },
+  { id: 'one-command-setup', text: 'One-command setup', depth: 2 },
+  { id: 'development-commands', text: 'Development commands', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Development Setup" description="Set up the full development environment for building Quira from source." section="Contributing" headings={headings}>
+  <h1 id="development-setup" class="content-section">Development Setup</h1>
+  <p>Ready to contribute? The <a href="/docs/en/getting-started/installation/">Installation</a> section covered end-user setup. This section covers the full development environment for building Quira from source.</p>
+  <h2 id="prerequisites" class="content-section">Prerequisites</h2>
+  <table><thead><tr><th>Tool</th><th>Version</th><th>Purpose</th></tr></thead><tbody>
+    <tr><td>Rust</td><td>1.75+</td><td>Core browser, UI layer, graph engine</td></tr>
+    <tr><td>Node.js</td><td>20+</td><td>Build tooling, extension system</td></tr>
+    <tr><td>Just</td><td>latest</td><td>Command runner (replaces Make)</td></tr>
+  </tbody></table>
+  <h2 id="one-command-setup" class="content-section">One-command setup</h2>
+  <pre><code>{`git clone https://github.com/tennnennsui/quira.git
+cd cortex
+just setup    # Installs all dependencies + downloads model`}</code></pre>
+  <h2 id="development-commands" class="content-section">Development commands</h2>
+  <pre><code>{`just dev      # Start development server with hot-reload
+just test     # Run the full test suite
+just lint     # Run linters (rustfmt + clippy + eslint)
+just build    # Build release binary
+just bench    # Run performance benchmarks`}</code></pre>
+  <Callout type="tip" title="Dev Container support">
+    <p>The repository includes a <code>.devcontainer</code> for VS Code and GitHub Codespaces. Open the project in a container for a fully configured environment with zero manual setup.</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/en/architecture/llm-integration/', title: 'LLM Integration' }} next={{ href: '/docs/en/contributing/code-style/', title: 'Code Style' }} />
+</DocsLayout>

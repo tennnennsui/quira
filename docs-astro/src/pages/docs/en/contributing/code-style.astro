@@ -1,0 +1,38 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'code-style', text: 'Code Style', depth: 2 },
+  { id: 'rust', text: 'Rust', depth: 2 },
+  { id: 'typescript', text: 'TypeScript', depth: 2 },
+  { id: 'commit-conventions', text: 'Commit conventions', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Code Style" description="Coding conventions for Rust and TypeScript when contributing to Quira." section="Contributing" headings={headings}>
+  <h1 id="code-style" class="content-section">Code Style</h1>
+  <p>With your <a href="/docs/en/contributing/dev-setup/">development environment</a> set up, follow these conventions when writing code for Quira.</p>
+  <h2 id="rust" class="content-section">Rust</h2>
+  <ul>
+    <li>Format with <code>rustfmt</code> (enforced in CI)</li>
+    <li>Lint with <code>clippy</code> at the <code>pedantic</code> level</li>
+    <li>Prefer immutable patterns  Euse <code>let</code> over <code>let mut</code> where possible</li>
+    <li>Functions should be under 50 lines; files under 800 lines</li>
+    <li>Avoid <code>unwrap()</code> in production code  Euse <code>?</code> operator or explicit error handling</li>
+  </ul>
+  <h2 id="typescript" class="content-section">TypeScript</h2>
+  <ul>
+    <li>Format with <code>Prettier</code>, lint with <code>ESLint</code></li>
+    <li>Strict TypeScript  Eno <code>any</code> types, strict null checks enabled</li>
+    <li>Immutable-first  Eprefer <code>const</code>, <code>readonly</code>, and spread operators over mutation</li>
+    <li>No deep nesting beyond 4 levels</li>
+  </ul>
+  <h2 id="commit-conventions" class="content-section">Commit conventions</h2>
+  <p>All commits follow the <a href="https://www.conventionalcommits.org/">Conventional Commits</a> format:</p>
+  <pre><code>feat: add Space color picker
+fix: prevent duplicate nodes for redirected URLs
+refactor: extract graph renderer into separate module
+docs: update NL Query API reference
+test: add edge weight calculation tests
+perf: optimize FTS5 index rebuild on large graphs</code></pre>
+  <PrevNext prev={{ href: '/docs/en/contributing/dev-setup/', title: 'Development Setup' }} next={{ href: '/docs/en/contributing/pull-requests/', title: 'Pull Requests' }} />
+</DocsLayout>

@@ -1,0 +1,25 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'ai-privacy-levels', text: 'AI Privacy Levels', depth: 2 },
+  { id: 'privacy-levels', text: 'Privacy levels', depth: 2 },
+  { id: 'per-site-privacy', text: 'Per-site privacy settings', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="AI Privacy Levels" description="Control how Quira processes your data  Efrom fully local AI to opt-in cloud models." section="Features" headings={headings}>
+  <h1 id="ai-privacy-levels" class="content-section">AI Privacy Levels</h1>
+  <p>The <a href="/docs/en/core-concepts/local-ai/">Local AI</a> runs on-device by default, but you can opt into cloud models for more capability. Quira offers two AI privacy levels in the MVP, with the architecture supporting future expansion to four levels.</p>
+  <h2 id="privacy-levels" class="content-section">Privacy levels</h2>
+  <table><thead><tr><th>Level</th><th>Label</th><th>Data Flow</th><th>Default</th></tr></thead><tbody>
+    <tr><td>Level 1</td><td>LOCAL</td><td>All processing on-device</td><td>Yes (default)</td></tr>
+    <tr><td>Level 2</td><td>CLOUD</td><td>Heavy tasks offloaded to cloud (opt-in)</td><td>No</td></tr>
+  </tbody></table>
+  <h2 id="per-site-privacy" class="content-section">Per-site privacy settings</h2>
+  <p>You can configure privacy levels on a per-site basis at <code>quira://settings/ai</code>. For example, you might use CLOUD mode for general research while keeping LOCAL mode for sensitive sites.</p>
+  <Callout type="warning" title="Data sovereignty guarantee">
+    <p>Even in CLOUD mode, your browsing history and Context Graph data never leave the device. Only the query text and relevant AI-generated summaries are sent to the cloud service. Raw page content is never transmitted.</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/en/features/nl-query/', title: 'Natural Language Query' }} next={{ href: '/docs/en/features/graph-visualization/', title: 'Graph Visualization' }} />
+</DocsLayout>

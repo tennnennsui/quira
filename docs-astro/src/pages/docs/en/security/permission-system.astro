@@ -1,0 +1,89 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'permission-system', text: 'Permission System', depth: 2 },
+  { id: 'capability-based-security', text: 'Capability-based security', depth: 2 },
+  { id: 'context-tcc', text: 'Context TCC', depth: 2 },
+  { id: 'tcc-permissions', text: 'TCC permission types', depth: 3 },
+  { id: 'information-flow-control', text: 'Information Flow Control', depth: 2 },
+  { id: 'space-scoped-security', text: 'Space-scoped security boundaries', depth: 2 },
+  { id: 'plugin-sandboxing', text: 'Plugin sandboxing', depth: 2 },
+  { id: 'per-site-permissions', text: 'Per-site permissions', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Permission System" description="Capability-based security, Context TCC, Information Flow Control, and Space-scoped security boundaries." section="Security & Privacy" headings={headings}>
+  <h1 id="permission-system" class="content-section">Permission System</h1>
+  <p>Quira replaces the traditional identity-based access model — "who are you?" — with a <strong>capability-based security</strong> model — "what proof do you hold?" This fundamental shift eliminates ambient authority and makes every permission explicit, scoped, and time-limited.</p>
+
+  <h2 id="capability-based-security" class="content-section">Capability-based security</h2>
+  <p>In traditional browsers, extensions and pages operate under ambient authority: once granted a broad permission, they can exercise it freely. Quira eliminates this pattern entirely. All capability token evaluations are centralized through the <a href="/docs/en/security/advanced-architecture/#cta">Context Trust Arbiter (CTA)</a> — a single point of decision inspired by macOS AMFI.</p>
+  <table><thead><tr><th>Property</th><th>Traditional (Chrome/Firefox)</th><th>Quira</th></tr></thead><tbody>
+    <tr><td>Access model</td><td>Identity-based ACL</td><td>Capability token (unforgeable)</td></tr>
+    <tr><td>Token creation</td><td>Granted at install</td><td>HMAC-SHA256 bound to process + timestamp</td></tr>
+    <tr><td>Scope</td><td>Global or per-origin</td><td>Per-Space, per-permission, per-session</td></tr>
+    <tr><td>Delegation</td><td>Not possible</td><td>Attenuated sub-capabilities (read-only from read-write)</td></tr>
+    <tr><td>Revocation</td><td>Uninstall or manual toggle</td><td>Instant invalidation, all derived tokens revoked</td></tr>
+    <tr><td>Lifetime</td><td>Permanent until revoked</td><td>Time-bounded decay (configurable TTL)</td></tr>
+  </tbody></table>
+  <Callout type="info" title="No ambient authority">
+    <p>A capability token is unforgeable, non-transferable, and process-bound. Even if an extension's memory is compromised, the attacker cannot use stolen tokens from a different process.</p>
+  </Callout>
+
+  <h2 id="context-tcc" class="content-section">Context TCC</h2>
+  <p>Inspired by macOS TCC (Transparency, Consent, and Control), <strong>Context TCC</strong> applies the same explicit consent model to the Context Graph — a category of data no browser has ever protected at this granularity.</p>
+  <p>Whenever a plugin or internal subsystem requests access to the Context Graph, Context TCC intercepts the request and presents a clear consent dialog explaining exactly what data will be accessed and why.</p>
+
+  <h3 id="tcc-permissions" class="content-section">TCC permission types</h3>
+  <table><thead><tr><th>Permission</th><th>Scope</th><th>What it allows</th><th>Sensitivity</th></tr></thead><tbody>
+    <tr><td><code>read:nodes</code></td><td>Per-Space</td><td>Read page titles, URLs, and metadata from the graph</td><td>Medium</td></tr>
+    <tr><td><code>read:embeddings</code></td><td>Per-Space</td><td>Read semantic embedding vectors — most sensitive permission</td><td>Critical</td></tr>
+    <tr><td><code>write:edges</code></td><td>Per-Space</td><td>Create or modify relationships between graph nodes</td><td>High</td></tr>
+    <tr><td><code>query:nl</code></td><td>Per-Space</td><td>Run natural language queries against the graph via the AI layer</td><td>High</td></tr>
+  </tbody></table>
+  <Callout type="warning" title="read:embeddings is critical">
+    <p>Embedding vectors encode semantic meaning of your browsing content. They can be inverted to reconstruct approximate page content. This permission requires explicit consent per Space and is never auto-granted.</p>
+  </Callout>
+
+  <h2 id="information-flow-control" class="content-section">Information Flow Control</h2>
+  <p>Beyond controlling who can <em>access</em> data, Quira tracks where data <em>flows</em>. Every piece of data in the Context Graph carries an IFC label that constrains its propagation.</p>
+  <ul>
+    <li><strong>Monotonic labels</strong> — Sensitivity labels can only increase, never decrease. Data derived from a "confidential" source inherits at least "confidential" sensitivity.</li>
+    <li><strong>Taint tracking</strong> — When AI processes graph data, the output inherits the maximum sensitivity of all inputs.</li>
+    <li><strong>Cross-Space barrier</strong> — Data from a Work Space cannot silently flow into a Personal Space. The user must explicitly authorize cross-Space transfers.</li>
+    <li><strong>Export control</strong> — Data leaving the browser (clipboard, file export, network) is checked against its IFC label. High-sensitivity data triggers a confirmation dialog.</li>
+  </ul>
+
+  <h2 id="space-scoped-security" class="content-section">Space-scoped security boundaries</h2>
+  <p>Context Spaces are not just organizational containers — they are <strong>security boundaries</strong>. Each Space has its own independent security configuration:</p>
+  <ul>
+    <li>Independent capability token pools (tokens from Space A cannot access Space B)</li>
+    <li>Separate privacy mode settings (Standard, Strict, Incognito per Space)</li>
+    <li>Isolated Context Graph partitions with independent encryption keys</li>
+    <li>Per-Space audit logs for all graph write operations</li>
+  </ul>
+
+  <h2 id="plugin-sandboxing" class="content-section">Plugin sandboxing</h2>
+  <p>Quira plugins run in a sandboxed environment with a declarative capability model:</p>
+  <ul>
+    <li><strong>Manifest declarations</strong> — Each plugin declares required capabilities in its manifest</li>
+    <li><strong>Attenuated delegation</strong> — Plugins receive the minimum capability tokens needed, not broad permissions</li>
+    <li><strong>Network allowlist</strong> — Plugins can only connect to domains declared in their manifest</li>
+    <li><strong>Storage quotas</strong> — Per-plugin storage limit (default 10 MB)</li>
+    <li><strong>Audit logging</strong> — All Context Graph operations by plugins are logged at <code>quira://settings/security/audit</code></li>
+  </ul>
+
+  <h2 id="per-site-permissions" class="content-section">Per-site permissions</h2>
+  <p>Traditional web permissions (camera, microphone, location, notifications) follow the same capability model:</p>
+  <table><thead><tr><th>Category</th><th>APIs</th><th>Default</th></tr></thead><tbody>
+    <tr><td>Location</td><td>Geolocation API</td><td>Ask every time</td></tr>
+    <tr><td>Camera and Microphone</td><td>getUserMedia</td><td>Ask every time</td></tr>
+    <tr><td>Notifications</td><td>Notification API, Push API</td><td>Blocked</td></tr>
+    <tr><td>Clipboard</td><td>Clipboard API (read)</td><td>Ask every time</td></tr>
+    <tr><td>Autoplay</td><td>Audio/video autoplay</td><td>Blocked (user gesture required)</td></tr>
+    <tr><td>Downloads</td><td>Programmatic file downloads</td><td>Ask every time</td></tr>
+  </tbody></table>
+
+  <PrevNext prev={{ href: '/docs/en/security/threat-protection/', title: 'Threat Protection' }} next={{ href: '/docs/en/security/advanced-architecture/', title: 'Advanced Architecture' }} />
+</DocsLayout>

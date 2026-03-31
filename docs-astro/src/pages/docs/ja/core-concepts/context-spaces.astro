@@ -1,0 +1,44 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'context-spaces', text: 'Context Spaces', depth: 2 },
+  { id: 'space-bar-ui', text: 'Space Bar UI', depth: 2 },
+  { id: 'inbox-space-gtd-model', text: 'Inbox Space（GTD モデル）', depth: 2 },
+  { id: 'environment-color-theming', text: '環境カラーテーマ', depth: 2 },
+  { id: 'keyboard-shortcuts', text: 'キーボードショートカットと操作', depth: 2 },
+  { id: 'automatic-tab-suspension', text: '自動タブサスペンド', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="Context Spaces" description="Quira の Context Spaces でタブをリサーチコンテキストごとに整理しましょう。" section="コアコンセプト" headings={headings}>
+  <h1 id="context-spaces" class="content-section">Context Spaces</h1>
+  <p><a href="/docs/ja/core-concepts/context-graph/">Context Graph</a> はブラウジングの構造をキャプチャします。Context Spaces はそれを整理する手段です。従来のタブグループをコンテキスト対応のワークスペースに置き換えます。各 Space は、タブ、ノート、<a href="/docs/ja/core-concepts/local-ai/">AI 要約</a>、そして Context Graph の部分ビューの集合体で、プロジェクトやトピックごとに整理されます。</p>
+  <pre><code>Space = タブ + ノート + AI 要約 + Context Graph サブビュー</code></pre>
+  <h2 id="space-bar-ui" class="content-section">Space Bar UI</h2>
+  <p>Space Bar はタブストリップの上に配置され、明確な視覚的階層を作ります：Spaces &gt; タブ。初日はコンパクトな 28px の高さで、背景ブレンドにより控えめに表示されます。2つ以上の Space を作成すると 36px に拡大します。</p>
+  <h2 id="inbox-space-gtd-model" class="content-section">Inbox Space（GTD モデル）</h2>
+  <p>すべての新しいページはデフォルトで <strong>Inbox</strong> Space に開きます。Inbox は未分類のランディングゾーンです — ブラウザの GTD インボックスと考えてください。準備ができたらページをプロジェクト Space に振り分けます。3日間アクセスのないページは視覚的にフェードしますが、削除されることはありません。AI が「このページは [Space 名] に属する可能性があります」と提案することもあります。</p>
+  <h2 id="environment-color-theming" class="content-section">環境カラーテーマ</h2>
+  <p>各 Space にはタブストリップとツールバーの背景を色付けするカラーテーマがあります：</p>
+  <table><thead><tr><th>カラー</th><th>Hex</th><th>推奨用途</th></tr></thead><tbody>
+    <tr><td>Navy</td><td><code>#0D1B2A</code></td><td>デフォルト / Inbox</td></tr>
+    <tr><td>Amber</td><td><code>#E8A838</code></td><td>アクティブプロジェクト</td></tr>
+    <tr><td>Teal</td><td><code>#2A9D8F</code></td><td>リサーチ</td></tr>
+    <tr><td>Rose</td><td><code>#E76F51</code></td><td>緊急</td></tr>
+    <tr><td>Violet</td><td><code>#7B2CBF</code></td><td>クリエイティブ</td></tr>
+    <tr><td>Green</td><td><code>#52B788</code></td><td>個人</td></tr>
+    <tr><td>Slate</td><td><code>#6C757D</code></td><td>アーカイブ</td></tr>
+    <tr><td>Sky</td><td><code>#48CAE4</code></td><td>学習</td></tr>
+  </tbody></table>
+  <h2 id="keyboard-shortcuts" class="content-section">キーボードショートカットと操作</h2>
+  <table><thead><tr><th>アクション</th><th>方法</th></tr></thead><tbody>
+    <tr><td>Space を切り替え</td><td><code>Cmd+1</code> 〜 <code>Cmd+9</code></td></tr>
+    <tr><td>Space スイッチャー</td><td><code>Cmd+Shift+Space</code></td></tr>
+    <tr><td>タブを Space 間で移動</td><td>タブストリップから Space Bar へドラッグ＆ドロップ</td></tr>
+    <tr><td>新しい Space を作成</td><td>Space Bar の <code>+</code> ボタン、またはコマンドパレットから</td></tr>
+    <tr><td>Space の名前変更 / 色変更</td><td>右クリックコンテキストメニュー</td></tr>
+  </tbody></table>
+  <h2 id="automatic-tab-suspension" class="content-section">自動タブサスペンド</h2>
+  <p><strong>30分間</strong>非アクティブなタブは自動的にサスペンドされ、メモリが解放されます。サスペンドされたタブは暗くなったファビコンインジケーターで表示され、クリックすると即座に復元されます。サスペンドのタイムアウトは設定でカスタマイズ可能です。</p>
+  <PrevNext prev={{ href: '/docs/ja/core-concepts/context-graph/', title: 'Context Graph' }} next={{ href: '/docs/ja/core-concepts/local-ai/', title: 'Local AI' }} />
+</DocsLayout>

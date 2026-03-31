@@ -1,0 +1,86 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'threat-protection', text: 'Threat Protection', depth: 2 },
+  { id: 'ai-immune-system', text: 'AI Immune System', depth: 2 },
+  { id: 'adversarial-ml-defense', text: 'Adversarial ML defense', depth: 2 },
+  { id: 'ai-pipeline-defense', text: 'AI pipeline 4-layer defense', depth: 3 },
+  { id: 'living-security', text: 'Living Security', depth: 2 },
+  { id: 'phishing-detection', text: 'Phishing detection', depth: 2 },
+  { id: 'malware-blocking', text: 'Malware URL blocking', depth: 2 },
+  { id: 'certificate-validation', text: 'Certificate validation', depth: 2 },
+  { id: 'download-scanning', text: 'Download scanning', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Threat Protection" description="AI Immune System, adversarial ML defense, Living Security, and real-time threat detection." section="Security & Privacy" headings={headings}>
+  <h1 id="threat-protection" class="content-section">Threat Protection</h1>
+  <p>Quira's threat protection goes beyond traditional blocklists and heuristics. It introduces an <strong>AI Immune System</strong> that behaviorally baselines your browser and detects anomalies in real-time, plus <strong>adversarial ML defense</strong> that protects the browser's own AI from manipulation by web content.</p>
+
+  <h2 id="ai-immune-system" class="content-section">AI Immune System</h2>
+  <p>Inspired by biological immune systems, Quira's AI defense layer continuously monitors browser behavior and autonomous detects threats — even novel zero-day attacks that no blocklist has seen. All security events from the AI Immune System feed into the <a href="/docs/en/security/advanced-architecture/#cseb">Context Security Event Bus (CSEB)</a> for programmable rule evaluation and forensic audit.</p>
+  <table><thead><tr><th>Component</th><th>What it does</th><th>Example</th></tr></thead><tbody>
+    <tr><td>Behavioral baselining</td><td>Learns normal patterns for each user across resource usage, network patterns, and graph access</td><td>Detects a compromised extension suddenly accessing 100x more graph data than normal</td></tr>
+    <tr><td>Extension monitoring</td><td>Continuously profiles extension behavior against their declared capabilities</td><td>Flags an extension requesting network access outside its allowlisted domains</td></tr>
+    <tr><td>Anomaly scoring</td><td>Assigns real-time threat scores to active processes, tabs, and extensions</td><td>Quarantines a tab whose JavaScript is making rapid clipboard reads</td></tr>
+    <tr><td>Self-healing</td><td>Automatically revokes compromised capability tokens and isolates affected Spaces</td><td>If an extension's threat score exceeds threshold, its tokens are revoked and the extension is suspended</td></tr>
+  </tbody></table>
+  <Callout type="info" title="All analysis is local">
+    <p>The AI Immune System runs entirely on-device. Behavioral models are trained on your patterns locally and never leave the device. No browsing behavior is sent to external services for analysis.</p>
+  </Callout>
+
+  <h2 id="adversarial-ml-defense" class="content-section">Adversarial ML defense</h2>
+  <p>Quira's AI processes web content to build the Context Graph — which means web pages can attempt to manipulate the AI. This is the browser-specific equivalent of prompt injection, and Quira defends against it with purpose-built countermeasures.</p>
+  <ul>
+    <li><strong>Invisible text removal</strong> — Detect and strip hidden text (CSS hidden, zero-width characters, white-on-white) designed to pollute AI summaries</li>
+    <li><strong>Unicode normalization</strong> — Canonicalize all text before AI processing to prevent homograph-based entity confusion</li>
+    <li><strong>Entity validation</strong> — Cross-reference extracted entities against the existing Context Graph to detect implausible injections</li>
+    <li><strong>Embedding anomaly detection</strong> — Flag content whose embedding vectors are statistical outliers compared to the page's visible content</li>
+  </ul>
+
+  <h3 id="ai-pipeline-defense" class="content-section">AI pipeline 4-layer defense</h3>
+  <p>Every piece of web content that enters Quira's AI pipeline passes through four independent defense layers:</p>
+  <table><thead><tr><th>Layer</th><th>Function</th><th>What it catches</th></tr></thead><tbody>
+    <tr><td>L1 — Content Sanitization</td><td>Strip hidden text, normalize Unicode, remove injected instructions</td><td>Prompt injection, invisible SEO spam, adversarial text</td></tr>
+    <tr><td>L2 — Privilege Framing</td><td>Wrap all web content with explicit "untrusted source" framing before AI processes it</td><td>Content trying to impersonate system instructions</td></tr>
+    <tr><td>L3 — Output Schema Validation</td><td>AI output is validated against strict schemas — only structured data is accepted</td><td>Free-text manipulation, hallucinated entities, action injection</td></tr>
+    <tr><td>L4 — Capability Separation</td><td>The AI inference process has no capability tokens — it cannot read or write the graph directly</td><td>Even if the AI is fully compromised, it cannot exfiltrate data</td></tr>
+  </tbody></table>
+
+  <h2 id="living-security" class="content-section">Living Security</h2>
+  <p>Security in Quira is not a static configuration — it is a continuously adapting system. Living Security introduces the <strong>Security Health Score</strong>.</p>
+  <ul>
+    <li><strong>Security Health Score</strong> — A real-time composite score (0-100) visible in the toolbar, reflecting current security posture: extension risk, permission sprawl, outdated blocklists, etc.</li>
+    <li><strong>Adaptive recommendations</strong> — When the score drops, Quira suggests specific actions: revoking unused permissions, updating blocklists, removing suspicious extensions</li>
+    <li><strong>Threat memory</strong> — The AI Immune System remembers past threat patterns and can recognize variations even after the original threat signature changes</li>
+  </ul>
+
+  <h2 id="phishing-detection" class="content-section">Phishing detection</h2>
+  <p>Quira uses a multi-signal approach to detect phishing pages:</p>
+  <ul>
+    <li><strong>URL heuristics</strong> — Detects homograph attacks, excessive subdomains, and known phishing URL structures</li>
+    <li><strong>Local blocklist</strong> — Regularly updated list of confirmed phishing domains, checked entirely on-device</li>
+    <li><strong>Visual similarity</strong> — On-device ML model compares page layouts to known login pages and flags lookalikes</li>
+    <li><strong>Certificate age</strong> — Warns when visiting login pages on domains with certificates issued less than 7 days ago</li>
+  </ul>
+  <Callout type="warning" title="No data leaves your device">
+    <p>Unlike Chrome Safe Browsing or Firefox Phishing Protection, Quira's phishing detection runs entirely on-device. No URLs or page content are sent to external servers for evaluation.</p>
+  </Callout>
+
+  <h2 id="malware-blocking" class="content-section">Malware URL blocking</h2>
+  <p>Known malware distribution URLs are blocked at the network layer using a locally maintained blocklist updated via differential sync. Sources include URLhaus, PhishTank, and Quira's own threat intelligence feed.</p>
+
+  <h2 id="certificate-validation" class="content-section">Certificate validation</h2>
+  <table><thead><tr><th>Check</th><th>Description</th></tr></thead><tbody>
+    <tr><td>CT log verification</td><td>Verifies the certificate appears in at least two Certificate Transparency logs</td></tr>
+    <tr><td>TOFU pinning</td><td>Trust-on-first-use: warns if a site's certificate issuer changes unexpectedly</td></tr>
+    <tr><td>CA reputation</td><td>Flags certificates from CAs with a history of mis-issuance</td></tr>
+    <tr><td>Revocation check</td><td>OCSP stapling preferred; CRL fallback with local cache</td></tr>
+  </tbody></table>
+
+  <h2 id="download-scanning" class="content-section">Download scanning</h2>
+  <p>Downloaded files are checked against known-bad hashes before they are saved to disk. Executable files trigger an additional warning dialog showing the file's digital signature status and source domain reputation.</p>
+
+  <PrevNext prev={{ href: '/docs/en/security/content-filtering/', title: 'Content Filtering' }} next={{ href: '/docs/en/security/permission-system/', title: 'Permission System' }} />
+</DocsLayout>

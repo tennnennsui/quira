@@ -1,0 +1,29 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'llm-integration', text: 'LLM Integration', depth: 2 },
+  { id: 'how-nl-query-works', text: 'NL Query の内部動作', depth: 2 },
+  { id: 'ai-capability-latencies', text: 'AI 機能のレイテンシ', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="LLM Integration" description="Quira の RAG パイプラインが内部でどのように動作するか。" section="アーキテクチャ" headings={headings}>
+  <h1 id="llm-integration" class="content-section">LLM Integration</h1>
+  <p><a href="/docs/ja/core-concepts/local-ai/">Local AI</a> のセクションでは AI が何をするかを説明しました。このセクションでは、その内部の仕組みを解説します。Quira の AI 機能は llama.cpp（クロスプラットフォーム）と MLX（Apple Silicon）で動作します。モデルは初回起動時にダウンロードされ、ローカルに保存されます。</p>
+  <h2 id="how-nl-query-works" class="content-section">NL Query の内部動作</h2>
+  <p>自然言語クエリを送信すると、Quira は Context Graph 上で RAG（Retrieval-Augmented Generation）パイプラインを使用します：</p>
+  <ol>
+    <li><strong>クエリ埋め込み</strong> — 質問が 384 次元の埋め込みベクトルに変換されます。</li>
+    <li><strong>検索</strong> — sqlite-vec が最もセマンティックに類似したノードを検索します。FTS5 がキーワードマッチで補完します。</li>
+    <li><strong>コンテキスト組み立て</strong> — 取得されたノードの要約、エンティティ、メタデータが LLM のコンテキストウィンドウに組み立てられます。</li>
+    <li><strong>引用付き生成</strong> — LLM が取得されたコンテキストに基づいた回答を、必須のソース引用付きで生成します。</li>
+  </ol>
+  <h2 id="ai-capability-latencies" class="content-section">AI 機能のレイテンシ</h2>
+  <table><thead><tr><th>AI 機能</th><th>トリガー</th><th>目標レイテンシ</th></tr></thead><tbody>
+    <tr><td>ページ要約</td><td>ノード作成時に自動</td><td>&lt; 2s</td></tr>
+    <tr><td>エンティティ抽出</td><td>ノード作成時に自動</td><td>&lt; 1s</td></tr>
+    <tr><td>埋め込み生成</td><td>ノード作成時に自動</td><td>&lt; 500ms</td></tr>
+    <tr><td>NL Query（100 ノード）</td><td>コマンドパレットからユーザーが実行</td><td>&lt; 3s</td></tr>
+  </tbody></table>
+  <PrevNext prev={{ href: '/docs/ja/architecture/storage/', title: 'ストレージ (SQLite)' }} next={{ href: '/docs/ja/contributing/dev-setup/', title: '開発環境セットアップ' }} />
+</DocsLayout>

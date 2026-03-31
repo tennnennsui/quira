@@ -1,0 +1,49 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'what-is-quira', text: 'What is Quira?', depth: 2 },
+  { id: 'core-features', text: 'Core features', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="What is Quira?" description="Understand the idea behind Quira  Ea Gecko-based browser that turns your browsing context into a queryable knowledge graph." section="Getting Started" headings={headings}>
+  <h1 id="what-is-quira" class="content-section">What is Quira?</h1>
+  <p>Before diving into setup, it helps to understand the idea behind the product. Quira is a Gecko-based browser built on a simple observation: <strong>AI made knowledge free, but your context is yours alone.</strong> ChatGPT knows everything about the world. Quira knows everything about <em>you</em>  Ewhat you've read, how your research has evolved, and which threads of inquiry you've left unexplored.</p>
+  <p>The two aren't competing. They're complementary. Quira makes any LLM 10x more useful by providing the personal context that no cloud AI can access.</p>
+  <h2 id="core-features" class="content-section">Core features</h2>
+  <div style="display:flex;flex-direction:column;gap:1rem;margin-bottom:2rem;">
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:#141413;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><span style="color:#E8A838;font-size:12px;font-weight:600;">1</span></div>
+      <div>
+        <p style="color:#FAF9F5;font-size:15px;font-weight:500;margin:0 0 4px;"><a href="/docs/en/core-concepts/context-graph/">Context Graph</a></p>
+        <p style="font-size:14px;color:#C2C0B6;line-height:1.6;margin:0;">Automatically captures and structures your browsing into a queryable knowledge graph. Pages you visit for 30+ seconds become context nodes, connected by the actual path of your investigation.</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:#141413;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><span style="color:#E8A838;font-size:12px;font-weight:600;">2</span></div>
+      <div>
+        <p style="color:#FAF9F5;font-size:15px;font-weight:500;margin:0 0 4px;"><a href="/docs/en/core-concepts/local-ai/">Local-First AI</a></p>
+        <p style="font-size:14px;color:#C2C0B6;line-height:1.6;margin:0;">Ships with Phi-3.5 Mini running entirely on your device. Summarizes pages, extracts entities, and answers <a href="/docs/en/features/nl-query/">natural language queries</a> about your browsing history. Your data never leaves your machine.</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:#141413;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><span style="color:#E8A838;font-size:12px;font-weight:600;">3</span></div>
+      <div>
+        <p style="color:#FAF9F5;font-size:15px;font-weight:500;margin:0 0 4px;"><a href="/docs/en/core-concepts/context-spaces/">Context Spaces</a></p>
+        <p style="font-size:14px;color:#C2C0B6;line-height:1.6;margin:0;">Organize tabs by research context, not just position. Each Space holds tabs, notes, AI summaries, and a partial view of the Context Graph. Think GTD for your browser.</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:#141413;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><span style="color:#E8A838;font-size:12px;font-weight:600;">4</span></div>
+      <div>
+        <p style="color:#FAF9F5;font-size:15px;font-weight:500;margin:0 0 4px;"><a href="/docs/en/core-concepts/research-replay/">Research Replay</a></p>
+        <p style="font-size:14px;color:#C2C0B6;line-height:1.6;margin:0;">Resume any past investigation exactly where you left off. The AI tells you what you covered, what conclusions you reached, and what remains unexplored.</p>
+      </div>
+    </div>
+  </div>
+  <Callout type="note" title="Privacy by design">
+    <p>All Context Graph data is stored locally in an encrypted <a href="/docs/en/architecture/storage/">SQLite database</a>. Even when cloud AI is enabled (opt-in), only query text and summaries are sent  Enever your raw browsing history or page content. See <a href="/docs/en/features/ai-privacy/">AI Privacy Levels</a> for details.</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/en/', title: 'Welcome' }} next={{ href: '/docs/en/getting-started/quick-start/', title: 'Quick Start' }} />
+</DocsLayout>

@@ -1,0 +1,278 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'emergent-security', text: 'Emergent Interaction Security', depth: 2 },
+  { id: 'ksci', text: '1. Knowledge Supply Chain Integrity (KSCI)', depth: 2 },
+  { id: 'ksci-model', text: 'Formal model', depth: 3 },
+  { id: 'ksci-scenarios', text: 'Attack scenarios', depth: 3 },
+  { id: 'ksci-defense', text: 'Defense architecture', depth: 3 },
+  { id: 'ird', text: '2. Inference Residue Defense (IRD)', depth: 2 },
+  { id: 'ird-classification', text: 'Residue classification', depth: 3 },
+  { id: 'ird-architecture', text: 'Purge architecture', depth: 3 },
+  { id: 'sbrc', text: '3. Semantic Blast Radius Containment (SBRC)', depth: 2 },
+  { id: 'sbrc-zones', text: 'Containment zones', depth: 3 },
+  { id: 'sbrc-sdi', text: 'Semantic Damage Index', depth: 3 },
+  { id: 'agtr', text: '4. Adversarial Graph Topology Resistance (AGTR)', depth: 2 },
+  { id: 'agtr-attacks', text: 'Topology attacks', depth: 3 },
+  { id: 'agtr-defense', text: 'Topological Invariant Monitor', depth: 3 },
+  { id: 'tcv', text: '5. Temporal Causality Verification (TCV)', depth: 2 },
+  { id: 'tcv-chain', text: 'Hash chain construction', depth: 3 },
+  { id: 'cselp', text: '6. Cross-Session Entropy Leakage Prevention (CSELP)', depth: 2 },
+  { id: 'cselp-decorrelation', text: 'Decorrelation techniques', depth: 3 },
+  { id: 'rsip', text: '7. Retroactive Sanitization with Inference Purging (RSIP)', depth: 2 },
+  { id: 'rsip-pipeline', text: 'Retroactive pipeline', depth: 3 },
+  { id: 'cav', text: '8. Contextual Amnesia Verification (CAV)', depth: 2 },
+  { id: 'cav-proof', text: 'Proof of Forgetting', depth: 3 },
+  { id: 'cav-subsystems', text: 'Subsystem-wise forgetting', depth: 3 },
+  { id: 'priority-map', text: 'Implementation priority', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Emergent Interaction Security" description="Eight novel security structures addressing cognition–AI–graph interaction threats — Knowledge Supply Chain, Inference Residue Defense, Semantic Blast Radius, and more." section="Security & Privacy" headings={headings}>
+  <h1 id="emergent-security" class="content-section">Emergent Interaction Security</h1>
+  <p>Quira's existing security layers protect individual components — encryption, sandboxing, IFC labels, capability-based access. But a class of threats emerges only from the <strong>interaction between three systems</strong>: the user's cognitive patterns, the AI inference pipeline, and the Knowledge Graph's evolving structure.</p>
+  <p>This page documents eight novel structures that address the <strong>knowledge lifecycle</strong> — how knowledge enters the graph, what happens when AI draws inferences, how to measure and contain semantic leakage, and how to retroactively enforce policy changes on already-processed data.</p>
+  <Callout type="info" title="Research status">
+    <p>These structures build on the <a href="/docs/en/security/advanced-architecture/">Advanced Architecture</a> foundations (KPC, CSEB, SKV, etc.) and extend the formal threat model's adversary classes with seven new attack vectors.</p>
+  </Callout>
+
+  <!-- ═══════════════ KSCI ═══════════════ -->
+  <h2 id="ksci" class="content-section">1. Knowledge Supply Chain Integrity (KSCI)</h2>
+  <p>Software supply chain attacks (SolarWinds, Log4Shell) inject malicious code through legitimate distribution channels. KSCI applies this concept to the <strong>knowledge domain</strong>: an attacker strategically places <em>factually correct but directionally biased</em> content on legitimate websites to poison a user's Knowledge Graph.</p>
+  <p>This is fundamentally different from phishing (fake sites) or prompt injection (hidden instructions). KSCI targets <strong>visible, plausible content</strong> whose purpose is graph structure manipulation.</p>
+  <Callout type="warning" title="How this differs">
+    <p>Context Gatekeeper and XProtect detect malicious code and known-bad signatures. KSCI detects <strong>strategically placed knowledge</strong> — content that is technically true but designed to shift a user's knowledge structure.</p>
+  </Callout>
+
+  <h3 id="ksci-model" class="content-section">Formal model</h3>
+  <p>A knowledge supply chain is modeled as <code>KSC = (S, T, &pi;, &iota;)</code> where S is the set of information sources, T is a trust score function, &pi; traces provenance, and &iota; verifies integrity.</p>
+  <p>Each knowledge node receives a <strong>composite trust score</strong>:</p>
+  <table><thead><tr><th>Component</th><th>Measures</th><th>Example</th></tr></thead><tbody>
+    <tr><td><strong>Source trust</strong></td><td>Domain reputation, HTTPS, content stability</td><td>mayoclinic.org = 0.95, random-blog.xyz = 0.2</td></tr>
+    <tr><td><strong>Corroboration</strong></td><td>Independent sources confirming the same claim</td><td>3 independent sources = 0.85</td></tr>
+    <tr><td><strong>Temporal stability</strong></td><td>Content consistency over time</td><td>Unchanged for 2 years = 0.9; edited yesterday = 0.3</td></tr>
+  </tbody></table>
+  <p><strong>Poisoning detection:</strong> A source triggers an alert when all three conditions are met simultaneously: (1) recent content change (low temporal stability), (2) large semantic shift from previous version, and (3) suspiciously high affinity with the user's existing graph structure.</p>
+
+  <h3 id="ksci-scenarios" class="content-section">Attack scenarios</h3>
+  <table><thead><tr><th>Scenario</th><th>Method</th><th>KSCI defense</th></tr></thead><tbody>
+    <tr><td>Gradual graph poisoning</td><td>Attacker builds reputation on Stack Overflow, then edits answers to introduce bias on user's research topic</td><td>Temporal stability detects content change; corroboration engine checks if claims match independent sources</td></tr>
+    <tr><td>Knowledge cluster targeting</td><td>Attacker places subtly biased content across multiple sites; user's natural search leads them to accumulate nudges toward a conclusion</td><td>Source independence verification detects coordinated placement; graph affinity anomaly flags unnaturally fitting content</td></tr>
+    <tr><td>Citation chain manipulation</td><td>Create a chain of pages that cite each other circularly, manufacturing false corroboration</td><td>Provenance tracker detects circular citation graphs; independence scoring penalizes co-owned sources</td></tr>
+  </tbody></table>
+
+  <h3 id="ksci-defense" class="content-section">Defense architecture</h3>
+  <p>Two core components:</p>
+  <ul>
+    <li><strong>Provenance Tracker</strong> — Records source metadata: domain Whois history, content snapshots (via Wayback Machine comparison), TLS certificate age, edit timestamps. Treats web content as <em>supply chain artifacts</em>.</li>
+    <li><strong>Corroboration Engine</strong> — Verifies that the same claim (entity + relationship) is confirmed by independent sources. Single-source nodes receive low trust scores and are visually distinguished in the UI.</li>
+  </ul>
+  <p><strong>Threat model mapping:</strong> Adversary A2 (malicious web content) — extends beyond existing A2.1–A2.5 vectors. New vector <strong>A2.8 Knowledge Supply Chain Poisoning</strong> targets visible content rather than hidden instructions.</p>
+
+  <!-- ═══════════════ IRD ═══════════════ -->
+  <h2 id="ird" class="content-section">2. Inference Residue Defense (IRD)</h2>
+  <p>When a user deletes a node from the Knowledge Graph, the data is removed from disk. But <strong>AI-generated inferences</strong> based on that node may survive in other nodes' attributes, entity relationships, embedding indices, and cluster statistics. This is <em>inference residue</em>.</p>
+  <Callout type="warning" title="The ghost problem">
+    <p>A user deletes all HIV treatment pages. But the AI previously inferred "interested in immunology" and added that tag to related nodes. The original data is gone, but its <strong>ghost</strong> — the inference — persists and can be exploited.</p>
+  </Callout>
+
+  <h3 id="ird-classification" class="content-section">Residue classification</h3>
+  <table><thead><tr><th>Type</th><th>Definition</th><th>Example</th><th>Detection difficulty</th></tr></thead><tbody>
+    <tr><td><strong>Direct residue</strong></td><td>Explicit edges/attributes referencing deleted node</td><td>"Related to [deleted node]" tag</td><td>Low</td></tr>
+    <tr><td><strong>Propagation residue</strong></td><td>Inferences indirectly influenced by deleted node</td><td>Cluster centroid shift from deleted data</td><td>Medium</td></tr>
+    <tr><td><strong>Embedding residue</strong></td><td>Deleted node's embedding affected similarity calculations</td><td>Changed similarity rankings</td><td>High</td></tr>
+    <tr><td><strong>Statistical residue</strong></td><td>Deleted node's impact on topic distributions and cluster stats</td><td>Skewed topic distribution</td><td>Very high</td></tr>
+  </tbody></table>
+
+  <h3 id="ird-architecture" class="content-section">Purge architecture</h3>
+  <p>IRD introduces the <strong>Inference Dependency Graph (IDG)</strong> — a directed acyclic graph that records which input nodes contributed to which AI-generated outputs.</p>
+  <p>When a node is deleted:</p>
+  <ol>
+    <li><strong>Direct residue:</strong> Immediately deleted (explicit references)</li>
+    <li><strong>Propagation residue:</strong> Queued for re-inference with the deleted node excluded from input</li>
+    <li><strong>Embedding residue:</strong> Affected similarity indices rebuilt</li>
+    <li><strong>Statistical residue:</strong> Topic statistics recomputed excluding deleted node</li>
+  </ol>
+  <p>The IDG records dependencies at ~2% overhead during inference. Each entry is compact (node ID + operation ID).</p>
+  <p><strong>Threat model mapping:</strong> Adversaries A3 (extensions) and A4 (OS-level). New vector <strong>A3.6 Inference Residue Exploitation</strong>.</p>
+
+  <!-- ═══════════════ SBRC ═══════════════ -->
+  <h2 id="sbrc" class="content-section">3. Semantic Blast Radius Containment (SBRC)</h2>
+  <p>Traditional breach metrics count leaked records, affected users, or exposed bytes. But in a Knowledge Graph, <strong>100 leaked cooking nodes ≠ 100 leaked psychiatric treatment nodes.</strong> The semantic damage is orders of magnitude different.</p>
+  <p>SBRC measures breach impact in <strong>semantic units</strong> and defines containment boundaries in semantic space.</p>
+
+  <h3 id="sbrc-zones" class="content-section">Containment zones</h3>
+  <p>The graph is partitioned into semantic containment zones, each with a damage budget:</p>
+  <table><thead><tr><th>Zone</th><th>Base sensitivity</th><th>Damage budget</th><th>Example categories</th></tr></thead><tbody>
+    <tr><td>Zone 1 (Medical)</td><td>1.0</td><td>50</td><td>Diagnoses, treatments, prescriptions</td></tr>
+    <tr><td>Zone 2 (Financial)</td><td>0.9</td><td>40</td><td>Banking, investments, credit</td></tr>
+    <tr><td>Zone 3 (Personal)</td><td>0.8</td><td>35</td><td>Relationships, private messages</td></tr>
+    <tr><td>Zone 4 (Work)</td><td>0.3</td><td>20</td><td>Code, projects, meetings</td></tr>
+    <tr><td>Zone 5 (General)</td><td>0.1</td><td>5</td><td>News, recipes, tutorials</td></tr>
+  </tbody></table>
+  <p><strong>Cross-zone edge abstraction:</strong> Edges between zones carry abstracted labels. "Researching diabetes for a medical paper" (zone 1 → zone 4) becomes "health-related work" at the zone boundary. This prevents a breach in the Work zone from revealing specific Medical zone contents.</p>
+
+  <h3 id="sbrc-sdi" class="content-section">Semantic Damage Index</h3>
+  <p>When a breach is detected, SBRC calculates the <strong>Semantic Damage Index (SDI)</strong> instead of a raw node count:</p>
+  <p><code>SDI(breach) = &Sigma; sensitivity(node) &times; linkability(node) &times; uniqueness(node)</code></p>
+  <ul>
+    <li><strong>Sensitivity:</strong> Category-based (medical = 1.0, general = 0.1) multiplied by specificity (how detailed the node is)</li>
+    <li><strong>Linkability:</strong> High-degree nodes that connect sensitive categories multiply the damage</li>
+    <li><strong>Uniqueness:</strong> "Python syntax" (general knowledge) vs. "Patient X's prescription" (uniquely identifying)</li>
+  </ul>
+  <p>Breach reports show: "3 high-sensitivity medical nodes and 12 general nodes leaked. Estimated privacy impact: <strong>HIGH</strong>" — not just "15 nodes leaked."</p>
+  <Callout type="info" title="Relationship: SBRC and Space-Scoped Security">
+    <p>SBRC containment zones are a <strong>semantic superset</strong> of <a href="/docs/en/security/permission-system/">Space-Scoped Security</a>. Context Spaces define administrative boundaries (user-created project groups); SBRC defines security boundaries based on semantic sensitivity. A single Space may contain nodes across multiple SBRC zones (e.g., a "Health Research" Space spans Zone 1 Medical and Zone 5 General). SBRC uses <a href="/docs/en/security/permission-system/">IFC labels</a> to track cross-zone data flow.</p>
+  </Callout>
+
+  <!-- ═══════════════ AGTR ═══════════════ -->
+  <h2 id="agtr" class="content-section">4. Adversarial Graph Topology Resistance (AGTR)</h2>
+  <p>Existing attacks target <em>individual nodes</em> (prompt injection, entity poisoning, embedding manipulation). AGTR addresses a new threat class: attacks on the <strong>graph's topology (structure) itself</strong>.</p>
+  <p>The attacker manipulates not node contents but <strong>connection patterns</strong> — to identify, track, or manipulate users through their graph structure.</p>
+
+  <h3 id="agtr-attacks" class="content-section">Topology attacks</h3>
+  <table><thead><tr><th>Attack</th><th>Mechanism</th><th>Goal</th></tr></thead><tbody>
+    <tr><td><strong>Structural watermarking</strong></td><td>Place k pages with specific inter-link structure. When user visits them, an identifiable subgraph (watermark) forms in the Knowledge Graph.</td><td>User identification. Later, partial graph access reveals the watermark.</td></tr>
+    <tr><td><strong>Bridge node injection</strong></td><td>Inject content that creates bridge nodes between separated clusters.</td><td>Force AI inference to propagate across sensitivity boundaries.</td></tr>
+    <tr><td><strong>Motif fingerprinting</strong></td><td>Observe graph structure (degree distribution, clustering coefficient, spectral properties) from metadata.</td><td>Identify the user among a population via unique structural patterns.</td></tr>
+  </tbody></table>
+
+  <h3 id="agtr-defense" class="content-section">Topological Invariant Monitor</h3>
+  <p>AGTR deploys a <strong>Topological Invariant Monitor (TIM)</strong> that continuously tracks structural properties:</p>
+  <ul>
+    <li><strong>Structural drift detection:</strong> Alert when the graph's topological feature vector (degree sequence, clustering, motif frequencies, spectral properties) changes beyond threshold between time steps.</li>
+    <li><strong>Watermark pattern matching:</strong> Check if recently added nodes form identifiable subgraph patterns.</li>
+    <li><strong>Structural noise on export:</strong> Add dummy edges, remove random edges, and inject decoy substructures before any graph data export — so the exported topology ≠ the real topology.</li>
+  </ul>
+  <p><strong>Threat model mapping:</strong> Adversary A2. New vectors <strong>A2.6 Structural Watermarking</strong> and <strong>A2.7 Bridge Node Injection</strong>.</p>
+
+  <!-- ═══════════════ TCV ═══════════════ -->
+  <h2 id="tcv" class="content-section">5. Temporal Causality Verification (TCV)</h2>
+  <p>Knowledge in the graph has a <strong>causal acquisition order</strong>: the user learned A, then B, then inferred C from A+B. This causal chain is essential for trust evaluation and fraud detection — but the existing Temporal Security paradigm only protects timestamps and time-based access, not <strong>causal order itself</strong>.</p>
+
+  <h3 id="tcv-chain" class="content-section">Hash chain construction</h3>
+  <p>Each node addition produces a hash chain entry:</p>
+  <p><code>h<sub>i</sub> = SHA-256(h<sub>i-1</sub> || content(v<sub>i</sub>) || timestamp(v<sub>i</sub>) || causal_refs(v<sub>i</sub>))</code></p>
+  <p><strong>Guarantees:</strong></p>
+  <ul>
+    <li><strong>Order immutability:</strong> Inserting a node mid-chain invalidates all subsequent hashes.</li>
+    <li><strong>Causal reference verification:</strong> A node claiming dependency on another can be verified — the referenced node must appear earlier in the chain.</li>
+    <li><strong>Deletion detection:</strong> Removing a node breaks the chain.</li>
+  </ul>
+  <table><thead><tr><th>Scenario</th><th>Without TCV</th><th>With TCV</th></tr></thead><tbody>
+    <tr><td>Causal forgery</td><td>Biased content v1 leads user to "objective" content v2 via link — v2 appears independent</td><td>Causal chain records v1 → v2 navigation, flagging non-independence</td></tr>
+    <tr><td>Knowledge backdating</td><td>Malicious extension alters node timestamps to fabricate "prior knowledge"</td><td>Hash chain detects timestamp inconsistency</td></tr>
+    <tr><td>Research precedence</td><td>No cryptographic proof of when knowledge was acquired</td><td>Merkle root + RFC 3161 timestamp authority enables provable precedence</td></tr>
+  </tbody></table>
+
+  <!-- ═══════════════ CSELP ═══════════════ -->
+  <h2 id="cselp" class="content-section">6. Cross-Session Entropy Leakage Prevention (CSELP)</h2>
+  <p>Even with perfect intra-session isolation, the Knowledge Graph is a <strong>session-spanning persistent structure</strong>. Each session's activity accumulates as graph growth patterns — and the sequence of growth patterns is a powerful fingerprint.</p>
+  <Callout type="info" title="Graph growth fingerprinting">
+    <p>Session 1: +50 nodes (ML, Python). Session 2: +3 nodes (cooking). Session 3: +80 nodes (ML, PyTorch). This pattern identifies "ML engineer who cooks" — each session is harmless alone, but the series is uniquely identifying.</p>
+  </Callout>
+
+  <h3 id="cselp-decorrelation" class="content-section">Decorrelation techniques</h3>
+  <table><thead><tr><th>Technique</th><th>What it breaks</th><th>How</th></tr></thead><tbody>
+    <tr><td><strong>Graph growth batching</strong></td><td>Session-specific growth patterns</td><td>Buffer node additions and commit at fixed intervals (hourly), not per-session</td></tr>
+    <tr><td><strong>Topic distribution smoothing</strong></td><td>Session topic signatures</td><td>Add Laplace noise to per-session topic distributions</td></tr>
+    <tr><td><strong>Query timing jitter</strong></td><td>Cognitive rhythm fingerprints</td><td>Add random delay to NL query issuance timestamps</td></tr>
+    <tr><td><strong>Phantom session injection</strong></td><td>Session sequence correlation</td><td>Insert dummy sessions (background graph operations) between real sessions</td></tr>
+  </tbody></table>
+  <p><strong>Defense goal:</strong> The mutual information between any two sessions' metadata vectors must stay below a threshold &epsilon;<sub>session</sub>. An observer who sees session N's metadata gains at most &epsilon;<sub>session</sub> bits about session N-1 or N+1.</p>
+  <p><strong>Threat model mapping:</strong> Adversaries A1 (network observer) and A3 (extensions — A3.5 metadata collection). New vector <strong>A3.7 Cross-Session Metadata Correlation</strong>.</p>
+
+  <!-- ═══════════════ RSIP ═══════════════ -->
+  <h2 id="rsip" class="content-section">7. Retroactive Sanitization with Inference Purging (RSIP)</h2>
+  <p>When a user changes their security policy (e.g., raises medical data sensitivity to maximum), the new policy must apply not only to <strong>future</strong> data but also to <strong>all data already collected and processed</strong>. This is far harder than it sounds:</p>
+  <ol>
+    <li>Data is already processed by the AI pipeline</li>
+    <li>Inferences have propagated to other nodes (IRD's problem)</li>
+    <li>Embeddings encode the information</li>
+    <li>Cluster statistics and topic models are affected</li>
+  </ol>
+  <Callout type="info" title="Legal alignment">
+    <p>RSIP provides the technical mechanism for GDPR's "right to be forgotten" and CCPA's consumer data deletion right — extended beyond deletion to <strong>retroactive reclassification and re-restriction</strong>.</p>
+  </Callout>
+
+  <h3 id="rsip-pipeline" class="content-section">Retroactive pipeline</h3>
+  <p>When policy &Pi;<sub>old</sub> changes to &Pi;<sub>new</sub>:</p>
+  <ol>
+    <li><strong>Identify affected nodes:</strong> R = &#123;nodes where &Pi;<sub>new</sub> is more restrictive than &Pi;<sub>old</sub>&#125;</li>
+    <li><strong>Apply new policy directly:</strong> Update labels, access restrictions, encryption levels on R</li>
+    <li><strong>Walk inference dependencies:</strong> Use IRD's Inference Dependency Graph to find all inferences derived from R</li>
+    <li><strong>Re-infer with R excluded:</strong> Recompute affected attributes and edges without R's data</li>
+    <li><strong>Rebuild embeddings:</strong> Update or remove R's embeddings and rebuild similarity indices</li>
+    <li><strong>Recompute statistics:</strong> Recalculate topic distributions and cluster aggregates excluding R</li>
+    <li><strong>Verify completeness:</strong> Confirm that no non-R node has dependency > 0 on any R node</li>
+  </ol>
+  <table><thead><tr><th>Optimization</th><th>Approach</th><th>Trade-off</th></tr></thead><tbody>
+    <tr><td>Progressive purge (default)</td><td>Process highest-dependency items first, stop below threshold</td><td>Controllable compute; tiny residue may remain</td></tr>
+    <tr><td>Lazy re-inference</td><td>Flag affected attributes; recompute on next access</td><td>Old values persist until accessed</td></tr>
+    <tr><td>Batch processing</td><td>Run full recomputation overnight</td><td>Delay before policy takes full effect</td></tr>
+    <tr><td>Full purge (user-selected)</td><td>Walk entire dependency graph immediately</td><td>CPU-intensive but guarantees completeness</td></tr>
+  </tbody></table>
+  <p><strong>Threat model mapping:</strong> All adversary classes. New vector <strong>A-cross Retroactive Policy Evasion</strong>.</p>
+
+  <!-- ═══════════════ CAV ═══════════════ -->
+  <h2 id="cav" class="content-section">8. Contextual Amnesia Verification (CAV)</h2>
+  <p>When a user says "forget this data," conventional systems confirm <em>deletion was executed</em>. CAV goes further: it provides <strong>cryptographic proof that recovery is impossible</strong> across all subsystems.</p>
+
+  <h3 id="cav-proof" class="content-section">Proof of Forgetting</h3>
+  <p>A Proof of Forgetting (PoF) is a triple: <code>(commitment, deletion_proof, absence_proof)</code>.</p>
+  <ol>
+    <li><strong>Commitment:</strong> While data exists, record a Merkle commitment showing the data is in the graph.</li>
+    <li><strong>Deletion proof:</strong> After deletion, the new Merkle root proves no valid Merkle path exists for the deleted data.</li>
+    <li><strong>Absence proof:</strong> Verify that no node in the updated graph has embedding similarity above threshold with the deleted data — i.e., the information doesn't survive in encoded form.</li>
+  </ol>
+
+  <h3 id="cav-subsystems" class="content-section">Subsystem-wise forgetting</h3>
+  <p>Same data exists across multiple subsystems. PoF must cover <strong>all</strong> of them:</p>
+  <table><thead><tr><th>Subsystem</th><th>Data form</th><th>Forgetting method</th><th>Verification</th></tr></thead><tbody>
+    <tr><td>Graph DB (SQLite)</td><td>Nodes + edges</td><td>DELETE + VACUUM</td><td>Merkle proof of absence</td></tr>
+    <tr><td>Embedding index</td><td>Vectors</td><td>Index rebuild</td><td>max<sub>v</sub> sim(&Phi;(v), &Phi;(d)) &lt; &tau;</td></tr>
+    <tr><td>Inference cache</td><td>AI outputs</td><td>IDG-based purge (IRD)</td><td>IDG dependency edge absence</td></tr>
+    <tr><td>Audit log</td><td>Text records</td><td>Encrypt entries, destroy key</td><td>Structural integrity preserved, content irrecoverable</td></tr>
+    <tr><td>Export history</td><td>Export records</td><td>Record deletion</td><td>— (data already sent externally is unrecoverable)</td></tr>
+  </tbody></table>
+  <p>The <strong>Composite PoF</strong> is the conjunction of all per-subsystem proofs. If any subsystem fails verification, the user is told: "Forgetting incomplete — data residue detected in [subsystem]."</p>
+  <Callout type="warning" title="The log dilemma">
+    <p>Audit logs prove data was accessed — but the log itself reveals data existed. Solution: log entries are <strong>encrypted at write time</strong>. For forgetting, the log encryption key is destroyed. The log entry remains (integrity preserved) but its content becomes irrecoverable.</p>
+  </Callout>
+  <p><strong>Threat model mapping:</strong> Adversaries A4 (OS-level — post-deletion recovery) and A5 (vendor — log-based reconstruction). New vector <strong>A4.3 Post-Deletion Data Recovery</strong>.</p>
+
+  <!-- ═══════════════ PRIORITY MAP ═══════════════ -->
+  <h2 id="priority-map" class="content-section">Implementation priority</h2>
+  <table><thead><tr><th>Phase</th><th>Structure</th><th>Rationale</th></tr></thead><tbody>
+    <tr><td>Phase 2 (immediate)</td><td>IRD, TCV</td><td>IRD's Inference Dependency Graph is a prerequisite for RSIP and CAV. TCV's hash chain should start early — the longer the chain, the stronger the verification.</td></tr>
+    <tr><td>Phase 2</td><td>KSCI, SBRC</td><td>Provenance Tracker (KSCI basic) and Semantic Zone Analyzer (SBRC) can be built as IFC label extensions.</td></tr>
+    <tr><td>Phase 3 (mature)</td><td>RSIP, CAV</td><td>Require IRD's IDG to have accumulated sufficient data. CAV needs all subsystems to expose forgetting interfaces.</td></tr>
+    <tr><td>Phase 3</td><td>AGTR, CSELP</td><td>Topological Invariant Monitor (AGTR) needs user base for validation. Session Metadata Decorrelator (CSELP) has high compute cost.</td></tr>
+  </tbody></table>
+
+  <h3>Dependency graph</h3>
+  <table><thead><tr><th>Structure</th><th>Depends on</th><th>Enables</th></tr></thead><tbody>
+    <tr><td>IRD</td><td>—</td><td>RSIP, CAV</td></tr>
+    <tr><td>TCV</td><td>—</td><td>KSCI (strengthens)</td></tr>
+    <tr><td>KSCI</td><td>—</td><td>AGTR (supply chain includes topology)</td></tr>
+    <tr><td>SBRC</td><td>IFC labels</td><td>—</td></tr>
+    <tr><td>RSIP</td><td>IRD</td><td>CAV</td></tr>
+    <tr><td>CAV</td><td>IRD, RSIP</td><td>—</td></tr>
+    <tr><td>AGTR</td><td>—</td><td>—</td></tr>
+    <tr><td>CSELP</td><td>—</td><td>—</td></tr>
+  </tbody></table>
+
+  <h3>New threat model attack vectors</h3>
+  <table><thead><tr><th>Vector</th><th>Adversary</th><th>Defended by</th></tr></thead><tbody>
+    <tr><td>A2.6 Structural Watermarking</td><td>A2 (Web content)</td><td>AGTR</td></tr>
+    <tr><td>A2.7 Bridge Node Injection</td><td>A2 (Web content)</td><td>AGTR</td></tr>
+    <tr><td>A2.8 Knowledge Supply Chain Poisoning</td><td>A2 (Web content)</td><td>KSCI</td></tr>
+    <tr><td>A3.6 Inference Residue Exploitation</td><td>A3 (Extension)</td><td>IRD</td></tr>
+    <tr><td>A3.7 Cross-Session Metadata Correlation</td><td>A3 (Extension)</td><td>CSELP</td></tr>
+    <tr><td>A4.3 Post-Deletion Data Recovery</td><td>A4 (OS-level)</td><td>CAV</td></tr>
+    <tr><td>A-cross Retroactive Policy Evasion</td><td>All classes</td><td>RSIP</td></tr>
+  </tbody></table>
+
+  <PrevNext prev={{ href: '/docs/en/security/advanced-architecture/', title: 'Advanced Architecture' }} next={{ href: '/docs/en/security/hardening/', title: 'Security Hardening' }} />
+</DocsLayout>

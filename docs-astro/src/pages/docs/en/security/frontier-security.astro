@@ -1,0 +1,206 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'frontier-security', text: 'Frontier Security Research', depth: 2 },
+  { id: 'gaps', text: 'Architectural gaps', depth: 3 },
+  { id: 'n1', text: 'N1. Cryptographic Graph Shredding (CGS)', depth: 2 },
+  { id: 'n1-model', text: 'Per-node key derivation', depth: 3 },
+  { id: 'n1-proof', text: 'Cryptographic deletion proof', depth: 3 },
+  { id: 'n2', text: 'N2. Forensic Integrity Layer (FIL)', depth: 2 },
+  { id: 'n2-arch', text: 'L8 architecture', depth: 3 },
+  { id: 'n2-privacy', text: 'Privacy-preserving forensics', depth: 3 },
+  { id: 'n3', text: 'N3. Speculative Execution Firewall (SEF)', depth: 2 },
+  { id: 'n3-layers', text: 'Four mitigation layers', depth: 3 },
+  { id: 'n4', text: 'N4. Graph Export Anonymization (GEAP)', depth: 2 },
+  { id: 'n4-pipeline', text: 'Anonymization pipeline', depth: 3 },
+  { id: 'n5', text: 'N5. Verifiable Supply Chain (VSCA)', depth: 2 },
+  { id: 'n5-slsa', text: 'SLSA Level 3 + Sigstore', depth: 3 },
+  { id: 'n6', text: 'N6. Formal Security Invariant Engine (FSIE)', depth: 2 },
+  { id: 'n6-tla', text: 'TLA+ specification', depth: 3 },
+  { id: 'n6-pbt', text: 'Property-based testing', depth: 3 },
+  { id: 'n7', text: 'N7. Cognitive Query Normalization (CQN)', depth: 2 },
+  { id: 'n7-attack', text: 'Query stylometry attack', depth: 3 },
+  { id: 'n7-pipeline', text: 'Advanced normalization', depth: 3 },
+  { id: 'n8', text: 'N8. DP Budget Controller (DPBC)', depth: 2 },
+  { id: 'n8-budget', text: 'Budget model', depth: 3 },
+  { id: 'n8-ui', text: 'Privacy budget UI', depth: 3 },
+  { id: 'priority-map', text: 'Priority map', depth: 2 },
+  { id: 'coverage-improvement', text: 'Coverage improvement', depth: 3 },
+];
+---
+<DocsLayout lang="en" title="Frontier Security Research" description="Eight novel security structures addressing gaps in the existing architecture — Cryptographic Graph Shredding, Forensic Integrity Layer, Speculative Execution Firewall, and more." section="Security & Privacy" headings={headings}>
+  <h1 id="frontier-security" class="content-section">Frontier Security Research</h1>
+  <p>After auditing 26 existing concepts + 6 hardening enhancements, we identified <strong>eight defense domains</strong> that the current architecture does not cover at all. These are entirely new structures that fill critical gaps.</p>
+
+  <Callout type="info" title="Research status">
+    <p>These build on the <a href="/docs/en/security/hardening/">Hardening</a> foundations. Prerequisites: E1 &rarr; N1, E3 &rarr; N2, E5 &rarr; N7.</p>
+  </Callout>
+
+  <h3 id="gaps" class="content-section">Architectural gaps</h3>
+  <table><thead><tr><th>#</th><th>Gap</th><th>Impact</th><th>Solution</th></tr></thead><tbody>
+    <tr><td>G1</td><td>No cryptographic deletion</td><td>GDPR Art.17 non-compliance</td><td>N1: CGS</td></tr>
+    <tr><td>G2</td><td>No forensic layer</td><td>Cannot determine breach scope</td><td>N2: FIL</td></tr>
+    <tr><td>G3</td><td>Microarchitectural side channels</td><td>Cache timing on LLM inference</td><td>N3: SEF</td></tr>
+    <tr><td>G4</td><td>Export re-identification</td><td>Graph structure = user fingerprint</td><td>N4: GEAP</td></tr>
+    <tr><td>G5</td><td>No supply chain verification</td><td>SolarWinds-type vulnerability</td><td>N5: VSCA</td></tr>
+    <tr><td>G6</td><td>No formal verification</td><td>Bugs break security invariants</td><td>N6: FSIE</td></tr>
+    <tr><td>G7</td><td>Cognitive query fingerprint</td><td>User identification via NL queries</td><td>N7: CQN</td></tr>
+    <tr><td>G8</td><td>No DP budget management</td><td>Undefined &epsilon; values and exhaustion behavior</td><td>N8: DPBC</td></tr>
+  </tbody></table>
+
+  <!-- ═══════════════ N1 ═══════════════ -->
+  <h2 id="n1" class="content-section">N1. Cryptographic Graph Shredding (CGS)</h2>
+  <p>GDPR Article 17 / CCPA deletion requests cannot be satisfied by SQL DELETE alone — WAL logs, FTS5 indices, embedding vectors, and filesystem sectors retain data. CGS makes deletion <strong>cryptographically irreversible</strong>.</p>
+
+  <h3 id="n1-model" class="content-section">Per-node key derivation</h3>
+  <p>Each node v<sub>i</sub> gets a unique encryption key derived via HKDF: <code>k<sub>i</sub> = HKDF(master_key, node_id || epoch)</code>. All node data is encrypted with k<sub>i</sub> using AES-256-GCM. <strong>Deletion = destroying the key</strong> via <code>SecureZeroMemory(k<sub>i</sub>)</code>. The ciphertext remains on disk but is cryptographically unrecoverable.</p>
+  <p>Keys are never stored at rest — they are re-derived from the master key on demand. The Key Ledger stores only derivation metadata and key hashes for verification.</p>
+
+  <h3 id="n1-proof" class="content-section">Cryptographic deletion proof</h3>
+  <p>After deletion, attempt decryption with the destroyed key &rarr; failure is recorded as cryptographic evidence of deletion completeness. Integrates with CAV's Proof of Forgetting.</p>
+  <p><strong>Novelty:</strong> &#9733;&#9733;&#9733;&#9733; — Crypto-shredding exists at Google/AWS scale, but node-granularity shredding covering embeddings + inference residue in a personal knowledge graph is world-first.</p>
+  <p><strong>Adversaries:</strong> A4 (disk theft), A5 (legal compulsion). <strong>Phase:</strong> 1–2.</p>
+
+  <!-- ═══════════════ N2 ═══════════════ -->
+  <h2 id="n2" class="content-section">N2. Forensic Integrity Layer (FIL)</h2>
+  <p>The current 7-layer security model (L1–L7) lacks a <strong>post-incident analysis layer</strong>. After a breach, there is no way to prove "what leaked, when, and to what extent." FIL adds L8 on top of E3 (Immutable Audit Commitment).</p>
+
+  <h3 id="n2-arch" class="content-section">L8 architecture</h3>
+  <p>FIL Analyzer processes E3's append-only audit buffer: pattern detection (frequency/timing anomalies), blast radius estimation (SBRC integration), evidence preservation, and optional SIEM export (CEF/JSON format for ArcSight, Splunk, QRadar).</p>
+
+  <h3 id="n2-privacy" class="content-section">Privacy-preserving forensics</h3>
+  <p>Core principle: <strong>record behavioral patterns, never knowledge content</strong>. FIL records event types, affected node counts, CSEB rule IDs, decisions, and posture levels — but never records node IDs, content, queries, entities, or URLs.</p>
+  <p><strong>Novelty:</strong> &#9733;&#9733;&#9733;&#9733;&#9733; — Privacy-preserving forensics in a personal browser is world-first.</p>
+  <p><strong>Adversaries:</strong> A2–A5. <strong>Phase:</strong> 2.</p>
+
+  <!-- ═══════════════ N3 ═══════════════ -->
+  <h2 id="n3" class="content-section">N3. Speculative Execution Firewall (SEF)</h2>
+  <p>Spectre-class attacks are not fully mitigated by Gecko Fission's Site Isolation. When LLM inference and Context Graph reads coexist in the same process, cache timing attacks can leak embedding vectors.</p>
+
+  <h3 id="n3-layers" class="content-section">Four mitigation layers</h3>
+  <table><thead><tr><th>Layer</th><th>Mechanism</th><th>When</th></tr></thead><tbody>
+    <tr><td>Build-time</td><td>retpoline, SLH, LVI hardening</td><td>All builds</td></tr>
+    <tr><td>Inference isolation</td><td>L1/L2 cache flush + memory barrier + COW snapshot</td><td>Every inference call</td></tr>
+    <tr><td>High Security mode</td><td>Suspend extensions during inference, limit timer resolution, disable SharedArrayBuffer</td><td>ASP &ge; Elevated</td></tr>
+    <tr><td>Runtime detection</td><td>Cache timing anomaly detector (z-score based)</td><td>Continuous</td></tr>
+  </tbody></table>
+  <p><strong>Novelty:</strong> &#9733;&#9733;&#9733; — retpoline/SLH are existing, but applying Spectre mitigations specifically to in-browser LLM inference is novel.</p>
+  <p><strong>Adversaries:</strong> A4. <strong>Phase:</strong> 2–3.</p>
+
+  <!-- ═══════════════ N4 ═══════════════ -->
+  <h2 id="n4" class="content-section">N4. Graph Export Anonymization (GEAP)</h2>
+  <p>When users export or share research sessions, the graph structure itself acts as a fingerprint. Degree distribution, clustering coefficients, and spectral properties are individually unique (Narayanan &amp; Shmatikov, 2009).</p>
+
+  <h3 id="n4-pipeline" class="content-section">Anonymization pipeline</h3>
+  <p>Four-stage structural perturbation applied at export time:</p>
+  <table><thead><tr><th>Stage</th><th>Mechanism</th><th>Effect</th></tr></thead><tbody>
+    <tr><td>Edge DP</td><td>&epsilon;-DP edge flipping (default &epsilon; = 1.0)</td><td>Hides individual edges while preserving community structure</td></tr>
+    <tr><td>Degree capping</td><td>Max degree limit (default 10)</td><td>Removes high-degree outlier signal</td></tr>
+    <tr><td>Dummy injection</td><td>PKO phantom nodes + random edges (10–20%)</td><td>Dilutes structural uniqueness</td></tr>
+    <tr><td>Temporal shuffle</td><td>Laplace noise on timestamps</td><td>Prevents temporal behavior inference</td></tr>
+  </tbody></table>
+  <p>AGTR's Topological Invariant Monitor scores graph identifiability before export and auto-adjusts GEAP perturbation intensity.</p>
+  <p><strong>Novelty:</strong> &#9733;&#9733;&#9733;&#9733; — Graph DP exists academically, but a complete export anonymization protocol for personal knowledge graphs is first.</p>
+  <p><strong>Adversaries:</strong> A1, A3. <strong>Phase:</strong> 2–3.</p>
+
+  <!-- ═══════════════ N5 ═══════════════ -->
+  <h2 id="n5" class="content-section">N5. Verifiable Supply Chain (VSCA)</h2>
+  <p>Quira embeds llama.cpp, ONNX Runtime, SQLite, and OpenSSL. Without integrity verification, a SolarWinds-style attack compromises all users. VSCA also provides defense against A5 (vendor distrust).</p>
+
+  <h3 id="n5-slsa" class="content-section">SLSA Level 3 + Sigstore</h3>
+  <table><thead><tr><th>Component</th><th>Implementation</th></tr></thead><tbody>
+    <tr><td>SBOM</td><td>CycloneDX manifest of all dependencies with SHA-256 hashes</td></tr>
+    <tr><td>Signing</td><td>Sigstore keyless signing + Rekor CT log</td></tr>
+    <tr><td>Reproducible builds</td><td>Byte-identical binary from any third party given the same commit</td></tr>
+    <tr><td>LLM runtime verification</td><td>llama.cpp/ONNX version pinning + source hash verification at build time + binary hash at load time</td></tr>
+  </tbody></table>
+  <p><strong>Novelty:</strong> &#9733;&#9733;&#9733; — SLSA/Sigstore are established, but SBOM covering in-browser LLM runtimes is first.</p>
+  <p><strong>Adversaries:</strong> A5. <strong>Phase:</strong> 1–2.</p>
+
+  <!-- ═══════════════ N6 ═══════════════ -->
+  <h2 id="n6" class="content-section">N6. Formal Security Invariant Engine (FSIE)</h2>
+  <p>CBS capability token decisions, IFC label propagation, and CTA trust judgments can all be broken by implementation bugs. FSIE uses <strong>TLA+ formal verification</strong> to prove that security invariants hold mathematically.</p>
+
+  <h3 id="n6-tla" class="content-section">TLA+ specification</h3>
+  <p>The Context Graph Access Gateway (CGAG) state machine is specified in TLA+ with four key invariants:</p>
+  <table><thead><tr><th>Invariant</th><th>Statement</th></tr></thead><tbody>
+    <tr><td>INV-1</td><td>Revoked tokens always result in DENY</td></tr>
+    <tr><td>INV-2</td><td>During Lockdown, all access is DENY</td></tr>
+    <tr><td>INV-3</td><td>Extensions cannot access nodes outside their scope</td></tr>
+    <tr><td>INV-4</td><td>KPC-Sealed nodes are accessible only via SKV</td></tr>
+  </tbody></table>
+
+  <h3 id="n6-pbt" class="content-section">Property-based testing</h3>
+  <p>10K+ randomized request sequences per CI run verify that the Rust implementation matches the TLA+ specification. TLC model checker runs on every PR.</p>
+  <p><strong>Novelty:</strong> &#9733;&#9733;&#9733;&#9733; — AWS uses TLA+ for SDN/S3, but applying it to a browser capability model is first.</p>
+  <p><strong>Adversaries:</strong> All classes (prevents implementation bugs). <strong>Phase:</strong> 1.</p>
+
+  <!-- ═══════════════ N7 ═══════════════ -->
+  <h2 id="n7" class="content-section">N7. Cognitive Query Normalization (CQN)</h2>
+  <p>NL query linguistic patterns (vocabulary, syntax, abbreviation frequency) identify users with &gt;95% accuracy (Narayanan &amp; Shmatikov, 2008 stylometry). CQN extends E5's basic canonicalization into a full cognitive fingerprint defense system.</p>
+
+  <h3 id="n7-attack" class="content-section">Query stylometry attack</h3>
+  <p>Linguistic fingerprint features: vocabulary distribution, syntax tree depth, abbreviation rate, query length distribution, and topic transition patterns — the last being the most powerful identifier.</p>
+
+  <h3 id="n7-pipeline" class="content-section">Advanced normalization</h3>
+  <p>Beyond E5's basic pipeline, CQN adds: (1) domain-adaptive synonym dictionaries via local LLM, (2) ML-based style neutralization transforming queries into "style-neutral form", (3) probabilistic query batching with dummy injection, (4) topic transition smoothing inserting bridge queries to prevent pattern detection from sudden topic jumps.</p>
+  <p>All normalization happens <strong>on-device</strong>. Only normalized queries leave the device.</p>
+  <p><strong>Novelty:</strong> &#9733;&#9733;&#9733;&#9733;&#9733; — Systematic query linguistic fingerprint erasure exists in no browser or search engine.</p>
+  <p><strong>Adversaries:</strong> A1, A5. <strong>Phase:</strong> 2.</p>
+
+  <!-- ═══════════════ N8 ═══════════════ -->
+  <h2 id="n8" class="content-section">N8. DP Budget Controller (DPBC)</h2>
+  <p>Existing concepts (AGTR, CSELP) say "inject DP noise" but leave &epsilon; values, cumulative budget tracking, and exhaustion behavior undefined. DP guarantees <strong>degrade cumulatively</strong> — without budget management, DP is security theater.</p>
+
+  <h3 id="n8-budget" class="content-section">Budget model</h3>
+  <p>Default monthly budget: &epsilon; = 1.0 (between Apple's 2–8 and Google RAPPOR's ln(3) &approx; 1.1). Composition tracking via <strong>zCDP</strong> (zero-Concentrated DP) for the tightest guarantees (&rho;<sub>i</sub> = &epsilon;<sub>i</sub>&sup2;/2).</p>
+  <table><thead><tr><th>Budget used</th><th>Behavior</th></tr></thead><tbody>
+    <tr><td>&lt; 70%</td><td>Allow (normal operation)</td></tr>
+    <tr><td>70–90%</td><td>Throttle (auto-reduce &epsilon;, notify user)</td></tr>
+    <tr><td>90–100%</td><td>Warning (opt-in confirmation required)</td></tr>
+    <tr><td>&ge; 100%</td><td>Deny (data collection stops until next month)</td></tr>
+  </tbody></table>
+
+  <h3 id="n8-ui" class="content-section">Privacy budget UI</h3>
+  <p>Real-time budget gauge at <code>quira://settings/privacy/budget</code> showing consumption by component (AGTR, CSELP, GEAP), remaining &epsilon;, and reset date. All noise injection happens <strong>on-device</strong> — the server never knows&nbsp;&epsilon;.</p>
+  <p><strong>Novelty:</strong> &#9733;&#9733;&#9733;&#9733; — No browser integrates a privacy budget UI managing cross-component zCDP budgets.</p>
+  <p><strong>Adversaries:</strong> A1, A5. <strong>Phase:</strong> 2.</p>
+
+  <!-- ═══════════════ Priority Map ═══════════════ -->
+  <h2 id="priority-map" class="content-section">Priority map</h2>
+  <table><thead><tr><th>ID</th><th>Structure</th><th>&#9733;</th><th>Phase</th><th>Adversaries</th></tr></thead><tbody>
+    <tr><td>N1</td><td>CGS — Cryptographic Graph Shredding</td><td>&#9733;4</td><td>1–2</td><td>A4, A5</td></tr>
+    <tr><td>N2</td><td>FIL — Forensic Integrity Layer</td><td>&#9733;5</td><td>2</td><td>A2–A5</td></tr>
+    <tr><td>N3</td><td>SEF — Speculative Execution Firewall</td><td>&#9733;3</td><td>2–3</td><td>A4</td></tr>
+    <tr><td>N4</td><td>GEAP — Graph Export Anonymization</td><td>&#9733;4</td><td>2–3</td><td>A1, A3</td></tr>
+    <tr><td>N5</td><td>VSCA — Verifiable Supply Chain</td><td>&#9733;3</td><td>1–2</td><td>A5</td></tr>
+    <tr><td>N6</td><td>FSIE — Formal Security Invariant Engine</td><td>&#9733;4</td><td>1</td><td>All</td></tr>
+    <tr><td>N7</td><td>CQN — Cognitive Query Normalization</td><td>&#9733;5</td><td>2</td><td>A1, A5</td></tr>
+    <tr><td>N8</td><td>DPBC — DP Budget Controller</td><td>&#9733;4</td><td>2</td><td>A1, A5</td></tr>
+  </tbody></table>
+
+  <h3 id="coverage-improvement" class="content-section">Coverage improvement</h3>
+  <table><thead><tr><th>Adversary</th><th>Before</th><th>+E1–E6</th><th>+N1–N8</th><th>Gain</th></tr></thead><tbody>
+    <tr><td>A1 — Network</td><td>40%</td><td>50%</td><td>70%</td><td>+30%</td></tr>
+    <tr><td>A2 — Web Content</td><td>80%</td><td>85%</td><td>90%</td><td>+10%</td></tr>
+    <tr><td>A3 — Extension</td><td>75%</td><td>80%</td><td>90%</td><td>+15%</td></tr>
+    <tr><td>A4 — OS-Level</td><td>60%</td><td>70%</td><td>85%</td><td>+25%</td></tr>
+    <tr><td>A5 — Vendor</td><td>30%</td><td>40%</td><td>65%</td><td>+35%</td></tr>
+  </tbody></table>
+
+  <h3>New attack vectors</h3>
+  <table><thead><tr><th>Vector</th><th>Adversary</th><th>Defense</th></tr></thead><tbody>
+    <tr><td>A4.4 Embedding Inversion via Disk Theft</td><td>A4</td><td>N1 (CGS) + E1</td></tr>
+    <tr><td>A4.5 Spectre-BHB on LLM Inference</td><td>A4</td><td>N3 (SEF)</td></tr>
+    <tr><td>A5.3 Binary Supply Chain Tampering</td><td>A5</td><td>N5 (VSCA)</td></tr>
+    <tr><td>A5.4 Query Stylometry Identification</td><td>A5</td><td>N7 (CQN) + E5</td></tr>
+    <tr><td>A-cross Audit Log Tampering</td><td>All</td><td>N2 (FIL) + E3</td></tr>
+    <tr><td>A-cross Graph Re-identification</td><td>A1, A3</td><td>N4 (GEAP)</td></tr>
+    <tr><td>A-cross DP Budget Exhaustion</td><td>A1, A5</td><td>N8 (DPBC)</td></tr>
+    <tr><td>A-cross Security Invariant Violation</td><td>All</td><td>N6 (FSIE)</td></tr>
+  </tbody></table>
+
+  <PrevNext prev={{ href: '/docs/en/security/hardening/', title: 'Security Hardening' }} next={{ href: '/docs/en/use-cases/developers/', title: 'For Developers' }} />
+</DocsLayout>

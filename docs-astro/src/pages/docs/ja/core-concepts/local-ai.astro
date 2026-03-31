@@ -1,0 +1,38 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'local-ai', text: 'Local AI', depth: 2 },
+  { id: 'model-options', text: 'モデルオプション', depth: 2 },
+  { id: 'runtime-by-platform', text: 'プラットフォーム別ランタイム', depth: 2 },
+  { id: 'ai-shield', text: 'AI Shield プライバシーインジケーター', depth: 2 },
+  { id: 'first-run', text: '初回モデルダウンロード', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="Local AI" description="Quira のオンデバイス AI がページ要約、エンティティ抽出、自然言語クエリをどのように実現するか。" section="コアコンセプト" headings={headings}>
+  <h1 id="local-ai" class="content-section">Local AI</h1>
+  <p><a href="/docs/ja/core-concepts/context-graph/">Context Graph</a> はブラウジングの構造をキャプチャします。Local AI はそれをインテリジェントにする要素です。Quira には完全にデバイス上で動作するローカル LLM が搭載されています。ページ要約、エンティティ抽出、埋め込み生成、そして最も重要な — Context Graph に対する<a href="/docs/ja/features/nl-query/">自然言語クエリ</a>を実現します。デフォルトではデータがデバイスの外に出ることはありません（<a href="/docs/ja/features/ai-privacy/">AI プライバシーレベル</a>を参照）。</p>
+  <h2 id="model-options" class="content-section">モデルオプション</h2>
+  <table><thead><tr><th>設定</th><th>モデル</th><th>パラメータ数</th><th>最小 RAM</th><th>用途</th></tr></thead><tbody>
+    <tr><td>デフォルト</td><td>Phi-3.5 Mini</td><td>3.8B</td><td>8 GB</td><td>標準的な要約、エンティティ抽出、NL Query</td></tr>
+    <tr><td>オプション</td><td>Llama 3.1 8B Q4</td><td>8B（4-bit）</td><td>16 GB</td><td>より高品質な回答、より深い推論</td></tr>
+  </tbody></table>
+  <h2 id="runtime-by-platform" class="content-section">プラットフォーム別ランタイム</h2>
+  <table><thead><tr><th>プラットフォーム</th><th>ランタイム</th><th>アクセラレーション</th></tr></thead><tbody>
+    <tr><td>macOS (Apple Silicon)</td><td>MLX</td><td>Metal GPU</td></tr>
+    <tr><td>macOS (Intel)</td><td>llama.cpp</td><td>CPU</td></tr>
+    <tr><td>Linux</td><td>llama.cpp</td><td>CUDA / Vulkan / CPU</td></tr>
+  </tbody></table>
+  <h2 id="ai-shield" class="content-section">AI Shield プライバシーインジケーター</h2>
+  <ul>
+    <li><strong>緑のシールド（LOCAL）</strong> — すべての AI 処理がデバイス上で実行されます。これがデフォルトです。</li>
+    <li><strong>紫のシールド（CLOUD）</strong> — クラウド AI がアクティブです（オプトインのみ）。負荷の高いタスクがクラウドにオフロードされます。</li>
+  </ul>
+  <h2 id="first-run" class="content-section">初回モデルダウンロード</h2>
+  <ol>
+    <li><strong>Quira を初めて起動</strong> — 推定サイズ（約2.3 GB）と所要時間とともにモデルダウンロードのプロンプトが表示されます。</li>
+    <li><strong>バックグラウンドダウンロード</strong> — パーセンテージと ETA 付きのプログレスバーが表示されます。ダウンロード中も通常通りブラウジングできます。</li>
+    <li><strong>準備完了通知</strong> — 「ローカル AI の準備ができました」 — すべての AI 機能がアクティブになります。</li>
+  </ol>
+  <PrevNext prev={{ href: '/docs/ja/core-concepts/context-spaces/', title: 'Context Spaces' }} next={{ href: '/docs/ja/core-concepts/research-replay/', title: 'Research Replay' }} />
+</DocsLayout>

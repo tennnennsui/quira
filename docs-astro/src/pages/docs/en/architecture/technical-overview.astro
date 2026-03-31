@@ -1,0 +1,16 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [{ id: 'technical-overview', text: 'Technical Overview', depth: 2 }];
+---
+<DocsLayout lang="en" title="Technical Overview" description="Quira's three-layer architecture  EUI Layer, Context Layer, and Agent Layer." section="Architecture" headings={headings}>
+  <h1 id="technical-overview" class="content-section">Technical Overview</h1>
+  <p>You've seen what Quira does. Now let's look at how it's built. Quira is structured in three primary layers, all running locally on your machine:</p>
+  <ul>
+    <li><strong>UI Layer</strong> (Rust + WebGPU)  ENative-performance interface including the <a href="/docs/en/features/graph-visualization/">Graph Explorer</a>, Space Bar, and all custom UI elements.</li>
+    <li><strong>Context Layer</strong> (<a href="/docs/en/architecture/storage/">SQLite + FTS5 + sqlite-vec</a>)  EThe local graph database that stores and indexes all <a href="/docs/en/core-concepts/context-graph/">Context Graph</a> data.</li>
+    <li><strong>Agent Layer</strong> (<a href="/docs/en/architecture/llm-integration/">llama.cpp / MLX</a>)  EThe local LLM runtime that powers summarization, entity extraction, embedding generation, and <a href="/docs/en/features/nl-query/">NL Query</a>.</li>
+  </ul>
+  <p>All three layers sit on top of the <a href="/docs/en/architecture/gecko-engine/">Gecko-based rendering engine</a>, which handles standard web page rendering and provides full <a href="/docs/en/api/webextension-api/">WebExtension API</a> compatibility.</p>
+  <PrevNext prev={{ href: '/docs/en/features/export-import/', title: 'Export & Import' }} next={{ href: '/docs/en/architecture/gecko-engine/', title: 'Gecko Engine' }} />
+</DocsLayout>

@@ -1,0 +1,26 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'export-import', text: 'Export & Import', depth: 2 },
+  { id: 'export-formats', text: 'Export formats', depth: 2 },
+  { id: 'import-from-chrome', text: 'Import from Chrome', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Export & Import" description="Full data portability  Eexport your Context Graph to JSON or Markdown, and import from Chrome." section="Features" headings={headings}>
+  <h1 id="export-import" class="content-section">Export &amp; Import</h1>
+  <p>Your <a href="/docs/en/core-concepts/context-graph/">Context Graph</a> data is valuable. Quira believes in full data portability  Eyou can export it anytime and import from other browsers. Exported data works with tools like Obsidian and can be consumed via the <a href="/docs/en/api/graph-query-api/">Graph Query API</a>.</p>
+  <h2 id="export-formats" class="content-section">Export formats</h2>
+  <ul>
+    <li><strong>JSON</strong>  EFull Context Graph export including nodes, edges, metadata, and embeddings. Machine-readable for integration with other tools.</li>
+    <li><strong>Markdown</strong>  EHuman-readable export of nodes with titles, summaries, tags, and links. Compatible with Obsidian, Notion, and other note-taking tools.</li>
+  </ul>
+  <h2 id="import-from-chrome" class="content-section">Import from Chrome</h2>
+  <p>On first launch, Quira offers to import your Chrome data:</p>
+  <ul>
+    <li><strong>Bookmarks</strong>  EImported and optionally converted to Context Graph nodes</li>
+    <li><strong>Open tabs</strong>  ECurrent Chrome tabs can be imported into a new Space</li>
+    <li><strong>Extensions</strong>  E<a href="/docs/en/api/webextension-api/">WebExtension-compatible</a> (MV2+MV3) extensions work out of the box</li>
+  </ul>
+  <PrevNext prev={{ href: '/docs/en/features/graph-visualization/', title: 'Graph Visualization' }} next={{ href: '/docs/en/architecture/technical-overview/', title: 'Technical Overview' }} />
+</DocsLayout>

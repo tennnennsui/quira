@@ -1,0 +1,26 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'research-replay', text: 'Research Replay', depth: 2 },
+  { id: 'automatic-cluster-detection', text: '自動クラスター検出', depth: 2 },
+  { id: 'resume-functionality', text: '再開機能', depth: 2 },
+  { id: 'session-management', text: 'セッション管理', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="Research Replay" description="AI 生成の要約で過去のリサーチセッションを再開しましょう。" section="コアコンセプト" headings={headings}>
+  <h1 id="research-replay" class="content-section">Research Replay</h1>
+  <p>ブラウジングとともに <a href="/docs/ja/core-concepts/context-graph/">Context Graph</a> が成長し、<a href="/docs/ja/core-concepts/local-ai/">Local AI</a> がそれを充実させます。Research Replay はその両方を基盤として、グラフ内のリサーチクラスターを検出し、リサーチセッションの再開、レビュー、共有を可能にします。</p>
+  <h2 id="automatic-cluster-detection" class="content-section">自動クラスター検出</h2>
+  <p>システムは、訪問の時間的近接性、ノード間のトピック/エンティティの重複、そして Navigation エッジの密度に基づいて、リサーチクラスターを自動的に特定します。5つ以上のノードを持つクラスターは「リサーチセッション」としてフラグ付けされます。</p>
+  <h2 id="resume-functionality" class="content-section">再開機能</h2>
+  <p>検出されたリサーチクラスターには「再開」ボタンが表示されます。クリックすると：</p>
+  <ol>
+    <li>クラスターのカラーテーマで新しい Context Space が開きます</li>
+    <li>クラスター内のすべてのタブが復元され、最後に閲覧したページがアクティブタブになります</li>
+    <li>AI 生成の要約が表示されます：何を調査したか、どんな結論に至ったか、何がまだ未探索か</li>
+  </ol>
+  <h2 id="session-management" class="content-section">セッション管理</h2>
+  <p>すべてのリサーチセッションは <code>quira://research</code> で管理されます。各セッションは、名前（自動生成またはユーザーカスタマイズ）、ステータス（<code>active</code>、<code>paused</code>、<code>completed</code>）、関連する Context Graph ノード、AI 要約、タイムスタンプを追跡します。</p>
+  <PrevNext prev={{ href: '/docs/ja/core-concepts/local-ai/', title: 'Local AI' }} next={{ href: '/docs/ja/features/nl-query/', title: '自然言語クエリ' }} />
+</DocsLayout>

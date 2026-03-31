@@ -1,0 +1,87 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'security-overview', text: 'セキュリティ概要', depth: 2 },
+  { id: 'context-security', text: 'Context Security: 新しいパラダイム', depth: 2 },
+  { id: 'compositional-sensitivity', text: '構成的センシティビティ', depth: 3 },
+  { id: 'eight-paradigms', text: '8つのセキュリティパラダイム', depth: 2 },
+  { id: 'defense-in-depth', text: '多層防御', depth: 2 },
+  { id: 'security-layers', text: 'セキュリティレイヤー', depth: 2 },
+  { id: 'security-comparison', text: '競合比較', depth: 2 },
+  { id: 'implementation-roadmap', text: '実装ロードマップ', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="セキュリティ概要" description="Context Security — 接続ではなく蓄積された知識を保護する、Quira独自の世界初セキュリティアーキテクチャ。" section="セキュリティ & プライバシー" headings={headings}>
+  <h1 id="security-overview" class="content-section">セキュリティ概要</h1>
+  <p>Quiraはセキュリティをファーストクラスの関心事として設計されています。しかしQuiraは既存のどのブラウザよりも先を行きます: <strong>Context Security</strong> ― ネットワーク接続ではなく、蓄積された知識構造を保護する新しいセキュリティ分野を導入します。</p>
+
+  <h2 id="context-security" class="content-section">Context Security: 新しいパラダイム</h2>
+  <p>Chrome、Firefox、Brave ― すべての主要ブラウザは、サンドボックス、サイト分離、コンテンツセキュリティポリシーによって<em>Webからユーザーを守る</em>ことに注力しています。しかし、<em>ユーザー自身が蓄積した知識</em>を同じ厳格さで保護するブラウザは存在しません。</p>
+  <p>QuiraのContext Graphは自動構築されるパーソナルナレッジグラフ ― 知的活動の構造化マップです。これは既存のブラウザセキュリティモデルが保護していない、まったく新しいカテゴリのセンシティブデータです。<strong>Context Security</strong>とは、パーソナルナレッジ構造を保護する学問です。</p>
+  <Callout type="warning" title="なぜこれが重要か">
+    <p>Context GraphにはAI要約、エンティティ抽出、セマンティック埋め込み、閲覧パターン、時間的リサーチパスが含まれます。これは閲覧履歴とは本質的に異なる ― あなたの思考の機械可読マップです。</p>
+  </Callout>
+
+  <h3 id="compositional-sensitivity" class="content-section">構成的センシティビティ</h3>
+  <p>個々のページ訪問は低感度データです。しかしContext Graphに蓄積され ― AI要約、抽出エンティティ、時間パターンと組み合わされると ― 考えうる最もセンシティブな個人データセットの一つになります。これはモバイル位置情報の個々のピングは無害でも、集約された位置履歴は完全な監視になるのと同じ原理です。</p>
+
+  <h2 id="eight-paradigms" class="content-section">8つのセキュリティパラダイム</h2>
+  <p>Quiraのセキュリティアーキテクチャは8つの連動するパラダイムで構築されています。それぞれが独立して価値を持ち、組み合わさることで生きた適応的な暗号学的防御システムを形成します。</p>
+  <table><thead><tr><th>#</th><th>パラダイム</th><th>核心</th><th>詳細</th></tr></thead><tbody>
+    <tr><td>1</td><td>Capability-Based Security</td><td>偽造不能なトークンがIDベースアクセスを置換。環境権限なし。</td><td><a href="/docs/ja/security/permission-system/">パーミッションシステム</a></td></tr>
+    <tr><td>2</td><td>情報フロー制御</td><td>誰がアクセスできるかではなく、データがどこに流れるかを追跡。ラベルは単調。</td><td><a href="/docs/ja/security/permission-system/">パーミッションシステム</a></td></tr>
+    <tr><td>3</td><td>AI免疫システム</td><td>行動ベースライニングと異常検知。AIが自らを防衛。</td><td><a href="/docs/ja/security/threat-protection/">脅威対策</a></td></tr>
+    <tr><td>4</td><td>時間セキュリティ</td><td>パーミッションは減衰。セッションは時間制限。デッドマンスイッチ。</td><td><a href="/docs/ja/security/privacy-architecture/">プライバシーアーキテクチャ</a></td></tr>
+    <tr><td>5</td><td>敵対的ML防御</td><td>Webコンテンツによるブラウザ自身のAI操作に対する多層防御。</td><td><a href="/docs/ja/security/threat-protection/">脅威対策</a></td></tr>
+    <tr><td>6</td><td>暗号イノベーション</td><td>保存時前方秘匿性、閾値暗号、検証可能な削除、ZKP。</td><td><a href="/docs/ja/security/privacy-architecture/">プライバシーアーキテクチャ</a></td></tr>
+    <tr><td>7</td><td>ハードウェア協調設計</td><td>AI推論用TEE、メモリ暗号化、タブ単位復号。</td><td><a href="/docs/ja/security/privacy-architecture/">プライバシーアーキテクチャ</a></td></tr>
+    <tr><td>8</td><td>リビングセキュリティ</td><td>セキュリティヘルススコア、静的設定ではなく継続的適応。</td><td><a href="/docs/ja/security/threat-protection/">脅威対策</a></td></tr>
+  </tbody></table>
+  <p>これら8つのパラダイムに加え、Quiraは26の新規セキュリティ構造を導入 — <a href="/docs/ja/security/advanced-architecture/">macOS深層アーキテクチャ概念</a>（8構造: CSEB, KPC, CTA等）から<a href="/docs/ja/security/emergent-security/">エマージェント相互作用構造</a>（8構造: KSCI, IRD, RSIP, CAV等）まで。各ページに形式モデルと実装詳細を記載。</p>
+
+  <h2 id="defense-in-depth" class="content-section">多層防御</h2>
+  <p>QuiraはmacOSの多層セキュリティモデルに触発された<strong>多層防御</strong>戦略を実装しています。単一の境界に依存するのではなく、複数の独立したレイヤーにより1つが突破されてもシステム全体が危殆化しないようにしています。</p>
+  <table><thead><tr><th>macOS</th><th>Quira相当</th><th>既存ブラウザとの違い</th></tr></thead><tbody>
+    <tr><td>Gatekeeper</td><td>インストール前の暗号学的拡張機能検証</td><td>Chromeは公開後にレビュー; Quiraは実行前に検証</td></tr>
+    <tr><td>TCC</td><td>Context TCC ― グラフアクセスに対するきめ細かい同意</td><td>世界初: ナレッジグラフアクセス制御を持つブラウザはない</td></tr>
+    <tr><td>SIP</td><td>Context Graphの不変性保護</td><td>閲覧データの整合性を保証するブラウザはない</td></tr>
+    <tr><td>App Sandbox</td><td>Space-Scoped Security ― Context Spaceがセキュリティ境界</td><td>世界初: タブグループがセキュリティ境界</td></tr>
+    <tr><td>Keychain</td><td>独立暗号化による埋め込みボールト</td><td>世界初: 保存時の閲覧データ暗号化</td></tr>
+    <tr><td>Lockdown Mode</td><td>Context Lockdown ― JIT無効化、パニックワイプ、RAMのみモード</td><td>世界初: ジャーナリスト/活動家向け極限プライバシーモード</td></tr>
+  </tbody></table>
+
+  <h2 id="security-layers" class="content-section">セキュリティレイヤー</h2>
+  <table><thead><tr><th>レイヤー</th><th>コンポーネント</th><th>保護対象</th></tr></thead><tbody>
+    <tr><td>L1 ― ネットワーク</td><td><a href="/docs/ja/security/network-firewall/">ネットワークファイアウォール</a></td><td>悪意ある接続、DNSフィルタリング、TLS強制</td></tr>
+    <tr><td>L2 ― コンテンツ</td><td><a href="/docs/ja/security/content-filtering/">コンテンツフィルタリング</a></td><td>トラッカー、広告、フィンガープリンティング、暗号通貨マイナー</td></tr>
+    <tr><td>L3 ― 脅威</td><td><a href="/docs/ja/security/threat-protection/">脅威対策</a></td><td>フィッシング、マルウェア、AI免疫システム、敵対的ML防御</td></tr>
+    <tr><td>L4 ― 権限</td><td><a href="/docs/ja/security/permission-system/">パーミッションシステム</a></td><td>Capabilityトークン、Context TCC、IFCラベル、Space隔離</td></tr>
+    <tr><td>L5 ― プライバシー</td><td><a href="/docs/ja/security/privacy-architecture/">プライバシーアーキテクチャ</a></td><td>保存時暗号化、時間セキュリティ、ハードウェア連携</td></tr>
+    <tr><td>L6 ― インフラ</td><td><a href="/docs/ja/security/advanced-architecture/">高度アーキテクチャ</a></td><td>KPC分類、CSEBイベントバス、KQRリレー、CTA信頼判定、ASPポスチャ</td></tr>
+    <tr><td>L7 ― エマージェント</td><td><a href="/docs/ja/security/emergent-security/">エマージェントセキュリティ</a></td><td>KSCIサプライチェーン、IRD推論残渣、SBRC爆風半径、TCV因果、CAV忘却</td></tr>
+  </tbody></table>
+
+  <h2 id="security-comparison" class="content-section">競合比較</h2>
+  <table><thead><tr><th>機能</th><th>Chrome</th><th>Firefox</th><th>Brave</th><th>Tor</th><th>Quira</th></tr></thead><tbody>
+    <tr><td>サイト分離</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes (Gecko Fission)</td></tr>
+    <tr><td>拡張機能サンドボックス</td><td>基本的</td><td>基本的</td><td>基本的</td><td>制限的</td><td>Capability-based TCC</td></tr>
+    <tr><td>履歴暗号化</td><td>No</td><td>No</td><td>No</td><td>RAMのみ</td><td>SQLCipher + 埋め込み暗号化</td></tr>
+    <tr><td>AI脅威防御</td><td>No</td><td>No</td><td>No</td><td>N/A</td><td>4層プロンプトインジェクション防御</td></tr>
+    <tr><td>知識流出検知</td><td>No</td><td>No</td><td>No</td><td>No</td><td>Context DLP</td></tr>
+    <tr><td>ロックダウンモード</td><td>No</td><td>No</td><td>No</td><td>部分的</td><td>Context Lockdown</td></tr>
+    <tr><td>構成的センシティビティ</td><td>No</td><td>No</td><td>No</td><td>No</td><td>Yes ― 世界初</td></tr>
+  </tbody></table>
+
+  <h2 id="implementation-roadmap" class="content-section">実装ロードマップ</h2>
+  <p>コアセキュリティ、<a href="/docs/ja/security/advanced-architecture/">高度アーキテクチャ</a>、<a href="/docs/ja/security/emergent-security/">エマージェントセキュリティ</a>の統合ロードマップ。</p>
+  <table><thead><tr><th>フェーズ</th><th>コアセキュリティ</th><th>高度アーキテクチャ</th><th>エマージェント</th><th>タイムライン</th></tr></thead><tbody>
+    <tr><td>Phase 1 (MVP)</td><td>SQLCipher、拡張機能エンタイトルメント、コンテンツサニタイゼーション、ドメイン除外</td><td>KPC（保護クラス）、CSEB（イベントバス）、CTA（信頼判定）</td><td>KSCI（サプライチェーン完全性）、TCV（時間因果）</td><td>Q3 2026</td></tr>
+    <tr><td>Phase 2 (Pro)</td><td>Context TCC、Space境界、埋め込み暗号化、差分プライバシー</td><td>PSCS（権限分離）、SKV（封印ボリューム）、ASP（適応ポスチャ）</td><td>IRD（推論残渣防御）、SBRC（爆風半径封じ込め）</td><td>Q4 2026</td></tr>
+    <tr><td>Phase 3 (Enterprise)</td><td>TEE統合、Context Lockdown、流出検知、PQC</td><td>KQR（クエリリレー）、DSPL（ポリシー言語）</td><td>AGTR（グラフトポロジー耐性）、CSELP（エントロピー漏洩防止）</td><td>2027</td></tr>
+    <tr><td>Phase 4 (Standard)</td><td>Context Security Framework — W3C/IETF標準化提案</td><td>完全統合 + 形式検証</td><td>RSIP（過去に遍及する浄化）、CAV（忘却検証）</td><td>2027+</td></tr>
+  </tbody></table>
+
+  <PrevNext prev={{ href: '/docs/ja/features/export-import/', title: 'エクスポート & インポート' }} next={{ href: '/docs/ja/security/threat-model/', title: '脅威モデル' }} />
+</DocsLayout>

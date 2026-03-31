@@ -1,0 +1,53 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'quick-start', text: 'クイックスタート', depth: 2 },
+  { id: 'steps', text: 'ステップ', depth: 2 },
+  { id: 'querying-the-context-graph', text: 'Context Graph へのクエリ', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="クイックスタート" description="5分以内に Quira を起動し、Context Graph の自動構築を開始しましょう。" section="はじめに" headings={headings}>
+  <h1 id="quick-start" class="content-section">クイックスタート</h1>
+  <p><a href="/docs/ja/getting-started/what-is-quira/">Quira とは何か</a>を理解したところで、実際に起動してみましょう。5分以内に <a href="/docs/ja/core-concepts/context-graph/">Context Graph</a> の構築を開始できます。</p>
+  <h2 id="steps" class="content-section">ステップ</h2>
+  <h3>1. ダウンロードとインストール</h3>
+  <p>お使いのプラットフォーム向けの最新リリースを取得してください。Quira は現在 macOS（Apple Silicon および Intel）と Linux をサポートしています。</p>
+  <pre><code>{`# macOS (Apple Silicon)
+curl -fsSL https://get.qu-ira.com | sh
+
+# Linux (Debian/Ubuntu)
+wget -qO- https://get.qu-ira.com/linux | sudo sh`}</code></pre>
+  <h3>2. ローカル AI のセットアップ</h3>
+  <p>初回起動時に、Quira は Phi-3.5 Mini モデル（約2.3 GB）をダウンロードします。ダウンロード中もバックグラウンドで通常通りブラウジングできます。</p>
+  <h3>3. 自然にブラウジング</h3>
+  <p>Quira を通常のブラウザとして使用してください。30秒以上滞在したページは自動的にコンテキストノードとしてキャプチャされます。Context Graph が成長するにつれて、アンビエントサイドバーにドットが表示されます。</p>
+  <h3>4. ブラウザに質問する</h3>
+  <p>コマンドパレットを <code>Cmd+Shift+P</code> で開き、自然言語で質問してください。Quira が Context Graph を検索し、引用付きの回答を返します。</p>
+  <hr>
+  <h2 id="querying-the-context-graph" class="content-section">Context Graph へのクエリ</h2>
+  <p>Quira をインストールし Context Graph が成長している今、その上に何を構築できるかをご紹介します。<a href="/docs/ja/api/graph-query-api/">Graph Query API</a> を使えば、拡張機能や<a href="/docs/ja/api/plugin-api/">プラグイン</a>が Context Graph をプログラムから検索できます。</p>
+  <pre><code>{`// ブラウジングコンテキストをクエリ
+const results = await quira.graph.query("What did I read about React this week?");
+
+console.log(results.nodes);    // 関連するコンテキストノード
+console.log(results.sources);  // 元のページ URL
+console.log(results.summary);  // AI 生成の要約`}</code></pre>
+  <p>レスポンスには完全な引用データが含まれます — 要約に含まれるすべての主張が、タイムスタンプと滞在時間とともに元のページにリンクされています。これがゼロハルシネーション保証です：Quira は実際に読んだ内容からのみ回答します。</p>
+  <pre><code>{`// 現在のページに関連するノードを取得
+const related = await quira.graph.getRelated(currentUrl, {
+  hops: 2,          // 最大2エッジまで探索
+  limit: 10,         // 返すノードの最大数
+  minWeight: 0.3,    // エッジの最小重み
+});
+
+// エンティティタイプでフィルタリング
+const techNodes = related.filter(n =>
+  n.entities.some(e => e.type === "technology")
+);`}</code></pre>
+  <Callout type="warning" title="API はアルファ版です">
+    <p>Graph Query API は活発に開発中です。メソッドのシグネチャは v1.0 安定版リリース前に変更される可能性があります。本番環境でこれらの API に依存する場合は、拡張機能を特定の Quira バージョンにピン留めしてください。</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/ja/getting-started/what-is-quira/', title: 'Quira とは？' }} next={{ href: '/docs/ja/getting-started/installation/', title: 'インストール' }} />
+</DocsLayout>

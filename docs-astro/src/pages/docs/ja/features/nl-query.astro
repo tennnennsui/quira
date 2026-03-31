@@ -1,0 +1,32 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'natural-language-query', text: '自然言語クエリ', depth: 2 },
+  { id: 'how-to-use-it', text: '使い方', depth: 2 },
+  { id: 'example-queries', text: 'クエリの例', depth: 2 },
+  { id: 'zero-hallucination', text: 'ゼロハルシネーション保証', depth: 2 },
+  { id: 'response-time-targets', text: 'レスポンス時間の目標', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="自然言語クエリ" description="ブラウザに何でも自然言語で質問し、実際のブラウジング履歴に基づいた回答を得ましょう。" section="機能" headings={headings}>
+  <h1 id="natural-language-query" class="content-section">自然言語クエリ</h1>
+  <p><a href="/docs/ja/core-concepts/context-graph/">Context Graph</a> が構築され、<a href="/docs/ja/core-concepts/local-ai/">Local AI</a> が稼働している今、他のどのブラウザでもできないことが可能になります。NL Query は Quira のキラー機能です：ブラウザに自然言語で何でも質問し、実際のブラウジング履歴に基づいた回答を得られます。技術的な詳細については、<a href="/docs/ja/architecture/llm-integration/">LLM Integration</a> をご覧ください。</p>
+  <h2 id="how-to-use-it" class="content-section">使い方</h2>
+  <p>コマンドパレットを <code>Cmd+Shift+P</code> で開き、自然言語の質問を入力してください。<code>?</code> で始まる入力や自然言語のフレーズは、直接 NL Query にルーティングされます。</p>
+  <h2 id="example-queries" class="content-section">クエリの例</h2>
+  <pre><code>"What was that Rust crate I looked at yesterday?"
+"Summarize everything I read about WebGPU this week"
+"What pages did I spend the most time on about authentication?"
+"Compare the two database articles I read on Monday"</code></pre>
+  <h2 id="zero-hallucination" class="content-section">ゼロハルシネーション保証</h2>
+  <p>すべての回答は、URL、タイトル、訪問タイムスタンプ付きのソースページを<strong>必ず</strong>引用します。回答を Context Graph に基づいて根拠づけられない場合、Quira は情報を捏造するのではなく、明示的にそのことを伝えます。</p>
+  <h2 id="response-time-targets" class="content-section">レスポンス時間の目標</h2>
+  <table><thead><tr><th>シナリオ</th><th>目標</th></tr></thead><tbody>
+    <tr><td>100 ノードに対する NL Query</td><td>&lt; 3 秒</td></tr>
+    <tr><td>1,000 ノードに対する NL Query</td><td>&lt; 8 秒</td></tr>
+    <tr><td>ページ要約</td><td>&lt; 2 秒</td></tr>
+    <tr><td>エンティティ抽出</td><td>&lt; 1 秒</td></tr>
+  </tbody></table>
+  <PrevNext prev={{ href: '/docs/ja/core-concepts/research-replay/', title: 'Research Replay' }} next={{ href: '/docs/ja/features/ai-privacy/', title: 'AI プライバシーレベル' }} />
+</DocsLayout>

@@ -1,0 +1,49 @@
+---
+interface Props {
+  type: 'tip' | 'note' | 'warning' | 'info';
+  title: string;
+}
+
+const { type, title } = Astro.props;
+
+const config: Record<string, { bg: string; border: string; iconColor: string; icon: string }> = {
+  tip: {
+    bg: '#2D2D2B',
+    border: 'rgba(232,168,56,0.3)',
+    iconColor: '#E8A838',
+    icon: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  },
+  note: {
+    bg: '#2D2D2B',
+    border: 'rgba(44,132,219,0.3)',
+    iconColor: '#2C84DB',
+    icon: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+  },
+  warning: {
+    bg: '#2D2D2B',
+    border: 'rgba(232,168,56,0.3)',
+    iconColor: '#E8A838',
+    icon: '<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  },
+  info: {
+    bg: '#2D2D2B',
+    border: 'rgba(44,132,219,0.3)',
+    iconColor: '#2C84DB',
+    icon: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+  },
+};
+
+const c = config[type];
+---
+
+<div style={`background:${c.bg};border:1px solid ${c.border};border-radius:8px;padding:12px 16px;margin-bottom:2rem;`}>
+  <div style="display:flex;align-items:flex-start;gap:12px;">
+    <svg style="margin-top:2px;flex-shrink:0;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={c.iconColor} stroke-width="2" stroke-linecap="round"><Fragment set:html={c.icon} /></svg>
+    <div>
+      <p style="color:#FAF9F5;font-size:14px;font-weight:500;margin:0 0 4px 0;">{title}</p>
+      <div style="color:#C2C0B6;font-size:14px;line-height:1.6;">
+        <slot />
+      </div>
+    </div>
+  </div>
+</div>

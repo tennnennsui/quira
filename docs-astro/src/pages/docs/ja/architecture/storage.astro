@@ -1,0 +1,49 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'storage-sqlite', text: 'ストレージ (SQLite)', depth: 2 },
+  { id: 'data-model', text: 'データモデル', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="ストレージ (SQLite)" description="Quira が Context Graph を暗号化されたローカル SQLite データベースに保存する仕組み。" section="アーキテクチャ" headings={headings}>
+  <h1 id="storage-sqlite" class="content-section">ストレージ (SQLite)</h1>
+  <p><a href="/docs/ja/core-concepts/context-graph/">Context Graph</a> にはデータの保存先が必要です。すべてのデータは、3つの主要な拡張機能を備えたローカルの暗号化 SQLite データベースに保存されます：全文検索用の FTS5、ベクトル類似検索用の sqlite-vec、そしてクラッシュセーフな書き込み用の WAL モード。</p>
+  <h2 id="data-model" class="content-section">データモデル</h2>
+  <p>データベースには5つのコアエンティティが含まれます：</p>
+  <ul>
+    <li><strong>ContextNode</strong> — グラフにキャプチャされたページ（URL、タイトル、AI 要約、エンティティ、埋め込み、滞在時間、タグ）</li>
+    <li><strong>ContextEdge</strong> — ノード間の接続（タイプ、重み、タイムスタンプ）</li>
+    <li><strong>Space</strong> — コンテキストワークスペース（名前、色、アイコン、位置）</li>
+    <li><strong>Tab</strong> — 個々のブラウザタブ（URL、タイトル、サスペンド状態、Space 内の位置）</li>
+    <li><strong>ResearchSession</strong> — 検出されたリサーチクラスター（ノード ID、ステータス、AI 要約）</li>
+  </ul>
+  <pre><code>{`-- コアテーブル: Context Graph ノード
+CREATE TABLE context_node (
+    id              TEXT PRIMARY KEY,   -- UUID v7
+    url             TEXT NOT NULL,
+    title           TEXT NOT NULL,
+    domain          TEXT NOT NULL,
+    ai_summary      TEXT,
+    ai_entities     TEXT,               -- JSON array
+    ai_embedding    BLOB,               -- 384-dim float32 vector
+    visit_count     INTEGER DEFAULT 1,
+    total_dwell_time INTEGER DEFAULT 0,
+    first_visited   TEXT NOT NULL,
+    last_visited    TEXT NOT NULL,
+    user_tags       TEXT,               -- JSON array
+    space_id        TEXT REFERENCES space(id),
+    is_excluded     INTEGER DEFAULT 0
+);
+
+-- 全文検索インデックス
+CREATE VIRTUAL TABLE context_node_fts USING fts5(
+    title, url, ai_summary, ai_entities, user_notes,
+    content=context_node
+);`}</code></pre>
+  <Callout type="note" title="保存時の暗号化">
+    <p>SQLite データベースはユーザー派生キーで暗号化されています。WAL（Write-Ahead Logging）モードにより、予期しないシャットダウン時にもデータが失われることはありません。定期的なセッション状態のスナップショットがクラッシュリカバリーを提供します。</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/ja/architecture/gecko-engine/', title: 'Gecko Engine' }} next={{ href: '/docs/ja/architecture/llm-integration/', title: 'LLM Integration' }} />
+</DocsLayout>

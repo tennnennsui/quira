@@ -1,0 +1,661 @@
+---
+import Sidebar from '../components/Sidebar.astro';
+import TOC from '../components/TOC.astro';
+import LanguageSelector from '../components/LanguageSelector.astro';
+import AskDocs from '../components/AskDocs.astro';
+import { t, getBasePath, type Lang } from '../i18n/translations';
+import { ClientRouter } from 'astro:transitions';
+
+interface Props {
+  title: string;
+  description?: string;
+  section: string;
+  headings?: Array<{ id: string; text: string; depth: number }>;
+  lang?: Lang;
+}
+
+const { title, description, section, headings = [], lang = 'en' } = Astro.props;
+const currentPath = Astro.url.pathname;
+const translations = t(lang);
+const base = getBasePath(lang);
+---
+
+<!DOCTYPE html>
+<html lang={lang} class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title} - Quira Docs</title>
+  {description && <meta name="description" content={description} />}
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <ClientRouter />
+  <style is:inline>
+    * { box-sizing: border-box; color: inherit; }
+    html { background-color: #262624; scrollbar-color: #4A4A48 #1F1E1D; scrollbar-width: thin; }
+    body { background-color: #262624; color: #FAF9F5; font-family: 'Inter', system-ui, sans-serif; margin: 0; font-size: 16px; line-height: 24px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    p, li, td, span { color: #FAF9F5; }
+    main { background-color: #262624; min-height: 100vh; }
+    .right-toc { background-color: #262624; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #1F1E1D; }
+    ::-webkit-scrollbar-thumb { background: #4A4A48; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #5A5A58; }
+    .left-sidebar { scrollbar-width: none; }
+    .left-sidebar::-webkit-scrollbar { display: none; }
+    .nav-section-btn { transition: color 0.15s ease; font-weight: 540; }
+    .nav-section-btn:hover { color: #FAF9F5; }
+    .nav-link { transition: color 0.15s ease; display: block; padding: 4px 8px 4px 28px; font-size: 14px; color: #6B6A64; text-decoration: none; border-radius: 6px; }
+    .nav-link:hover { color: #C2C0B6; }
+    .nav-link.active { color: #FAF9F5; }
+    .toc-link { transition: color 0.15s ease; display: block; padding: 4px 0 4px 16px; font-size: 13px; color: #6B6A64; text-decoration: none; line-height: 22px; }
+    .toc-link:hover { color: #C2C0B6; }
+    .toc-link.active { color: #FAF9F5; }
+    .toc-track { position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: rgba(222,220,209,0.08); border-radius: 1px; }
+    .toc-thumb { position: absolute; left: 0; width: 2px; background: #E8A838; border-radius: 1px; transition: top 0.2s ease, height 0.2s ease; }
+    .chevron { transition: transform 0.2s ease; }
+    .chevron.open { transform: rotate(90deg); }
+    .copy-btn { opacity: 0; transition: opacity 0.15s ease; }
+    .code-block:hover .copy-btn { opacity: 1; }
+    ::selection { background: rgba(232,168,56,0.3); color: #FAF9F5; }
+    h2 { font-weight: 460 !important; }
+    h3 { font-weight: 460 !important; }
+    .heading-anchor { opacity: 0; transition: opacity 0.15s ease; cursor: pointer; background: none; border: none; vertical-align: middle; }
+    h2:hover .heading-anchor, h3:hover .heading-anchor, .group:hover .heading-anchor { opacity: 1; }
+    .header-scrolled { box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+    .content-section { scroll-margin-top: 80px; }
+    .search-input::placeholder { color: #9C9A92; }
+    article a:not(.heading-anchor):not([class*="block"]):not([class*="flex"]) { color: #E8A838; text-decoration-line: underline; text-decoration-color: rgba(232,168,56,0.4); text-underline-offset: 2px; }
+    article a:not(.heading-anchor):not([class*="block"]):not([class*="flex"]):hover { text-decoration-color: #E8A838; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 1.5rem; }
+    table th { font-weight: 600; text-align: left; color: #FAF9F5; padding: 8px 16px 8px 0; border-bottom: 1px solid rgba(222,220,209,0.15); }
+    table td { padding: 10px 16px 10px 0; color: #FAF9F5; border-bottom: 1px solid rgba(222,220,209,0.15); }
+    :not(pre) > code { background: #30302E; padding: 2px 6px; border-radius: 4px; font-size: 0.875em; font-family: 'JetBrains Mono', monospace; color: #E8A838; }
+    article h1 { font-family: Georgia, 'Times New Roman', Times, serif; font-size: 28px; font-weight: 460; color: #FAF9F5; line-height: 1.3; margin-bottom: 1.25rem; }
+    article h2 { font-family: Georgia, 'Times New Roman', Times, serif; font-size: 24px; font-weight: 460; color: #FAF9F5; line-height: 1.3; margin-top: 3rem; margin-bottom: 1.5rem; }
+    article h3 { font-family: Georgia, 'Times New Roman', Times, serif; font-size: 20px; font-weight: 460; color: #FAF9F5; line-height: 1.3; margin-top: 2rem; margin-bottom: 1rem; }
+    article p { font-size: 14px; line-height: 1.625; color: #FAF9F5; margin-bottom: 1.5rem; max-width: 832px; }
+    article ul, article ol { padding-left: 1.5rem; margin-bottom: 1.5rem; }
+    article li { font-size: 14px; line-height: 1.625; color: #FAF9F5; margin-bottom: 0.5rem; }
+    article strong { color: #FAF9F5; }
+    article em { font-style: italic; }
+    article hr { border: none; border-top: 1px solid rgba(222,220,209,0.15); margin: 3rem 0 2rem; }
+    article pre { background: #30302E; border: 1px solid rgba(222,220,209,0.15); border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 14px; line-height: 1.5; margin-bottom: 1.5rem; }
+    article pre code { font-family: 'JetBrains Mono', monospace; background: none; padding: 0; }
+    /* Responsive layout via CSS custom property */
+    :root { --sidebar-w: 256px; }
+    .left-sidebar { width: var(--sidebar-w) !important; }
+    .docs-main { margin-left: var(--sidebar-w) !important; }
+    .header-nav { display: flex; }
+    .header-actions-text { display: inline; }
+    /* >= 1281: 3-column (sidebar 256 + content + TOC 280) — default above */
+    @media (max-width: 1280px) {
+      .right-toc { display: none; }
+    }
+    @media (max-width: 1024px) {
+      :root { --sidebar-w: 220px; }
+      .header-nav { display: none; }
+      .header-actions-text { display: none; }
+      #menu-toggle { display: block !important; }
+    }
+    @media (max-width: 768px) {
+      :root { --sidebar-w: 280px; }
+      .left-sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+      .left-sidebar.open { transform: translateX(0); }
+      .docs-main { margin-left: 0 !important; }
+      article h1 { font-size: 24px; }
+      article { padding: 1.5rem 1rem 4rem !important; }
+      .footer-grid { flex-direction: column; gap: 2rem !important; }
+      .footer-links { grid-template-columns: repeat(2, 1fr) !important; }
+      .search-dialog { margin: 2rem 1rem !important; }
+    }
+    @media (max-width: 480px) {
+      .footer-links { grid-template-columns: 1fr !important; }
+    }
+    /* Skeleton loader styles */
+    #skeleton-loader { display: block; opacity: 1; transition: opacity 0.2s ease; }
+    #skeleton-loader.hidden { opacity: 0; pointer-events: none; }
+    .skeleton-bar { background: #2D2D2B; border-radius: 4px; position: relative; overflow: hidden; }
+    .skeleton-bar::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 0%, #353533 50%, transparent 100%); animation: shimmer 1.5s infinite; }
+    .skeleton-rect { background: #2D2D2B; border-radius: 8px; position: relative; overflow: hidden; }
+    .skeleton-rect::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 0%, #353533 50%, transparent 100%); animation: shimmer 1.5s infinite; }
+    .skeleton-circle { background: #2D2D2B; border-radius: 50%; position: relative; overflow: hidden; }
+    .skeleton-circle::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 0%, #353533 50%, transparent 100%); animation: shimmer 1.5s infinite; }
+    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    /* Dark theme enforcement */
+    hr, .separator { border-color: rgba(222,220,209,0.15) !important; background: transparent !important; }
+    table { background: transparent !important; }
+    th { background: #2D2D2B !important; color: #FAF9F5 !important; }
+    td { border-color: rgba(222,220,209,0.15) !important; }
+
+    pre { background: #30302E !important; }
+    article a:not([style*="text-decoration:none"]) { color: #E8A838; }
+    article a:not([style*="text-decoration:none"]):hover { text-decoration: underline; }
+    blockquote { border-left: 3px solid #E8A838; background: #2D2D2B; padding: 12px 16px; margin: 16px 0; border-radius: 0 8px 8px 0; }
+    article > div[style*="grid"] > a { background: #2D2D2B; border-color: rgba(222,220,209,0.15); }
+    article > div[style*="grid"] > a:hover { border-color: rgba(222,220,209,0.3); }
+    article, article * { color: #FAF9F5; }
+    article h1, article h2, article h3 { color: #FAF9F5; }
+    article p, article li, article td, article span { color: #FAF9F5; }
+    article .text-secondary, article .muted { color: #C2C0B6; }
+    blockquote, blockquote * { color: #FAF9F5; }
+    blockquote p { color: #FAF9F5; }
+    article > div[style*="grid"] > a span[style*="font-weight"] { color: #E8A838 !important; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header style="position:fixed;top:0;left:0;right:0;z-index:50;height:56px;background:#262624;border-bottom:1px solid rgba(222,220,209,0.15);display:flex;align-items:center;padding:0 16px;transition:box-shadow 0.2s ease;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button id="menu-toggle" style="display:none;padding:6px;border-radius:6px;background:none;border:none;cursor:pointer;" aria-label="Toggle sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FAF9F5" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <a href={`${base}/`} style="display:flex;align-items:center;gap:8px;color:#FAF9F5;text-decoration:none;">
+        <img src="/favicon.svg" alt="Quira" width="24" height="24" style="border-radius:4px;" />
+        <span style="font-weight:600;font-size:15px;letter-spacing:-0.01em;">Quira Docs</span>
+      </a>
+    </div>
+
+    <nav class="header-nav" style="align-items:center;gap:4px;margin-left:2rem;">
+      <a href={`${base}/`} style={`padding:6px 12px;font-size:14px;border-radius:9999px;text-decoration:none;transition:color 0.15s;color:${translations.guideSections.includes(section) ? '#FAF9F5' : '#9C9A92'};${translations.guideSections.includes(section) ? 'background:rgb(0,0,0);' : ''}`}>{translations.navGuide}</a>
+      <a href={`${base}/api/plugin-api/`} style={`padding:6px 12px;font-size:14px;border-radius:9999px;text-decoration:none;transition:color 0.15s;color:${section === translations.apiSection ? '#FAF9F5' : '#9C9A92'};${section === translations.apiSection ? 'background:rgb(0,0,0);' : ''}`}>{translations.navApi}</a>
+      <a href={`${base}/architecture/technical-overview/`} style={`padding:6px 12px;font-size:14px;border-radius:9999px;text-decoration:none;transition:color 0.15s;color:${section === translations.archSection ? '#FAF9F5' : '#9C9A92'};${section === translations.archSection ? 'background:rgb(0,0,0);' : ''}`}>{translations.navArch}</a>
+      <a href={`${base}/contributing/dev-setup/`} style={`padding:6px 12px;font-size:14px;border-radius:9999px;text-decoration:none;transition:color 0.15s;color:${section === translations.contribSection ? '#FAF9F5' : '#9C9A92'};${section === translations.contribSection ? 'background:rgb(0,0,0);' : ''}`}>{translations.navContrib}</a>
+      <a href={`${base}/security/overview/`} style={`padding:6px 12px;font-size:14px;border-radius:9999px;text-decoration:none;transition:color 0.15s;color:${section === translations.securitySection ? '#FAF9F5' : '#9C9A92'};${section === translations.securitySection ? 'background:rgb(0,0,0);' : ''}`}>{translations.navSecurity}</a>
+    </nav>
+
+    <div style="flex:1;"></div>
+
+    <div style="display:flex;align-items:center;gap:8px;">
+      <LanguageSelector lang={lang} />
+      <a href="https://github.com/tennnennsui/quira" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:6px;padding:6px 12px;font-size:14px;color:#9C9A92;text-decoration:none;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+        <span class="header-actions-text">GitHub</span>
+      </a>
+      <a href="https://github.com/tennnennsui/quira" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:6px;padding:6px 12px;font-size:14px;color:#141413;background:#E8A838;border-radius:8px;font-weight:500;text-decoration:none;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <span class="header-actions-text">Star</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Search modal -->
+  <div id="search-modal" class="hidden" style="position:fixed;inset:0;z-index:60;transition:opacity 0.15s ease;display:none;">
+    <div id="search-backdrop" style="position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);"></div>
+    <div class="search-dialog" style="position:relative;max-width:36rem;margin:6rem auto;background:#1F1E1D;border:1px solid rgba(222,220,209,0.15);border-radius:12px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);overflow:hidden;">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(222,220,209,0.15);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9C9A92" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" style="flex:1;background:transparent;color:#FAF9F5;font-size:14px;outline:none;border:none;font-family:inherit;" placeholder={translations.searchPlaceholder}>
+        <kbd style="font-size:12px;color:#9C9A92;border:1px solid rgba(222,220,209,0.15);border-radius:4px;padding:2px 6px;">Esc</kbd>
+      </div>
+      <div id="search-results" style="padding:1rem;max-height:400px;overflow-y:auto;font-size:14px;color:#9C9A92;">
+        <p style="text-align:center;">{translations.searchEmpty}</p>
+        <p style="margin-top:0.5rem;font-size:12px;text-align:center;">{translations.searchHint}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar overlay (mobile) -->
+  <div id="sidebar-overlay" style="display:none;position:fixed;inset:0;z-index:30;background:rgba(0,0,0,0.5);"></div>
+
+  <Sidebar currentPath={currentPath} lang={lang} />
+
+  <main class="docs-main" style="padding-top:56px;background-color:#262624;min-height:100vh;">
+    <!-- Skeleton shows in place of article content -->
+    <div id="skeleton-loader" style="display:block;">
+      <div style="display:flex;">
+        <!-- Content skeleton (matches article area) -->
+        <div style="flex:1;min-width:0;max-width:896px;margin:0 auto;padding:2rem 2rem 6rem;">
+          <!-- Breadcrumb -->
+          <div class="skeleton-bar" style="width:120px;height:12px;margin-bottom:12px;"></div>
+          <!-- H1 -->
+          <div class="skeleton-bar" style="width:70%;height:28px;margin-bottom:24px;"></div>
+          <!-- Paragraph lines -->
+          <div class="skeleton-bar" style="width:100%;height:14px;margin-bottom:10px;"></div>
+          <div class="skeleton-bar" style="width:95%;height:14px;margin-bottom:10px;"></div>
+          <div class="skeleton-bar" style="width:88%;height:14px;margin-bottom:10px;"></div>
+          <div class="skeleton-bar" style="width:92%;height:14px;margin-bottom:24px;"></div>
+          <!-- Callout -->
+          <div style="background:#2D2D2B;border-radius:8px;padding:16px;margin-bottom:24px;border-left:3px solid #3A3A38;">
+            <div class="skeleton-bar" style="width:40%;height:14px;margin-bottom:8px;"></div>
+            <div class="skeleton-bar" style="width:80%;height:12px;"></div>
+          </div>
+          <!-- HR -->
+          <div style="height:1px;background:rgba(222,220,209,0.1);margin:32px 0 24px;"></div>
+          <!-- H2 -->
+          <div class="skeleton-bar" style="width:55%;height:22px;margin-bottom:20px;"></div>
+          <!-- Cards grid -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;">
+            <div style="background:#2D2D2B;border-radius:12px;padding:20px;border:1px solid rgba(222,220,209,0.08);">
+              <div class="skeleton-bar" style="width:60%;height:14px;margin-bottom:10px;"></div>
+              <div class="skeleton-bar" style="width:90%;height:12px;margin-bottom:6px;"></div>
+              <div class="skeleton-bar" style="width:75%;height:12px;"></div>
+            </div>
+            <div style="background:#2D2D2B;border-radius:12px;padding:20px;border:1px solid rgba(222,220,209,0.08);">
+              <div class="skeleton-bar" style="width:55%;height:14px;margin-bottom:10px;"></div>
+              <div class="skeleton-bar" style="width:85%;height:12px;margin-bottom:6px;"></div>
+              <div class="skeleton-bar" style="width:70%;height:12px;"></div>
+            </div>
+          </div>
+          <!-- H2 -->
+          <div class="skeleton-bar" style="width:45%;height:22px;margin-bottom:20px;"></div>
+          <!-- More paragraphs -->
+          <div class="skeleton-bar" style="width:100%;height:14px;margin-bottom:10px;"></div>
+          <div class="skeleton-bar" style="width:90%;height:14px;margin-bottom:10px;"></div>
+          <div class="skeleton-bar" style="width:96%;height:14px;margin-bottom:10px;"></div>
+          <!-- Code block placeholder -->
+          <div style="background:#30302E;border-radius:8px;padding:16px;margin-top:16px;">
+            <div class="skeleton-bar" style="width:30%;height:12px;margin-bottom:8px;opacity:0.6;"></div>
+            <div class="skeleton-bar" style="width:70%;height:12px;margin-bottom:6px;opacity:0.6;"></div>
+            <div class="skeleton-bar" style="width:55%;height:12px;margin-bottom:6px;opacity:0.6;"></div>
+            <div class="skeleton-bar" style="width:45%;height:12px;opacity:0.6;"></div>
+          </div>
+        </div>
+        <!-- TOC skeleton -->
+        <div class="right-toc" style="width:280px;flex-shrink:0;padding:2rem 1.5rem;">
+          <div class="skeleton-bar" style="width:80px;height:10px;margin-bottom:16px;opacity:0.5;"></div>
+          <div class="skeleton-bar" style="width:120px;height:12px;margin-bottom:8px;"></div>
+          <div class="skeleton-bar" style="width:140px;height:12px;margin-bottom:8px;"></div>
+          <div class="skeleton-bar" style="width:100px;height:12px;margin-bottom:8px;"></div>
+          <div class="skeleton-bar" style="width:130px;height:12px;margin-bottom:8px;"></div>
+          <div class="skeleton-bar" style="width:110px;height:12px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;">
+      <article style="flex:1;min-width:0;max-width:896px;margin:0 auto;padding:2rem 2rem 6rem;opacity:0;transition:opacity 0.2s ease;">
+        <nav style="font-size:13px;color:#9C9A92;margin-bottom:0.5rem;display:flex;align-items:center;gap:4px;">
+          <a href={`${base}/`} style="color:#9C9A92;text-decoration:none;">{translations.breadcrumbRoot}</a>
+          <span>&rsaquo;</span>
+          <span>{section}</span>
+        </nav>
+        <slot />
+        <div id="feedback-widget" style="display:flex;align-items:center;gap:12px;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid rgba(222,220,209,0.15);">
+          <span style="font-size:13px;color:#9C9A92;">{translations.feedbackQuestion}</span>
+          <button class="feedback-btn" data-value="good" data-response={translations.feedbackThanks} title={translations.feedbackYes} style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:transparent;border:1px solid rgba(222,220,209,0.15);border-radius:8px;color:#9C9A92;cursor:pointer;transition:all 0.2s ease;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+          </button>
+          <button class="feedback-btn" data-value="bad" data-response={translations.feedbackImprove} title={translations.feedbackNo} style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:transparent;border:1px solid rgba(222,220,209,0.15);border-radius:8px;color:#9C9A92;cursor:pointer;transition:all 0.2s ease;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10zM17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+          </button>
+        </div>
+      </article>
+      <TOC headings={headings} lang={lang} />
+    </div>
+
+    <!-- Footer -->
+    <footer style="border-top:1px solid rgba(222,220,209,0.15);margin-top:4rem;background-color:#1F1E1D;">
+      <div style="max-width:72rem;margin:0 auto;padding:3rem 2rem;">
+        <div class="footer-grid" style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:3rem;">
+          <div style="max-width:20rem;">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+              <img src="/favicon.svg" alt="Quira" width="20" height="20" style="border-radius:3px;" />
+              <span style="color:#FAF9F5;font-weight:600;font-size:14px;">Quira</span>
+            </div>
+            <p style="font-size:14px;color:#9C9A92;line-height:1.6;margin:0;">Ask your browser anything. A local-first browser that transforms browsing context into structured knowledge.</p>
+          </div>
+          <div class="footer-links" style="display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;font-size:14px;">
+            <div>
+              <p style="color:#FAF9F5;font-weight:600;margin:0 0 0.75rem;">Documentation</p>
+              <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+                <li><a href={`${base}/getting-started/quick-start/`} style="color:#9C9A92;text-decoration:none;">Quick Start</a></li>
+                <li><a href={`${base}/core-concepts/context-graph/`} style="color:#9C9A92;text-decoration:none;">Core Concepts</a></li>
+                <li><a href={`${base}/api/graph-query-api/`} style="color:#9C9A92;text-decoration:none;">API Reference</a></li>
+                <li><a href={`${base}/architecture/technical-overview/`} style="color:#9C9A92;text-decoration:none;">Architecture</a></li>
+              </ul>
+            </div>
+            <div>
+              <p style="color:#FAF9F5;font-weight:600;margin:0 0 0.75rem;">Community</p>
+              <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+                <li><a href="https://github.com/tennnennsui/quira" style="color:#9C9A92;text-decoration:none;">GitHub</a></li>
+                <li><a href="https://discord.gg/quira" style="color:#9C9A92;text-decoration:none;">Discord</a></li>
+                <li><a href="https://x.com/QuiraBrowser" style="color:#9C9A92;text-decoration:none;">Twitter</a></li>
+              </ul>
+            </div>
+            <div>
+              <p style="color:#FAF9F5;font-weight:600;margin:0 0 0.75rem;">Project</p>
+              <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+                <li><a href="https://github.com/tennnennsui/quira/blob/main/ROADMAP.md" style="color:#9C9A92;text-decoration:none;">Roadmap</a></li>
+                <li><a href="https://github.com/tennnennsui/quira/releases" style="color:#9C9A92;text-decoration:none;">Releases</a></li>
+                <li><a href={`${base}/contributing/dev-setup/`} style="color:#9C9A92;text-decoration:none;">Contributing</a></li>
+                <li><a href="https://github.com/tennnennsui/quira/blob/main/LICENSE" style="color:#9C9A92;text-decoration:none;">License</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div style="border-top:1px solid rgba(222,220,209,0.15);margin-top:2rem;padding-top:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+          <p style="font-size:12px;color:#9C9A92;margin:0;">&copy; 2026 Quira. Open source under MPL-2.0.</p>
+          <div style="display:flex;align-items:center;gap:1rem;">
+            <a href="https://x.com/QuiraBrowser" aria-label="X" style="color:#9C9A92;text-decoration:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+            <a href="https://github.com/tennnennsui/quira" aria-label="GitHub" style="color:#9C9A92;text-decoration:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <AskDocs lang={lang} />
+
+  <script is:inline>
+    function initDocsPage() {
+      // Mobile sidebar toggle
+      var menuToggle = document.getElementById('menu-toggle');
+      var leftSidebar = document.getElementById('left-sidebar');
+      var sidebarOverlay = document.getElementById('sidebar-overlay');
+      if (menuToggle && leftSidebar && sidebarOverlay) {
+        menuToggle.onclick = function() {
+          leftSidebar.classList.toggle('open');
+          sidebarOverlay.style.display = leftSidebar.classList.contains('open') ? 'block' : 'none';
+        };
+        sidebarOverlay.onclick = function() {
+          leftSidebar.classList.remove('open');
+          sidebarOverlay.style.display = 'none';
+        };
+      }
+
+      // Header shadow on scroll (cleanup old listener to prevent VT accumulation)
+      var headerEl = document.querySelector('header');
+      if (headerEl) {
+        if (window.__headerScrollHandler) window.removeEventListener('scroll', window.__headerScrollHandler);
+        window.__headerScrollHandler = function() {
+          headerEl.classList.toggle('header-scrolled', window.scrollY > 0);
+        };
+        window.addEventListener('scroll', window.__headerScrollHandler);
+      }
+
+      // Search modal
+      var searchModal = document.getElementById('search-modal');
+      var searchBackdrop = document.getElementById('search-backdrop');
+      var sidebarSearchBtn = document.getElementById('sidebar-search-btn');
+
+      function openSearch() {
+        if (searchModal) { searchModal.style.display = ''; searchModal.classList.remove('hidden'); var input = searchModal.querySelector('input'); if (input) input.focus(); }
+      }
+      function closeSearch() {
+        if (searchModal) { searchModal.classList.add('hidden'); searchModal.style.display = 'none'; }
+      }
+      if (sidebarSearchBtn) sidebarSearchBtn.onclick = openSearch;
+      if (searchBackdrop) searchBackdrop.onclick = closeSearch;
+
+      if (window.__searchKeyHandler) document.removeEventListener('keydown', window.__searchKeyHandler);
+      window.__searchKeyHandler = function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); searchModal && searchModal.classList.contains('hidden') ? openSearch() : closeSearch(); }
+        if (e.key === 'Escape') closeSearch();
+      };
+      document.addEventListener('keydown', window.__searchKeyHandler);
+
+      // Sidebar section toggle
+      document.querySelectorAll('.nav-section-btn').forEach(function(btn) {
+        btn.onclick = function() {
+          var chevron = btn.querySelector('.chevron');
+          var items = btn.parentElement.querySelector('.nav-items');
+          if (!chevron || !items) return;
+          var isOpen = chevron.classList.contains('open');
+          if (isOpen) { chevron.classList.remove('open'); items.style.display = 'none'; }
+          else { chevron.classList.add('open'); items.style.display = 'block'; }
+        };
+      });
+
+      // TOC scroll-spy with track thumb
+      var tocLinks = document.querySelectorAll('#toc-nav .toc-link');
+      var tocThumb = document.getElementById('toc-thumb');
+      var sections = document.querySelectorAll('.content-section');
+
+      function updateTocThumb(activeLink) {
+        if (!tocThumb || !activeLink) return;
+        var container = activeLink.parentElement;
+        if (!container) return;
+        var containerRect = container.getBoundingClientRect();
+        var linkRect = activeLink.getBoundingClientRect();
+        tocThumb.style.top = (linkRect.top - containerRect.top) + 'px';
+        tocThumb.style.height = linkRect.height + 'px';
+      }
+
+      if (window.__tocObserver) { window.__tocObserver.disconnect(); window.__tocObserver = null; }
+
+      if (sections.length > 0 && tocLinks.length > 0) {
+        // Set initial thumb position
+        var initialActive = document.querySelector('#toc-nav .toc-link.active');
+        if (initialActive) requestAnimationFrame(function() { updateTocThumb(initialActive); });
+
+        var observer = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              var id = entry.target.id;
+              tocLinks.forEach(function(link) {
+                var isMatch = link.getAttribute('href') === '#' + id;
+                link.classList.toggle('active', isMatch);
+                if (isMatch) updateTocThumb(link);
+              });
+            }
+          });
+        }, { root: null, rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+        sections.forEach(function(section) { observer.observe(section); });
+        window.__tocObserver = observer;
+      }
+
+      // Mobile/tablet menu button visibility (cleanup old listener)
+      var mobileBtn = document.getElementById('menu-toggle');
+      if (mobileBtn) {
+        if (window.__resizeHandler) window.removeEventListener('resize', window.__resizeHandler);
+        window.__resizeHandler = function() {
+          mobileBtn.style.display = window.innerWidth <= 1024 ? 'block' : 'none';
+        };
+        window.__resizeHandler();
+        window.addEventListener('resize', window.__resizeHandler);
+      }
+
+      // Code copy buttons
+      document.querySelectorAll('article pre').forEach(function(pre) {
+        if (pre.parentElement && pre.parentElement.classList.contains('code-block')) return;
+        var wrapper = document.createElement('div');
+        wrapper.className = 'code-block';
+        wrapper.style.cssText = 'position:relative;';
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+        var btn = document.createElement('button');
+        btn.className = 'copy-btn';
+        btn.style.cssText = 'position:absolute;top:8px;right:8px;padding:4px 8px;background:rgba(222,220,209,0.1);border:1px solid rgba(222,220,209,0.15);border-radius:6px;color:#9C9A92;cursor:pointer;font-size:12px;font-family:inherit;';
+        btn.textContent = 'Copy';
+        btn.addEventListener('click', function() {
+          var code = pre.querySelector('code');
+          var text = code ? code.textContent : pre.textContent;
+          navigator.clipboard.writeText(text).then(function() {
+            btn.textContent = '\u2713';
+            setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+          });
+        });
+        wrapper.appendChild(btn);
+      });
+
+      // Keyboard navigation (cleanup old listener)
+      if (window.__navKeyHandler) document.removeEventListener('keydown', window.__navKeyHandler);
+      window.__navKeyHandler = function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        var prevLink = document.querySelector('.prev-link');
+        var nextLink = document.querySelector('.next-link');
+        if (e.key === 'ArrowLeft' && prevLink) prevLink.click();
+        if (e.key === 'ArrowRight' && nextLink) nextLink.click();
+      };
+      document.addEventListener('keydown', window.__navKeyHandler);
+
+      // Page feedback widget
+      var feedbackWidget = document.getElementById('feedback-widget');
+      if (feedbackWidget) {
+        var pagePath = window.location.pathname;
+        var storageKey = 'feedback:' + pagePath;
+        var stored = null;
+        try { stored = localStorage.getItem(storageKey); } catch(e) {}
+        if (stored) {
+          showFeedbackState(feedbackWidget, stored);
+        }
+        feedbackWidget.querySelectorAll('.feedback-btn').forEach(function(btn) {
+          btn.addEventListener('mouseenter', function() { btn.style.borderColor = 'rgba(222,220,209,0.4)'; btn.style.color = '#FAF9F5'; });
+          btn.addEventListener('mouseleave', function() {
+            if (!btn.classList.contains('selected')) { btn.style.borderColor = 'rgba(222,220,209,0.15)'; btn.style.color = '#9C9A92'; }
+          });
+          btn.onclick = function() {
+            var value = btn.getAttribute('data-value');
+            try { localStorage.setItem(storageKey, value); } catch(e) {}
+            showFeedbackState(feedbackWidget, value);
+          };
+        });
+      }
+
+      function showFeedbackState(widget, value) {
+        widget.querySelectorAll('.feedback-btn').forEach(function(b) {
+          var isSelected = b.getAttribute('data-value') === value;
+          b.classList.toggle('selected', isSelected);
+          if (isSelected && value === 'good') {
+            b.style.borderColor = '#4ade80'; b.style.color = '#4ade80'; b.style.background = 'rgba(74,222,128,0.1)';
+          } else if (isSelected && value === 'bad') {
+            b.style.borderColor = '#f87171'; b.style.color = '#f87171'; b.style.background = 'rgba(248,113,113,0.1)';
+          } else {
+            b.style.borderColor = 'rgba(222,220,209,0.15)'; b.style.color = '#9C9A92'; b.style.background = 'transparent';
+          }
+        });
+        var msg = widget.querySelector('.feedback-msg');
+        if (!msg) {
+          msg = document.createElement('span');
+          msg.className = 'feedback-msg';
+          msg.style.cssText = 'font-size:13px;color:#9C9A92;transition:opacity 0.3s;';
+          widget.appendChild(msg);
+        }
+        var selectedBtn = widget.querySelector('.feedback-btn[data-value="' + value + '"]');
+        msg.textContent = selectedBtn ? selectedBtn.getAttribute('data-response') : '';
+      }
+
+      // Client-side search (cache on window to survive VT navigation)
+      var searchInput = document.querySelector('.search-input');
+      var searchResults = document.getElementById('search-results');
+
+      async function loadSearchIndex() {
+        if (!window.__searchIndex) {
+          try {
+            var res = await fetch('/docs/search-index.json');
+            window.__searchIndex = await res.json();
+          } catch(e) { window.__searchIndex = []; }
+        }
+        return window.__searchIndex;
+      }
+
+      function renderSearchResults(results, query) {
+        if (!searchResults) return;
+        searchResults.replaceChildren();
+        if (!query) {
+          var p1 = document.createElement('p');
+          p1.style.textAlign = 'center';
+          p1.textContent = document.documentElement.lang === 'ja' ? '\u691C\u7D22\u30EF\u30FC\u30C9\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044...' : 'Start typing to search the documentation...';
+          searchResults.appendChild(p1);
+          return;
+        }
+        if (results.length === 0) {
+          var noResult = document.createElement('p');
+          noResult.style.cssText = 'color:#9C9A92;text-align:center;';
+          noResult.textContent = (document.documentElement.lang === 'ja' ? '\u898B\u3064\u304B\u308A\u307E\u305B\u3093\u3067\u3057\u305F\uFF1A' : 'No results found for ') + '"' + query + '"';
+          searchResults.appendChild(noResult);
+          return;
+        }
+        results.forEach(function(r) {
+          var a = document.createElement('a');
+          a.href = r.path;
+          a.style.cssText = 'display:block;padding:8px 12px;border-radius:8px;color:#FAF9F5;text-decoration:none;margin-bottom:2px;';
+          a.addEventListener('mouseover', function() { a.style.background = 'rgba(222,220,209,0.06)'; });
+          a.addEventListener('mouseout', function() { a.style.background = 'transparent'; });
+          var titleDiv = document.createElement('div');
+          titleDiv.style.cssText = 'font-size:14px;font-weight:500;';
+          titleDiv.textContent = r.title;
+          var sectionDiv = document.createElement('div');
+          sectionDiv.style.cssText = 'font-size:12px;color:#9C9A92;';
+          sectionDiv.textContent = r.section;
+          a.appendChild(titleDiv);
+          a.appendChild(sectionDiv);
+          searchResults.appendChild(a);
+        });
+      }
+
+      if (searchInput && searchResults) {
+        searchInput.addEventListener('input', async function() {
+          var query = this.value.toLowerCase().trim();
+          if (!query) { renderSearchResults([], ''); return; }
+          var index = await loadSearchIndex();
+          var currentLang = document.documentElement.lang || 'en';
+          var results = index.filter(function(page) {
+            return page.lang === currentLang && (
+              page.title.toLowerCase().includes(query) ||
+              page.keywords.some(function(k) { return String(k).toLowerCase().includes(query); }) ||
+              page.section.toLowerCase().includes(query)
+            );
+          });
+          renderSearchResults(results, query);
+        });
+      }
+    }
+
+    // Hide skeleton and show content
+    function showContent() {
+      var skeleton = document.getElementById('skeleton-loader');
+      var article = document.querySelector('article');
+      var toc = document.querySelector('.right-toc');
+
+      if (skeleton) {
+        skeleton.style.transition = 'opacity 0.2s ease';
+        skeleton.style.opacity = '0';
+        setTimeout(function() { skeleton.style.display = 'none'; }, 200);
+      }
+      if (article) article.style.opacity = '1';
+      if (toc) toc.style.opacity = '1';
+    }
+
+    // Show skeleton and hide content
+    function showSkeleton() {
+      var skeleton = document.getElementById('skeleton-loader');
+      var article = document.querySelector('article');
+      var toc = document.querySelector('.right-toc');
+
+      if (article) article.style.opacity = '0';
+      if (toc) toc.style.opacity = '0';
+      if (skeleton) {
+        skeleton.style.display = 'block';
+        skeleton.style.opacity = '1';
+      }
+    }
+
+
+
+    // Always run on script execution (initial load + VT re-execution)
+    showContent();
+    initDocsPage();
+
+    // Register lifecycle handlers only once (is:inline re-executes on every VT navigation)
+    if (!window.__docsLifecycleInit) {
+      window.__docsLifecycleInit = true;
+
+      document.addEventListener('astro:after-swap', function() {
+        initDocsPage();
+        showContent();
+      });
+
+      document.addEventListener('astro:before-preparation', function() {
+        showSkeleton();
+      });
+
+      document.addEventListener('astro:page-load', function() {
+        showContent();
+      });
+    }
+
+    // Save language preference
+    try {
+      var currentLang = document.documentElement.lang;
+      if (currentLang === 'en' || currentLang === 'ja') {
+        localStorage.setItem('quira-docs-lang', currentLang);
+      }
+    } catch(e) {}
+  </script>
+</body>
+</html>

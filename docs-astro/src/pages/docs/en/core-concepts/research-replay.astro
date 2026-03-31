@@ -1,0 +1,26 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'research-replay', text: 'Research Replay', depth: 2 },
+  { id: 'automatic-cluster-detection', text: 'Automatic cluster detection', depth: 2 },
+  { id: 'resume-functionality', text: 'Resume functionality', depth: 2 },
+  { id: 'session-management', text: 'Session management', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Research Replay" description="Resume past research sessions with AI-generated summaries." section="Core Concepts" headings={headings}>
+  <h1 id="research-replay" class="content-section">Research Replay</h1>
+  <p>Your <a href="/docs/en/core-concepts/context-graph/">Context Graph</a> grows as you browse, and the <a href="/docs/en/core-concepts/local-ai/">Local AI</a> enriches it. Research Replay builds on both to detect research clusters in the graph and lets you resume, review, and share your research sessions.</p>
+  <h2 id="automatic-cluster-detection" class="content-section">Automatic cluster detection</h2>
+  <p>The system automatically identifies research clusters based on temporal proximity of visits, topic/entity overlap between nodes, and navigation edge density. Clusters with 5 or more nodes are flagged as "Research Sessions."</p>
+  <h2 id="resume-functionality" class="content-section">Resume functionality</h2>
+  <p>A "Resume" button appears on detected research clusters. Clicking it:</p>
+  <ol>
+    <li>Opens a new Context Space with the cluster's color theme</li>
+    <li>Restores all tabs from the cluster with the last viewed page as the active tab</li>
+    <li>Displays an AI-generated summary: what you investigated, what conclusions were reached, and what remains unexplored</li>
+  </ol>
+  <h2 id="session-management" class="content-section">Session management</h2>
+  <p>All research sessions are managed at <code>quira://research</code>. Each session tracks its name (auto-generated or user-customized), status (<code>active</code>, <code>paused</code>, or <code>completed</code>), associated Context Graph nodes, an AI summary, and timestamps.</p>
+  <PrevNext prev={{ href: '/docs/en/core-concepts/local-ai/', title: 'Local AI' }} next={{ href: '/docs/en/features/nl-query/', title: 'Natural Language Query' }} />
+</DocsLayout>

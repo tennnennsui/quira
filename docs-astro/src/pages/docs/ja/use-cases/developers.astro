@@ -1,0 +1,69 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'for-developers', text: '開発者向け', depth: 2 },
+  { id: 'technical-research', text: '技術リサーチワークフロー', depth: 2 },
+  { id: 'api-docs', text: 'APIドキュメントブラウジング', depth: 2 },
+  { id: 'deep-dives', text: 'Stack Overflow & GitHub の深掘り', depth: 2 },
+  { id: 'code-review', text: 'コードレビューのコンテキスト保持', depth: 2 },
+  { id: 'example-rsc', text: '実例: React Server Components の調査', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="開発者向け" description="QuiraのContext Graphで技術リサーチ、API探索、コードレビューを加速する方法。" section="ユースケース" headings={headings}>
+  <h1 id="for-developers" class="content-section">開発者向け</h1>
+  <p>開発者は1日の多くの時間をリサーチに費やしています — ドキュメントを読み、Stack Overflowのスレッドをデバッグし、GitHubリポジトリを探索し、プルリクエストをレビューします。Quiraの<a href="/docs/ja/core-concepts/context-graph/">Context Graph</a>は、これらすべてのソース間の接続を自動的にキャプチャし、複雑な調査の軌跡を失うことがありません。</p>
+
+  <h2 id="technical-research" class="content-section">技術リサーチワークフロー</h2>
+  <p>新しいライブラリ、フレームワーク、アーキテクチャパターンの調査を始めると、Quiraは訪問したすべてのページのグラフを構築します。ブラウザの履歴が平坦な時系列リストであるのに対し、Context Graphはページ間の<strong>ナビゲーション方法</strong>、同時に開いていたタブ、検索クエリをキャプチャします。</p>
+  <ul>
+    <li><strong>自動トピッククラスタリング</strong> — 同じ技術に関するページは<a href="/docs/ja/core-concepts/local-ai/">ローカルAI</a>によってクラスタにグループ化されます</li>
+    <li><strong>セッション横断の継続性</strong> — 数日後にリサーチトピックに戻り、<a href="/docs/ja/core-concepts/research-replay/">Research Replay</a>で正確に中断した場所を確認できます</li>
+    <li><strong>セマンティック検索</strong> — <a href="/docs/ja/features/nl-query/">自然言語クエリ</a>で「パフォーマンスのトレードオフについて何を読んだ？」のような質問ができます</li>
+  </ul>
+  <Callout type="tip" title="プロジェクトごとのContext Spaces">
+    <p>各プロジェクトや技術スパイクごとに専用の<a href="/docs/ja/core-concepts/context-spaces/">Context Space</a>を作成しましょう。Gitのトピックブランチのように、リサーチを分離して再訪しやすくなります。</p>
+  </Callout>
+
+  <h2 id="api-docs" class="content-section">APIドキュメントブラウジング</h2>
+  <p>APIドキュメントでは、関数シグネチャ、型定義、サンプル、変更ログなど、複数のページ間をジャンプすることがよくあります。Quiraはこれらのナビゲーションパターンを追跡し、ドキュメントサイトに戻った際に関連するAPIページを提示します。</p>
+  <ul>
+    <li>グラフはAPIエンドポイントと一緒に閲覧したサンプルをリンクします</li>
+    <li>ドキュメントサイトを再訪すると、Quiraは以前探索したセクションを提案します</li>
+    <li>探索パスをMarkdownとしてエクスポートし、チームドキュメントに活用できます</li>
+  </ul>
+
+  <h2 id="deep-dives" class="content-section">Stack Overflow & GitHub の深掘り</h2>
+  <p>典型的なデバッグセッションでは、数十のStack Overflowの回答、GitHubのイシュー、ブログ記事にまたがることがあります。Quiraは調査の全軌跡を保存します:</p>
+  <ol>
+    <li>Stack Overflowでエラーメッセージを検索する</li>
+    <li>回答で参照されているGitHubイシューへのリンクをたどる</li>
+    <li>関連するプルリクエストとコミットメッセージを読む</li>
+    <li>コメントでリンクされているブログ記事を訪問する</li>
+  </ol>
+  <p>これらの各ページはContext Graphのノードとなり、エッジは実際のナビゲーションフローを表します。後で「React 18のメモリリークについて見つけたものをすべて表示」とクエリすれば、Quiraがサブグラフ全体を取得します。</p>
+
+  <h2 id="code-review" class="content-section">コードレビューのコンテキスト保持</h2>
+  <p>コードレビュー中には、不慣れなパターンを調査することがよくあります — ドキュメントの確認、関連イシューの閲覧、ベストプラクティスの検索など。QuiraはこれらのリサーチページをレビューしていたPRにリンクします:</p>
+  <ul>
+    <li>Context Graphは、レビューセッション中に訪問したページをPR URLに自動的に関連付けます</li>
+    <li>PRに戻ると、Quiraが行ったバックグラウンドリサーチを表示します</li>
+    <li>レビューコンテキストをノートとしてエクスポートし、コードレビューコメントに添付できます</li>
+  </ul>
+
+  <h2 id="example-rsc" class="content-section">実例: React Server Components の調査</h2>
+  <p>React Server Componentsを調査する開発者のリアルなシナリオを示します:</p>
+  <ol>
+    <li><strong>Context Spaceを作成</strong> — 「RSCリサーチ」と名付ける</li>
+    <li><strong>ブラウジング開始</strong> — React公式ドキュメント、Next.jsドキュメント、GitHubのRFCディスカッション</li>
+    <li><strong>Quiraがキャプチャ</strong> — 8ドメインにわたる47ページを自動的にサブトピックにクラスタリング:「データフェッチ」「ストリーミングSSR」「バンドルサイズ」「移行パス」</li>
+    <li><strong>2日後</strong>、Research Replayで再開 — Quiraが前回のセッションのグラフを表示し、未読タブをハイライト</li>
+    <li><strong>質問する</strong> — 「RFCでストリーミングについて何と言っていた？」 — QuiraがGitHubの該当ディスカッションを見つけ、関連セクションをハイライト</li>
+    <li><strong>エクスポート</strong> — チームのADR（Architecture Decision Record）用にMarkdownサマリーを生成</li>
+  </ol>
+  <Callout type="note" title="リサーチ中のプライバシー">
+    <p>すべてのContext Graphデータはデバイス上に保存されます。リサーチパターン、訪問ページ、AI生成サマリーは<a href="/docs/ja/features/ai-privacy/">LOCALモード</a>では外部サーバーに送信されません。</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/ja/security/permission-system/', title: 'パーミッションシステム' }} next={{ href: '/docs/ja/use-cases/researchers/', title: '研究者向け' }} />
+</DocsLayout>

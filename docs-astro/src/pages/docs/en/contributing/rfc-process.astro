@@ -1,0 +1,28 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'rfc-process', text: 'RFC Process', depth: 2 },
+  { id: 'when-is-an-rfc-needed', text: 'When is an RFC needed?', depth: 2 },
+  { id: 'rfc-workflow', text: 'RFC workflow', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="RFC Process" description="How to propose significant changes to Quira through the Request for Comments process." section="Contributing" headings={headings}>
+  <h1 id="rfc-process" class="content-section">RFC Process</h1>
+  <p>Not all changes go through a <a href="/docs/en/contributing/pull-requests/">standard PR</a>. Significant changes to Quira's architecture, public APIs, or user-facing behavior require an RFC (Request for Comments).</p>
+  <h2 id="when-is-an-rfc-needed" class="content-section">When is an RFC needed?</h2>
+  <ul>
+    <li>New features that change the UI or user workflow</li>
+    <li>Changes to the Graph Query API or Plugin API</li>
+    <li>Architectural changes (new dependencies, storage format changes)</li>
+    <li>Changes to the data model or privacy guarantees</li>
+  </ul>
+  <h2 id="rfc-workflow" class="content-section">RFC workflow</h2>
+  <ol>
+    <li><strong>Submit</strong>  EOpen a PR to the <code>rfcs/</code> directory with your proposal following the RFC template.</li>
+    <li><strong>Review period</strong>  E2-week comment period for community feedback and discussion.</li>
+    <li><strong>Decision</strong>  EMaintainers approve, request changes, or close the RFC with rationale.</li>
+    <li><strong>Implementation</strong>  EApproved RFCs are tracked as issues and assigned to contributors.</li>
+  </ol>
+  <PrevNext prev={{ href: '/docs/en/contributing/pull-requests/', title: 'Pull Requests' }} next={{ href: '/docs/en/api/plugin-api/', title: 'Plugin API' }} />
+</DocsLayout>

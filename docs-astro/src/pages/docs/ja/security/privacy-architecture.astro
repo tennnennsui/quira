@@ -1,0 +1,80 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'privacy-architecture', text: 'プライバシーアーキテクチャ', depth: 2 },
+  { id: 'local-first-storage', text: 'ローカルファーストストレージ', depth: 2 },
+  { id: 'cryptographic-architecture', text: '暗号アーキテクチャ', depth: 2 },
+  { id: 'temporal-security', text: '時間セキュリティ', depth: 2 },
+  { id: 'anti-tracking', text: 'アンチトラッキング対策', depth: 2 },
+  { id: 'hardware-integration', text: 'ハードウェア協調設計', depth: 2 },
+  { id: 'privacy-modes', text: 'プライバシーモード', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="プライバシーアーキテクチャ" description="暗号イノベーション、時間セキュリティ、ハードウェア連携、ローカルファーストデータ保護。" section="セキュリティ & プライバシー" headings={headings}>
+  <h1 id="privacy-architecture" class="content-section">プライバシーアーキテクチャ</h1>
+  <p>Quiraにおいてプライバシーは機能ではなく、アーキテクチャ上の制約です。すべてのサブシステムは<strong>データ最小化</strong>の原則に基づいて設計されています: 必要なものだけを収集し、ローカルに保存し、前方秘匿性で暗号化し、明示的な同意なしに送信しない。</p>
+
+  <h2 id="local-first-storage" class="content-section">ローカルファーストストレージ</h2>
+  <p>すべてのブラウジングデータ（履歴、Context Graph、ブックマーク、パスワード、フォームデータ）はユーザーのデバイス上にのみ保存されます。デフォルトではクラウド同期はありません。</p>
+  <ul>
+    <li><strong>SQLite + SQLCipher</strong> ― すべての構造化データに対するAES-256暗号化（保存時）</li>
+    <li><strong>プロファイルごとの鍵</strong> ― 各ブラウザプロファイルにOSキーチェーンから派生したマスターキー</li>
+    <li><strong>埋め込み独立暗号化</strong> ― セマンティック埋め込みはメインデータベースとは別の鍵で暗号化。一方が侵害されてもう一方は露出しない</li>
+    <li><strong>安全な削除</strong> ― 削除されたデータはリンク解除だけでなくランダムバイトで上書き</li>
+  </ul>
+
+  <h2 id="cryptographic-architecture" class="content-section">暗号アーキテクチャ</h2>
+  <p>Quiraは標準的な保存時暗号化を超え、ナレッジグラフ保護のために特別に設計された複数の暗号イノベーションを導入します。認証状態に応じた4段階の保護クラスについては<a href="/docs/ja/security/advanced-architecture/#kpc">Knowledge Protection Classes (KPC)</a>を参照。</p>
+  <table><thead><tr><th>技術</th><th>保護対象</th><th>仕組み</th></tr></thead><tbody>
+    <tr><td>保存時前方秘匿性</td><td>鍵侵害後の過去データ</td><td>エポックベースの鍵ローテーション。古いエポック鍵は安全に消去。現在の鍵へのフォレンジックアクセスでは過去のエポックを復号不能。</td></tr>
+    <tr><td>閾値暗号</td><td>単一障害点の鍵管理</td><td>Shamirの秘密分散法 (3-of-5)。マスター鍵はデバイス、クラウドバックアップ、リカバリフレーズ、生体認証、ハードウェアキーに分割。任意の3つで鍵を再構成。</td></tr>
+    <tr><td>検証可能な削除</td><td>データ除去のユーザー信頼</td><td>削除されたデータが復元不能であることの暗号学的証明 ― そのデータセグメントの暗号化鍵が証明可能に破壊される。</td></tr>
+    <tr><td>差分プライバシー</td><td>グラフクエリによるパターン漏洩</td><td>集約クエリへのキャリブレーションされたノイズ注入。個々の閲覧パターンはクエリ結果から復元不能。</td></tr>
+  </tbody></table>
+  <Callout type="info" title="ポスト量子対応">
+    <p>Phase 3 (2027) ではX25519と並行してハイブリッドポスト量子鍵交換 (ML-KEM / Kyber) を導入し、保存データへの量子攻撃に対する将来への備えを行います。</p>
+  </Callout>
+
+  <h2 id="temporal-security" class="content-section">時間セキュリティ</h2>
+  <p>Quiraは時間をセキュリティ次元として扱います。パーミッションとデータアクセスは静的ではなく、減衰し、期限切れし、自己破壊します。</p>
+  <table><thead><tr><th>メカニズム</th><th>目的</th><th>例</th></tr></thead><tbody>
+    <tr><td>パーミッション減衰</td><td>古い付与のリスク蓄積を防止</td><td>プラグインの<code>read:nodes</code>トークンは更新されない限り24時間後に自動期限切れ</td></tr>
+    <tr><td>セッション健忘</td><td>時間的相関攻撃の制限</td><td>厳格モードのContext Graphクエリは現在のセッションのデータのみ返す</td></tr>
+    <tr><td>デッドマンスイッチ</td><td>ユーザーが行動不能な場合のデータ保護</td><td>N日間アンロックがなければグラフは暗号学的に封印（設定可能）</td></tr>
+    <tr><td>前方秘匿セッション</td><td>遡及的セッション再構成の防止</td><td>各ブラウジングセッションはエフェメラル鍵を派生; セッション終了後はセッションデータを復号不能</td></tr>
+  </tbody></table>
+
+  <h2 id="anti-tracking" class="content-section">アンチトラッキング対策</h2>
+  <p>Quiraは連携して動作する複数のアンチトラッキングレイヤーを実装しています:</p>
+  <table><thead><tr><th>技術</th><th>ブロック対象</th></tr></thead><tbody>
+    <tr><td>Cookie分離</td><td>サードパーティCookieをファーストパーティオリジンごとに隔離</td></tr>
+    <tr><td>ストレージ分離</td><td>localStorage、IndexedDB、Cache APIをオリジンペアごとに隔離</td></tr>
+    <tr><td>フィンガープリント耐性</td><td>Canvas、WebGL、AudioContext、フォント列挙にノイズ注入</td></tr>
+    <tr><td>Referrerトリミング</td><td>クロスオリジンReferrerをオリジンのみに削減</td></tr>
+    <tr><td>バウンストラッキング保護</td><td>リダイレクトベースのトラッキングチェーンを検知しブロック</td></tr>
+  </tbody></table>
+
+  <h2 id="hardware-integration" class="content-section">ハードウェア協調設計</h2>
+  <p>Quiraは利用可能な場合にハードウェアセキュリティ機能を活用するよう設計されており、ソフトウェアのみの保護へのグレースフルフォールバックを備えています。</p>
+  <table><thead><tr><th>ハードウェア機能</th><th>Quiraでの使用</th><th>フォールバック</th></tr></thead><tbody>
+    <tr><td>TEE (Intel SGX / ARM TrustZone)</td><td>隔離エンクレーブでのAI推論 ― モデル重みとグラフデータがメインOSに露出しない</td><td>暗号化メモリページによるプロセスレベル隔離</td></tr>
+    <tr><td>Secure Enclave / TPM</td><td>マスター鍵の派生と保存; 生体認証アンロックのバインディング</td><td>PBKDF2派生によるOSキーチェーン</td></tr>
+    <tr><td>メモリ暗号化 (Intel TME / AMD SME)</td><td>タブ単位のメモリ暗号化 ― 1つのタブのメモリ領域を侵害しても他は露出しない</td><td>アドレス空間ランダマイゼーション (ASLR)</td></tr>
+  </tbody></table>
+
+  <h2 id="privacy-modes" class="content-section">プライバシーモード</h2>
+  <p>QuiraはグローバルまたはContext Spaceごとに設定できる段階的なプライバシーモードを提供します:</p>
+  <table><thead><tr><th>モード</th><th>Context Graph</th><th>AI</th><th>ネットワーク</th><th>時間的制御</th></tr></thead><tbody>
+    <tr><td>標準</td><td>フルキャプチャ</td><td>ローカル</td><td>通常 + トラッカーブロック</td><td>設定可能な保持期間</td></tr>
+    <tr><td>厳格</td><td>タイトルのみ</td><td>ローカルのみ</td><td>積極的フィルタリング、WebRTCなし</td><td>セッションのみ</td></tr>
+    <tr><td>シークレット</td><td>無効</td><td>無効</td><td>Tor対応（オプション）</td><td>RAMのみ、永続化なし</td></tr>
+    <tr><td>ロックダウン</td><td>無効</td><td>無効</td><td>Tor + JIT無効化</td><td>トリガーフレーズでパニックワイプ</td></tr>
+  </tbody></table>
+  <Callout type="warning" title="Context Lockdown Mode">
+    <p>ロックダウンモードはジャーナリスト、活動家、敵対的環境にいるユーザー向けに設計されています。JavaScriptのJITコンパイルを無効化し、すべてのネットワークをTor回線に制限し、Context GraphをRAMのみモードで実行し、設定可能なキーコンビネーションでトリガーされるパニックワイプをサポートします。</p>
+  </Callout>
+
+  <PrevNext prev={{ href: '/docs/ja/security/network-firewall/', title: 'ネットワークファイアウォール' }} next={{ href: '/docs/ja/security/content-filtering/', title: 'コンテンツフィルタリング' }} />
+</DocsLayout>

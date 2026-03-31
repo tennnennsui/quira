@@ -1,0 +1,38 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'local-ai', text: 'Local AI', depth: 2 },
+  { id: 'model-options', text: 'Model options', depth: 2 },
+  { id: 'runtime-by-platform', text: 'Runtime by platform', depth: 2 },
+  { id: 'ai-shield', text: 'AI Shield privacy indicator', depth: 2 },
+  { id: 'first-run', text: 'First-run model download', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Local AI" description="How Quira's on-device AI powers page summarization, entity extraction, and natural language queries." section="Core Concepts" headings={headings}>
+  <h1 id="local-ai" class="content-section">Local AI</h1>
+  <p>The <a href="/docs/en/core-concepts/context-graph/">Context Graph</a> captures your browsing structure. The Local AI is what makes it intelligent. Quira ships with a local LLM that runs entirely on-device. It powers page summarization, entity extraction, embedding generation, and  Emost importantly  E<a href="/docs/en/features/nl-query/">natural language queries</a> against your Context Graph. No data ever leaves your device by default (see <a href="/docs/en/features/ai-privacy/">AI Privacy Levels</a>).</p>
+  <h2 id="model-options" class="content-section">Model options</h2>
+  <table><thead><tr><th>Config</th><th>Model</th><th>Parameters</th><th>Min RAM</th><th>Use Case</th></tr></thead><tbody>
+    <tr><td>Default</td><td>Phi-3.5 Mini</td><td>3.8B</td><td>8 GB</td><td>Standard summarization, entity extraction, NL Query</td></tr>
+    <tr><td>Optional</td><td>Llama 3.1 8B Q4</td><td>8B (4-bit)</td><td>16 GB</td><td>Higher quality responses, deeper reasoning</td></tr>
+  </tbody></table>
+  <h2 id="runtime-by-platform" class="content-section">Runtime by platform</h2>
+  <table><thead><tr><th>Platform</th><th>Runtime</th><th>Acceleration</th></tr></thead><tbody>
+    <tr><td>macOS (Apple Silicon)</td><td>MLX</td><td>Metal GPU</td></tr>
+    <tr><td>macOS (Intel)</td><td>llama.cpp</td><td>CPU</td></tr>
+    <tr><td>Linux</td><td>llama.cpp</td><td>CUDA / Vulkan / CPU</td></tr>
+  </tbody></table>
+  <h2 id="ai-shield" class="content-section">AI Shield privacy indicator</h2>
+  <ul>
+    <li><strong>Green Shield (LOCAL)</strong>  EAll AI processing on-device. This is the default.</li>
+    <li><strong>Purple Shield (CLOUD)</strong>  ECloud AI is active (opt-in only). Heavy tasks offloaded to cloud.</li>
+  </ul>
+  <h2 id="first-run" class="content-section">First-run model download</h2>
+  <ol>
+    <li><strong>Launch Quira for the first time</strong>  EA model download prompt appears with estimated size (~2.3 GB) and time.</li>
+    <li><strong>Background download</strong>  EProgress bar with percentage and ETA. You can browse normally during the download.</li>
+    <li><strong>Ready notification</strong>  E"Your local AI is ready"  Eall AI features are now active.</li>
+  </ol>
+  <PrevNext prev={{ href: '/docs/en/core-concepts/context-spaces/', title: 'Context Spaces' }} next={{ href: '/docs/en/core-concepts/research-replay/', title: 'Research Replay' }} />
+</DocsLayout>

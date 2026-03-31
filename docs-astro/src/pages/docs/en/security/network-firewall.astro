@@ -1,0 +1,53 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'network-firewall', text: 'Network Firewall', depth: 2 },
+  { id: 'how-it-works', text: 'How it works', depth: 2 },
+  { id: 'firewall-rules', text: 'Firewall rules', depth: 2 },
+  { id: 'dns-filtering', text: 'DNS filtering', depth: 2 },
+  { id: 'tls-enforcement', text: 'TLS enforcement', depth: 2 },
+  { id: 'configuration', text: 'Configuration', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Network Firewall" description="Built-in application-level firewall that filters connections, enforces TLS, and blocks malicious domains." section="Security & Privacy" headings={headings}>
+  <h1 id="network-firewall" class="content-section">Network Firewall</h1>
+  <p>Quira includes an application-level firewall that operates at the network layer inside the browser — similar to macOS's built-in firewall and Little Snitch. Every outbound and inbound connection is evaluated against configurable rules before data is transmitted.</p>
+
+  <h2 id="how-it-works" class="content-section">How it works</h2>
+  <p>The firewall intercepts all network requests at the Gecko networking layer (before the request leaves the browser process). Each request is evaluated against an ordered rule set:</p>
+  <ol>
+    <li><strong>Domain blocklist</strong> — Known malicious domains, tracking servers, and ad networks</li>
+    <li><strong>Protocol rules</strong> — Block non-HTTPS connections on sensitive pages</li>
+    <li><strong>Per-site rules</strong> — User-defined allow/block rules per origin</li>
+    <li><strong>AI classifier</strong> — On-device model flags suspicious connection patterns</li>
+  </ol>
+
+  <h2 id="firewall-rules" class="content-section">Firewall rules</h2>
+  <table><thead><tr><th>Rule type</th><th>Default</th><th>Description</th></tr></thead><tbody>
+    <tr><td>Block known trackers</td><td>Enabled</td><td>Uses EasyList + EasyPrivacy + Quira's own list</td></tr>
+    <tr><td>Block cryptominers</td><td>Enabled</td><td>Blocks WebSocket/HTTP connections to mining pools</td></tr>
+    <tr><td>Block mixed content</td><td>Enabled</td><td>Prevents HTTP resources on HTTPS pages</td></tr>
+    <tr><td>Block telemetry</td><td>Enabled</td><td>Blocks known telemetry endpoints from third-party scripts</td></tr>
+    <tr><td>Custom domain rules</td><td>Empty</td><td>User-defined allow/block by domain pattern</td></tr>
+  </tbody></table>
+
+  <h2 id="dns-filtering" class="content-section">DNS filtering</h2>
+  <p>Quira resolves DNS locally with built-in DNS-over-HTTPS (DoH) support. DNS queries are encrypted and sent to a configurable resolver (Cloudflare 1.1.1.1 by default). The browser also maintains a local blocklist for known malicious domains, evaluated before any DNS query is made.</p>
+
+  <h2 id="tls-enforcement" class="content-section">TLS enforcement</h2>
+  <p>All connections are upgraded to HTTPS when possible via a built-in HTTPS-Only mode. Certificate transparency logs are checked for recently issued certificates. Quira warns on:</p>
+  <ul>
+    <li>Certificates issued by unknown or distrusted CAs</li>
+    <li>Short-lived certificates that may indicate phishing infrastructure</li>
+    <li>Certificate changes for previously visited domains (TOFU model)</li>
+  </ul>
+
+  <h2 id="configuration" class="content-section">Configuration</h2>
+  <p>Firewall settings are accessible at <code>quira://settings/security/firewall</code>. Advanced users can import/export rule sets in JSON format and subscribe to community-maintained rule lists.</p>
+  <Callout type="info" title="Performance impact">
+    <p>The firewall operates at the request pipeline level with O(1) hash-based domain lookups. Typical overhead is less than 1ms per request — imperceptible in normal browsing.</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/en/security/overview/', title: 'Security Overview' }} next={{ href: '/docs/en/security/privacy-architecture/', title: 'Privacy Architecture' }} />
+</DocsLayout>

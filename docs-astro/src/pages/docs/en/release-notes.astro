@@ -1,0 +1,87 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import Callout from '../../../components/Callout.astro';
+import PrevNext from '../../../components/PrevNext.astro';
+const headings = [
+  { id: 'release-notes', text: 'Release Notes', depth: 2 },
+  { id: 'v010-alpha', text: 'v0.1.0-alpha (Planned Q3 2026)', depth: 2 },
+  { id: 'foundation-build', text: 'Foundation Build (Q1 2026)', depth: 2 },
+  { id: 'versioning', text: 'Versioning policy', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Release Notes" description="Quira release history, planned features, and breaking changes." section="Resources" headings={headings}>
+  <h1 id="release-notes" class="content-section">Release Notes</h1>
+  <p>This page tracks Quira's release history and planned milestones. Quira follows <a href="https://semver.org/" target="_blank">Semantic Versioning</a>. During the alpha and beta phases, breaking changes may occur between minor versions.</p>
+
+  <h2 id="v010-alpha" class="content-section">v0.1.0-alpha (Planned Q3 2026)</h2>
+  <Callout type="note" title="Upcoming release">
+    <p>This release is currently in development. Features and timelines are subject to change.</p>
+  </Callout>
+  <p>The first public alpha release of Quira, intended for early adopters and contributors.</p>
+
+  <h3>Core features</h3>
+  <ul>
+    <li><strong>Context Graph engine</strong> — Full browsing context capture with automatic topic clustering and semantic linking</li>
+    <li><strong>Context Spaces</strong> — Tab organization with GTD-inspired inbox, active, and archive states</li>
+    <li><strong>Local AI (Phi-3 Mini)</strong> — On-device inference for page summarization, natural language queries, and topic classification</li>
+    <li><strong>AI Privacy Levels</strong> — LOCAL mode (default) with opt-in CLOUD mode for heavier inference tasks</li>
+    <li><strong>Natural Language Query</strong> — Ask questions about your browsing history using the command palette (Ctrl+K / Cmd+K)</li>
+    <li><strong>Graph Visualization</strong> — WebGPU-accelerated interactive graph with force-directed layout, filtering, and timeline scrubbing</li>
+    <li><strong>Research Replay</strong> — Resume previous research sessions with full context restoration</li>
+    <li><strong>Export & Import</strong> — Export Context Graphs as JSON, Markdown, or Mermaid diagrams; import from Chrome/Firefox</li>
+  </ul>
+
+  <h3>Platform support</h3>
+  <ul>
+    <li>macOS 13+ (Apple Silicon and Intel)</li>
+    <li>Linux (Ubuntu 22.04+, Fedora 38+, Arch)</li>
+    <li>Windows support planned for v0.2.0</li>
+  </ul>
+
+  <h3>Known limitations</h3>
+  <ul>
+    <li>WebExtension compatibility is limited to a subset of MV2/MV3 APIs (see <a href="/docs/en/api/webextension-api/">WebExtension API</a>)</li>
+    <li>Graph visualization performance degrades above approximately 10,000 nodes — pagination or time-based filtering recommended</li>
+    <li>Cloud AI mode requires an API key from a supported provider (OpenAI, Anthropic, or local Ollama)</li>
+    <li>No sync between devices in this release</li>
+  </ul>
+
+  <h3>Breaking changes</h3>
+  <ul>
+    <li>None (initial release)</li>
+  </ul>
+
+  <h2 id="foundation-build" class="content-section">Foundation Build (Q1 2026)</h2>
+  <p>The foundation build represents the internal development milestone that precedes the public alpha. This phase established the core architecture.</p>
+
+  <h3>Completed milestones</h3>
+  <table><thead><tr><th>Milestone</th><th>Date</th><th>Description</th></tr></thead><tbody>
+    <tr><td>Gecko fork baseline</td><td>January 2026</td><td>Forked Firefox/Gecko engine, stripped telemetry, established custom build pipeline with <code>just</code></td></tr>
+    <tr><td>Context Graph storage</td><td>January 2026</td><td>SQLite + SQLCipher database schema with FTS5 full-text search and vector embeddings (sqlite-vss)</td></tr>
+    <tr><td>Context Spaces UI</td><td>February 2026</td><td>Tab management UI with GTD-inspired workflow: Inbox, Active, Archive states</td></tr>
+    <tr><td>Local AI runtime</td><td>February 2026</td><td>Integrated llama.cpp (CPU) and MLX (Apple Silicon GPU) for on-device inference</td></tr>
+    <tr><td>Basic graph visualization</td><td>March 2026</td><td>Force-directed graph layout using WebGPU compute shaders with Canvas 2D fallback</td></tr>
+    <tr><td>Security layer</td><td>March 2026</td><td>Network firewall, content filtering, permission system, and threat protection pipeline</td></tr>
+  </tbody></table>
+
+  <h3>Architecture decisions</h3>
+  <ul>
+    <li><strong>Gecko over Chromium</strong> — Chosen for its more permissive licensing (MPL 2.0) and existing privacy infrastructure from Firefox</li>
+    <li><strong>SQLite over custom DB</strong> — Battle-tested, embeddable, with excellent full-text search (FTS5) and emerging vector search capabilities</li>
+    <li><strong>Local-first AI</strong> — Phi-3 Mini (4-bit quantized) as the default model, balancing capability with resource requirements</li>
+    <li><strong>Rust for core, TypeScript for UI</strong> — Rust handles the browser engine integration, graph engine, and AI runtime; TypeScript powers the UI layer</li>
+  </ul>
+
+  <h2 id="versioning" class="content-section">Versioning policy</h2>
+  <p>Quira uses Semantic Versioning with the following conventions during the pre-1.0 phase:</p>
+  <ul>
+    <li><strong>0.x.0</strong> — Minor version bumps may include breaking changes to the Plugin API and data schema</li>
+    <li><strong>0.x.y</strong> — Patch releases contain only bug fixes and security patches, with no breaking changes</li>
+    <li><strong>Alpha</strong> — Public alpha releases are tagged with <code>-alpha</code> suffix. Data schema may change between alphas (migration tools will be provided)</li>
+    <li><strong>Beta</strong> — Beta releases stabilize the Plugin API and data schema. Breaking changes require a deprecation notice one release in advance</li>
+  </ul>
+  <Callout type="warning" title="Alpha data migration">
+    <p>During the alpha phase, the Context Graph database schema may change between releases. Quira will attempt automatic migration, but we recommend exporting important research data before upgrading to a new alpha version.</p>
+  </Callout>
+  <PrevNext prev={{ href: '/docs/en/troubleshooting/', title: 'Troubleshooting' }} next={{ href: '/docs/en/getting-started/what-is-quira/', title: 'What is Quira?' }} />
+</DocsLayout>

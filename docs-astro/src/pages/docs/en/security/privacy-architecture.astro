@@ -1,0 +1,80 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'privacy-architecture', text: 'Privacy Architecture', depth: 2 },
+  { id: 'local-first-storage', text: 'Local-first storage', depth: 2 },
+  { id: 'cryptographic-architecture', text: 'Cryptographic architecture', depth: 2 },
+  { id: 'temporal-security', text: 'Temporal security', depth: 2 },
+  { id: 'anti-tracking', text: 'Anti-tracking measures', depth: 2 },
+  { id: 'hardware-integration', text: 'Hardware-software co-design', depth: 2 },
+  { id: 'privacy-modes', text: 'Privacy modes', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Privacy Architecture" description="Cryptographic innovation, temporal security, hardware integration, and local-first data protection." section="Security & Privacy" headings={headings}>
+  <h1 id="privacy-architecture" class="content-section">Privacy Architecture</h1>
+  <p>Privacy in Quira is not a feature — it is an architectural constraint. Every subsystem is designed under the principle of <strong>data minimization</strong>: collect only what is needed, store it locally, encrypt it at rest with forward secrecy, and never transmit it without explicit consent.</p>
+
+  <h2 id="local-first-storage" class="content-section">Local-first storage</h2>
+  <p>All browsing data — history, Context Graph, bookmarks, passwords, form data — is stored exclusively on the user's device. There is no cloud sync by default.</p>
+  <ul>
+    <li><strong>SQLite + SQLCipher</strong> — AES-256 encryption at rest for all structured data</li>
+    <li><strong>Per-profile keys</strong> — Each browser profile has its own master key derived from the OS keychain</li>
+    <li><strong>Embedding independent encryption</strong> — Semantic embeddings are encrypted with a separate key from the main database, so compromising one does not expose the other</li>
+    <li><strong>Secure deletion</strong> — Deleted data is overwritten with random bytes, not just unlinked</li>
+  </ul>
+
+  <h2 id="cryptographic-architecture" class="content-section">Cryptographic architecture</h2>
+  <p>Quira goes beyond standard encryption-at-rest with several cryptographic innovations designed specifically for knowledge graph protection. For state-dependent graduated encryption (four protection classes tied to authentication state), see <a href="/docs/en/security/advanced-architecture/#kpc">Knowledge Protection Classes (KPC)</a>.</p>
+  <table><thead><tr><th>Technique</th><th>What it protects</th><th>How it works</th></tr></thead><tbody>
+    <tr><td>Forward secrecy at rest</td><td>Past data after key compromise</td><td>Epoch-based key rotation. Old epoch keys are securely erased. Forensic access to current key cannot decrypt past epochs.</td></tr>
+    <tr><td>Threshold encryption</td><td>Single-point-of-failure key management</td><td>Shamir Secret Sharing (3-of-5). Master key is split across device, cloud backup, recovery phrase, biometric, and hardware key. Any 3 reconstruct the key.</td></tr>
+    <tr><td>Verifiable deletion</td><td>User trust in data removal</td><td>Cryptographic proof that deleted data is irrecoverable — the encryption key for that data segment is provably destroyed.</td></tr>
+    <tr><td>Differential privacy</td><td>Graph queries leaking patterns</td><td>Calibrated noise injection on aggregate queries. Individual browsing patterns cannot be reconstructed from query results.</td></tr>
+  </tbody></table>
+  <Callout type="info" title="Post-quantum readiness">
+    <p>Phase 3 (2027) will introduce hybrid post-quantum key exchange (ML-KEM / Kyber) alongside X25519 for future-proofing against quantum attacks on stored data.</p>
+  </Callout>
+
+  <h2 id="temporal-security" class="content-section">Temporal security</h2>
+  <p>Quira treats time as a security dimension. Permissions and data access are not static — they decay, expire, and self-destruct.</p>
+  <table><thead><tr><th>Mechanism</th><th>Purpose</th><th>Example</th></tr></thead><tbody>
+    <tr><td>Permission decay</td><td>Prevent stale grants accumulating risk</td><td>A plugin's <code>read:nodes</code> token auto-expires after 24 hours unless renewed</td></tr>
+    <tr><td>Session amnesia</td><td>Limit temporal correlation attacks</td><td>Context Graph queries in Strict mode only return data from the current session</td></tr>
+    <tr><td>Dead man's switch</td><td>Protect data if user is incapacitated</td><td>If no unlock within N days, graph is cryptographically sealed (configurable)</td></tr>
+    <tr><td>Forward-secret sessions</td><td>Prevent retroactive session reconstruction</td><td>Each browsing session derives ephemeral keys; session data cannot be decrypted after session ends</td></tr>
+  </tbody></table>
+
+  <h2 id="anti-tracking" class="content-section">Anti-tracking measures</h2>
+  <p>Quira implements multiple anti-tracking layers that work together:</p>
+  <table><thead><tr><th>Technique</th><th>What it blocks</th></tr></thead><tbody>
+    <tr><td>Cookie partitioning</td><td>Third-party cookies isolated per first-party origin</td></tr>
+    <tr><td>Storage partitioning</td><td>localStorage, IndexedDB, Cache API isolated per origin pair</td></tr>
+    <tr><td>Fingerprint resistance</td><td>Canvas, WebGL, AudioContext, font enumeration noise injection</td></tr>
+    <tr><td>Referrer trimming</td><td>Cross-origin referrers stripped to origin-only</td></tr>
+    <tr><td>Bounce tracking protection</td><td>Detects and blocks redirect-based tracking chains</td></tr>
+  </tbody></table>
+
+  <h2 id="hardware-integration" class="content-section">Hardware-software co-design</h2>
+  <p>Quira is designed to leverage hardware security features when available, with graceful fallback to software-only protection.</p>
+  <table><thead><tr><th>Hardware feature</th><th>Quira usage</th><th>Fallback</th></tr></thead><tbody>
+    <tr><td>TEE (Intel SGX / ARM TrustZone)</td><td>AI inference in isolated enclave — model weights and graph data never exposed to main OS</td><td>Process-level isolation with encrypted memory pages</td></tr>
+    <tr><td>Secure Enclave / TPM</td><td>Master key derivation and storage; biometric unlock binding</td><td>OS keychain with PBKDF2 derivation</td></tr>
+    <tr><td>Memory encryption (Intel TME / AMD SME)</td><td>Per-tab memory encryption — compromising one tab's memory region does not expose others</td><td>Address space randomization (ASLR)</td></tr>
+  </tbody></table>
+
+  <h2 id="privacy-modes" class="content-section">Privacy modes</h2>
+  <p>Quira offers graduated privacy modes that users can set globally or per Context Space:</p>
+  <table><thead><tr><th>Mode</th><th>Context Graph</th><th>AI</th><th>Network</th><th>Temporal</th></tr></thead><tbody>
+    <tr><td>Standard</td><td>Full capture</td><td>Local</td><td>Normal + tracker blocking</td><td>Configurable retention</td></tr>
+    <tr><td>Strict</td><td>Titles only</td><td>Local only</td><td>Aggressive filtering, no WebRTC</td><td>Session-only data</td></tr>
+    <tr><td>Incognito</td><td>Disabled</td><td>Disabled</td><td>Tor-ready (optional)</td><td>RAM-only, zero persistence</td></tr>
+    <tr><td>Lockdown</td><td>Disabled</td><td>Disabled</td><td>Tor + JIT disabled</td><td>Panic wipe on trigger phrase</td></tr>
+  </tbody></table>
+  <Callout type="warning" title="Context Lockdown Mode">
+    <p>Lockdown Mode is designed for journalists, activists, and users in hostile environments. It disables JavaScript JIT compilation, restricts all network to Tor circuits, runs Context Graph in RAM-only mode, and supports a panic wipe triggered by a configurable key combination.</p>
+  </Callout>
+
+  <PrevNext prev={{ href: '/docs/en/security/network-firewall/', title: 'Network Firewall' }} next={{ href: '/docs/en/security/content-filtering/', title: 'Content Filtering' }} />
+</DocsLayout>

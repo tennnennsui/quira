@@ -1,0 +1,38 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'graph-visualization', text: 'Graph Visualization', depth: 2 },
+  { id: 'visual-language', text: 'Visual language', depth: 2 },
+  { id: 'filtering-and-controls', text: 'Filtering and controls', depth: 2 },
+  { id: 'performance-targets', text: 'Performance targets', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Graph Visualization" description="Explore your Context Graph visually with the WebGPU-powered Full Graph Explorer at 60fps." section="Features" headings={headings}>
+  <h1 id="graph-visualization" class="content-section">Graph Visualization</h1>
+  <p>You've been <a href="/docs/en/features/nl-query/">querying your Context Graph</a> with text. Now let's see it visually. The Full Graph Explorer at <code>quira://graph</code> renders your entire <a href="/docs/en/core-concepts/context-graph/">Context Graph</a> using WebGPU, achieving 60fps at 1,000+ nodes.</p>
+  <h2 id="visual-language" class="content-section">Visual language: Neural Network x Constellation</h2>
+  <ul>
+    <li>Dark background with luminous floating nodes</li>
+    <li>Node color represents visit frequency (cool-to-warm gradient)</li>
+    <li>Edges rendered as light paths; clusters show nebula effects</li>
+    <li>New node appearance triggers a "star birth" animation</li>
+    <li>Consistent with the Calm Tech brand identity</li>
+  </ul>
+  <h2 id="filtering-and-controls" class="content-section">Filtering and controls</h2>
+  <ul>
+    <li><strong>Date range filter</strong>  EFocus on a specific time period</li>
+    <li><strong>Domain filter</strong>  EShow only nodes from specific websites</li>
+    <li><strong>Tag filter</strong>  EFilter by user-assigned tags</li>
+    <li><strong>Timeline slider</strong>  EScrub through time to see your graph evolve</li>
+    <li><strong>Zoom/pan</strong>  EStandard canvas controls for navigation</li>
+    <li><strong>Domain exclusion</strong>  ERight-click any node to exclude retroactively</li>
+  </ul>
+  <h2 id="performance-targets" class="content-section">Performance targets</h2>
+  <table><thead><tr><th>Performance Metric</th><th>Target</th></tr></thead><tbody>
+    <tr><td>Graph rendering (1,000 nodes)</td><td>60fps (WebGPU)</td></tr>
+    <tr><td>Node search (FTS5)</td><td>&lt; 100ms</td></tr>
+    <tr><td>Embedding similarity (k-NN over 10K vectors)</td><td>&lt; 500ms</td></tr>
+  </tbody></table>
+  <PrevNext prev={{ href: '/docs/en/features/ai-privacy/', title: 'AI Privacy Levels' }} next={{ href: '/docs/en/features/export-import/', title: 'Export & Import' }} />
+</DocsLayout>

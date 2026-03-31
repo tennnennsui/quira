@@ -1,0 +1,128 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'hardening', text: 'セキュリティ強化策', depth: 2 },
+  { id: 'coverage-gaps', text: 'カバレッジギャップ', depth: 3 },
+  { id: 'e1', text: 'E1. Embedding残留物追跡', depth: 2 },
+  { id: 'e1-threat', text: '逆変換攻撃モデル', depth: 3 },
+  { id: 'e1-design', text: 'R5残留物カテゴリ', depth: 3 },
+  { id: 'e2', text: 'E2. 推論来歴チェーン', depth: 2 },
+  { id: 'e2-problem', text: '因果入力の欠落', depth: 3 },
+  { id: 'e2-design', text: 'TCV拡張', depth: 3 },
+  { id: 'e3', text: 'E3. 不変監査コミットメント', depth: 2 },
+  { id: 'e3-design', text: '追記専用監査バッファ', depth: 3 },
+  { id: 'e3-merkle', text: 'Merkleルートコミットメント', depth: 3 },
+  { id: 'e4', text: 'E4. ソーシャルリカバリ層', depth: 2 },
+  { id: 'e4-sss', text: 'Shamir秘密分散', depth: 3 },
+  { id: 'e5', text: 'E5. クエリ正規化シールド', depth: 2 },
+  { id: 'e5-pipeline', text: '正規化パイプライン', depth: 3 },
+  { id: 'e6', text: 'E6. カスケード障害フォールバック', depth: 2 },
+  { id: 'e6-watchdog', text: '独立ウォッチドッグ', depth: 3 },
+  { id: 'summary', text: 'まとめ', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="セキュリティ強化策" description="既存セキュリティ概念への6つの強化策 — Embedding残留物追跡、推論来歴チェーン、不変監査コミットメント、ソーシャルリカバリ、クエリ正規化、カスケード障害フォールバック。" section="セキュリティ & プライバシー" headings={headings}>
+  <h1 id="hardening" class="content-section">セキュリティ強化策</h1>
+  <p>既存26セキュリティ概念の全監査を行った結果、特定の敵対者クラスに対してカバレッジが不十分な6つの構造的弱点を特定した。これらは新規概念ではなく<strong>既存概念の拡張</strong>であり、それぞれ定義済みの構造を強化する。</p>
+
+  <Callout type="warning" title="なぜ重要か">
+    <p>現在の敵対者カバレッジ: A1（ネットワーク）40%、A5（ベンダー）30%。セキュリティ属性 S3（削除完全性）60%、S4（フロー分離）50%、S5（時間的整合性）40%。これらのギャップには的を絞った強化が必要。</p>
+  </Callout>
+
+  <h3 id="coverage-gaps" class="content-section">カバレッジギャップ</h3>
+  <table><thead><tr><th>敵対者</th><th>Phase 1</th><th>評価</th></tr></thead><tbody>
+    <tr><td>A1 — ネットワーク観測者</td><td>40%</td><td>危険</td></tr>
+    <tr><td>A2 — 悪意のあるWebコンテンツ</td><td>80%</td><td>良好</td></tr>
+    <tr><td>A3 — 悪意のある拡張機能</td><td>75%</td><td>良好</td></tr>
+    <tr><td>A4 — OS レベル攻撃者</td><td>60%</td><td>要注意</td></tr>
+    <tr><td>A5 — ブラウザベンダー</td><td>30%</td><td>最重要</td></tr>
+  </tbody></table>
+
+  <!-- ═══════════════ E1 ═══════════════ -->
+  <h2 id="e1" class="content-section">E1. Embedding残留物追跡</h2>
+  <p><strong>IRD + RSIP</strong>を拡張。&Phi;: V &rarr; R<sup>384</sup> で生成されるEmbeddingベクトルは最もリカバリ耐性が高い推論残留物である。現在のIRDは直接的、伝播的、統計的残留物を追跡するが、<strong>Embedding逆変換攻撃</strong>を明示的にモデル化していない。</p>
+
+  <h3 id="e1-threat" class="content-section">逆変換攻撃モデル</h3>
+  <p>Embeddingベクトル &phi;<sub>i</sub> が与えられると、攻撃者は逆変換モデルにより元のテキストを復元する。2024年以降、Sentence-BERT/E5モデルへの逆変換攻撃はBLEU 0.5+を達成している（Morris et al., 2023; Li et al., 2024）。</p>
+  <p>E1はIRDに新しい<strong>R5: EmbeddingVector</strong>残留物カテゴリを追加する：</p>
+  <table><thead><tr><th>フィールド</th><th>目的</th></tr></thead><tbody>
+    <tr><td><code>inversion_hazard_score</code></td><td>0.0–1.0 ベクトルからテキスト復元のリスク</td></tr>
+    <tr><td><code>dependent_indices</code></td><td>このベクトルを含むFTS5/ANNインデックス</td></tr>
+    <tr><td><code>key_derivation_path</code></td><td>CGS（N1）暗号鍵パスとの統合</td></tr>
+  </tbody></table>
+
+  <h3 id="e1-design" class="content-section">R5残留物カテゴリ</h3>
+  <p>RSIP実行時: (1) R5残留物を持つノードの &phi;<sub>i</sub> を特定、(2) ANNインデックスからベクトルを除去、(3) ベクトルなしでFTS5インデックスを再構築、(4) 逆変換BLEUスコアが閾値以下まで低下したことを検証。</p>
+  <p><strong>敵対者:</strong> A3（拡張機能APIからのEmbeddingアクセス）、A4（インデックスファイルのディスク窃取）。<strong>Phase:</strong> 1–2。</p>
+
+  <!-- ═══════════════ E2 ═══════════════ -->
+  <h2 id="e2" class="content-section">E2. 推論来歴チェーン</h2>
+  <p><strong>TCV</strong>を拡張。時間的因果関係検証システムはナビゲーションエッジのハッシュチェーンを記録するが、<strong>AI推論エッジの因果入力</strong>を追跡しない。AIが「AはBに関連する」というエッジを作成した時、どのノードを分析してその結論に至ったか特定できない。</p>
+
+  <h3 id="e2-problem" class="content-section">因果入力の欠落</h3>
+  <p>来歴追跡がないと: (1) ソースノードを削除してもAI推論エッジは残り、ソースの存在が漏洩する; (2) 推論結果の根拠を監査で検証できない; (3) RSIPが因果入力不明のエッジを見逃す。</p>
+
+  <h3 id="e2-design" class="content-section">TCV拡張</h3>
+  <p>TCVハッシュチェーンエントリに <code>causal_inputs</code> フィールドを追加。各因果入力はソースノードID、寄与重み（アテンションスコアまたは特徴重要度）、入力スナップショットハッシュ（クエリ時のコンテンツハッシュ）を記録する。</p>
+  <p>統合: IRDは <code>causal_inputs</code> を使って完全な推論残留物グラフを構築。RSIPは削除ノードを因果入力に含むすべてのAI推論エッジを自動エンキューする。</p>
+  <p><strong>敵対者:</strong> 全クラス（来歴は基盤的）。<strong>Phase:</strong> 2。</p>
+
+  <!-- ═══════════════ E3 ═══════════════ -->
+  <h2 id="e3" class="content-section">E3. 不変監査コミットメント</h2>
+  <p><strong>CSEB</strong>を拡張。Context Security Event Busはイベントをリアルタイムで監視するが、<strong>不変記録</strong>を保証しない。攻撃者がCSEBのイベントバッファを破壊すると、侵害の証拠を消去できる。</p>
+
+  <h3 id="e3-design" class="content-section">追記専用監査バッファ</h3>
+  <p>プライバシー保護型の監査イベントは、アクション種別、影響ノード数、セキュリティ判定、ASP姿勢レベルを記録する — ただしノードID、コンテンツ、ユーザークエリ、URLは<strong>一切</strong>記録しない。</p>
+
+  <h3 id="e3-merkle" class="content-section">Merkleルートコミットメント</h3>
+  <p>1時間ごとに蓄積された監査イベントのMerkleルートを計算し、SKV（Sealed Knowledge Volume）にコミットする。監査ログの遡及的改竄はMerkleルートの比較により検出可能。</p>
+  <p>E3はN2（Forensic Integrity Layer）の<strong>前提条件</strong>であり、N2はE3の上に完全なフォレンジック分析システムを構築する。</p>
+  <p><strong>敵対者:</strong> A2, A3, A4, A5。<strong>Phase:</strong> 1–2。</p>
+
+  <!-- ═══════════════ E4 ═══════════════ -->
+  <h2 id="e4" class="content-section">E4. ソーシャルリカバリ層</h2>
+  <p><strong>KPC</strong>を拡張。KPC暗号化はマスターパスフレーズに完全に依存している。パスフレーズの喪失 = 永久的なデータ喪失。災害復旧メカニズムが存在しない。</p>
+
+  <h3 id="e4-sss" class="content-section">Shamir秘密分散</h3>
+  <p>(3, 5)閾値で5つのシェアを生成 — 任意の3シェアでマスター鍵を再構成可能。シェアはモバイルデバイス、BIP39シードフレーズ（紙のバックアップ）、2名の信頼済み連絡先のデバイス、オプションの暗号化クラウドバックアップに分散される。</p>
+  <p>ソーシャルリカバリは<strong>オプトインのみ</strong>。シェアの生成と再構成はすべてローカルデバイス上で行われる。シェアは組み立て済みの形で送信されることはない。</p>
+  <p><strong>敵対者:</strong> 災害復旧（可用性リスク）、間接的A5防御。<strong>Phase:</strong> 2–3。</p>
+
+  <!-- ═══════════════ E5 ═══════════════ -->
+  <h2 id="e5" class="content-section">E5. クエリ正規化シールド</h2>
+  <p><strong>KQR</strong>を拡張。自然言語クエリは<strong>言語的指紋</strong> — 語彙選択、構文パターン、略語の頻度 — を含み、ユーザーの認知スタイルを特定できる。KQRはリレー経路を保護するがクエリ内容は保護しない。</p>
+
+  <h3 id="e5-pipeline" class="content-section">正規化パイプライン</h3>
+  <p>KQRがクラウドAIに送信する前に、クエリはローカル正規化パイプラインを通過する: (1) 同義語統一、(2) 語順正規化、(3) フィラー除去、(4) [トピック] [関係] [制約] 形式への構造正規化、(5) 確率的ダミー修飾子挿入。</p>
+  <p>オリジナルクエリはContext Graphに保存される。正規化されたバージョンのみがデバイスを離れる。</p>
+  <p>E5はN7（Cognitive Query Normalization）の<strong>足がかり</strong>であり、N7はML ベースのスタイル中立化を追加する。</p>
+  <p><strong>敵対者:</strong> A1, A5。<strong>Phase:</strong> 2。</p>
+
+  <!-- ═══════════════ E6 ═══════════════ -->
+  <h2 id="e6" class="content-section">E6. カスケード障害フォールバック</h2>
+  <p><strong>ASP</strong>を拡張。CSEBとCTAが同時に侵害された場合、ASPはトリガーソースを失い、アクセス制御が事実上停止する。独立したフォールバックが存在しない。</p>
+
+  <h3 id="e6-watchdog" class="content-section">独立ウォッチドッグ</h3>
+  <p>ハードウェア独立のウォッチドッグがCSEB/CTAとは別のメモリ空間で動作する。両方が5秒ごとにハートビートを送信。いずれかのハートビートが欠落した場合: 警告 + 強制的な姿勢エスカレーション。<strong>両方</strong>が欠落した場合: コンパイル時埋め込みポリシーによる即時ロックダウン（読み取り不可、書き込み不可、ネットワーク不可、AI推論不可、UIアラートのみ）。</p>
+  <p>ロックダウンポリシーは<strong>コンパイル時に埋め込まれ</strong> — ランタイムで変更不可能であり、攻撃者がフォールバックを改竄するリスクを排除する。</p>
+  <p><strong>敵対者:</strong> A3, A4。<strong>Phase:</strong> 2。</p>
+
+  <!-- ═══════════════ Summary ═══════════════ -->
+  <h2 id="summary" class="content-section">まとめ</h2>
+  <table><thead><tr><th>ID</th><th>強化策</th><th>対象</th><th>深刻度</th><th>Phase</th></tr></thead><tbody>
+    <tr><td>E1</td><td>Embedding残留物追跡</td><td>IRD + RSIP</td><td>CRITICAL</td><td>1–2</td></tr>
+    <tr><td>E2</td><td>推論来歴チェーン</td><td>TCV</td><td>HIGH</td><td>2</td></tr>
+    <tr><td>E3</td><td>不変監査コミットメント</td><td>CSEB</td><td>CRITICAL</td><td>1–2</td></tr>
+    <tr><td>E4</td><td>ソーシャルリカバリ層</td><td>KPC</td><td>HIGH</td><td>2–3</td></tr>
+    <tr><td>E5</td><td>クエリ正規化シールド</td><td>KQR</td><td>HIGH</td><td>2</td></tr>
+    <tr><td>E6</td><td>カスケード障害フォールバック</td><td>ASP</td><td>HIGH</td><td>2</td></tr>
+  </tbody></table>
+
+  <Callout type="info" title="フロンティアセキュリティとの関係">
+    <p>いくつかの強化策は<a href="/docs/ja/security/frontier-security/">フロンティアセキュリティ</a>構造の前提条件となる: E1 &rarr; N1（CGS）、E3 &rarr; N2（FIL）、E5 &rarr; N7（CQN）。</p>
+  </Callout>
+
+  <PrevNext prev={{ href: '/docs/ja/security/emergent-security/', title: '創発的相互作用セキュリティ' }} next={{ href: '/docs/ja/security/frontier-security/', title: 'フロンティアセキュリティ' }} />
+</DocsLayout>

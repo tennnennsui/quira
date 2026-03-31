@@ -1,0 +1,38 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'code-style', text: 'コードスタイル', depth: 2 },
+  { id: 'rust', text: 'Rust', depth: 2 },
+  { id: 'typescript', text: 'TypeScript', depth: 2 },
+  { id: 'commit-conventions', text: 'コミット規約', depth: 2 },
+];
+---
+<DocsLayout lang="ja" title="コードスタイル" description="Quira にコントリビュートする際の Rust と TypeScript のコーディング規約。" section="コントリビュート" headings={headings}>
+  <h1 id="code-style" class="content-section">コードスタイル</h1>
+  <p><a href="/docs/ja/contributing/dev-setup/">開発環境</a>のセットアップが完了したら、Quira のコードを書く際は以下の規約に従ってください。</p>
+  <h2 id="rust" class="content-section">Rust</h2>
+  <ul>
+    <li><code>rustfmt</code> でフォーマット（CI で強制）</li>
+    <li><code>clippy</code> を <code>pedantic</code> レベルでリント</li>
+    <li>イミュータブルパターンを優先 — 可能な限り <code>let mut</code> より <code>let</code> を使用</li>
+    <li>関数は50行以内、ファイルは800行以内</li>
+    <li>プロダクションコードでの <code>unwrap()</code> を避ける — <code>?</code> 演算子または明示的なエラーハンドリングを使用</li>
+  </ul>
+  <h2 id="typescript" class="content-section">TypeScript</h2>
+  <ul>
+    <li><code>Prettier</code> でフォーマット、<code>ESLint</code> でリント</li>
+    <li>Strict TypeScript — <code>any</code> 型なし、strict null checks 有効</li>
+    <li>イミュータブルファースト — ミューテーションよりも <code>const</code>、<code>readonly</code>、スプレッド演算子を優先</li>
+    <li>4レベルを超える深いネストは避ける</li>
+  </ul>
+  <h2 id="commit-conventions" class="content-section">コミット規約</h2>
+  <p>すべてのコミットは <a href="https://www.conventionalcommits.org/">Conventional Commits</a> 形式に従います：</p>
+  <pre><code>feat: add Space color picker
+fix: prevent duplicate nodes for redirected URLs
+refactor: extract graph renderer into separate module
+docs: update NL Query API reference
+test: add edge weight calculation tests
+perf: optimize FTS5 index rebuild on large graphs</code></pre>
+  <PrevNext prev={{ href: '/docs/ja/contributing/dev-setup/', title: '開発環境セットアップ' }} next={{ href: '/docs/ja/contributing/pull-requests/', title: 'プルリクエスト' }} />
+</DocsLayout>

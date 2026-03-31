@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.astro/
+_debug_chunks/
+*.png
+.env
+.env.*
+.dev.vars
+.wrangler/

@@ -1,0 +1,104 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import Callout from '../../../../components/Callout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'graph-query-api', text: 'Graph Query API', depth: 2 },
+  { id: 'quira-graph-query', text: 'quira.graph.query()', depth: 2 },
+  { id: 'quira-graph-getrelated', text: 'quira.graph.getRelated()', depth: 2 },
+  { id: 'quira-graph-getnode', text: 'quira.graph.getNode()', depth: 2 },
+  { id: 'quira-graph-search', text: 'quira.graph.search()', depth: 2 },
+  { id: 'quira-graph-export', text: 'quira.graph.export()', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Graph Query API" description="Complete reference for the quira.graph namespace." section="API Reference" headings={headings}>
+  <h1 id="graph-query-api" class="content-section">Graph Query API</h1>
+  <Callout type="tip" title="Prerequisites">
+    <p>Make sure you've read <a href="/docs/en/core-concepts/context-graph/">Context Graph</a> and <a href="/docs/en/api/plugin-api/">Plugin API</a> before this section.</p>
+  </Callout>
+  <p>This is the detailed reference for every method on the <code>quira.graph</code> namespace. The Graph Query API provides programmatic access to the <a href="/docs/en/core-concepts/context-graph/">Context Graph</a>. All methods return Promises.</p>
+  <Callout type="warning" title="Alpha API">
+    <p>These APIs are under active development. Method signatures may change before v1.0. Pin your extension to a specific Quira version if you depend on these APIs.</p>
+  </Callout>
+
+  <h2 id="quira-graph-query" class="content-section"><code>quira.graph.query(question, options?)</code></h2>
+  <p>Submit a natural language query against the Context Graph. Returns an AI-generated answer with cited sources.</p>
+  <table><thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead><tbody>
+    <tr><td><code>question</code></td><td><code>string</code></td><td>Natural language question</td></tr>
+    <tr><td><code>options.maxNodes</code></td><td><code>number</code></td><td>Maximum context nodes to consider (default: 50)</td></tr>
+    <tr><td><code>options.dateRange</code></td><td><code>{'{ from: string, to: string }'}</code></td><td>ISO 8601 date range filter</td></tr>
+  </tbody></table>
+  <p><strong>Returns:</strong> <code>{'Promise<QueryResult>'}</code></p>
+  <pre><code>{`const result = await quira.graph.query(
+  "What did I read about WebGPU this week?",
+  { maxNodes: 20 }
+);
+
+// result.summary   -> AI-generated answer string
+// result.sources   -> [{ url, title, visitedAt, dwellTime }]
+// result.nodes     -> [ContextNode] matched nodes
+// result.confidence -> number (0.0 - 1.0)`}</code></pre>
+
+  <h2 id="quira-graph-getrelated" class="content-section"><code>quira.graph.getRelated(url, options?)</code></h2>
+  <p>Get nodes related to a given URL by traversing the Context Graph edges.</p>
+  <table><thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead><tbody>
+    <tr><td><code>url</code></td><td><code>string</code></td><td>URL of the source node</td></tr>
+    <tr><td><code>options.hops</code></td><td><code>number</code></td><td>Max edge traversal depth (default: 2)</td></tr>
+    <tr><td><code>options.limit</code></td><td><code>number</code></td><td>Max nodes to return (default: 10)</td></tr>
+    <tr><td><code>options.minWeight</code></td><td><code>number</code></td><td>Minimum edge weight threshold (default: 0.0)</td></tr>
+  </tbody></table>
+  <p><strong>Returns:</strong> <code>{'Promise<ContextNode[]>'}</code></p>
+  <pre><code>{`const related = await quira.graph.getRelated(
+  "https://docs.rs/wgpu/latest/wgpu/",
+  { hops: 2, limit: 5, minWeight: 0.3 }
+);`}</code></pre>
+
+  <h2 id="quira-graph-getnode" class="content-section"><code>quira.graph.getNode(id)</code></h2>
+  <p>Retrieve a single Context Graph node by its ID.</p>
+  <table><thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead><tbody>
+    <tr><td><code>id</code></td><td><code>string</code></td><td>UUID v7 of the context node</td></tr>
+  </tbody></table>
+  <p><strong>Returns:</strong> <code>{'Promise<ContextNode | null>'}</code></p>
+  <pre><code>{`const node = await quira.graph.getNode("019503a1-b2c3-7def-8901-234567890abc");
+
+if (node) {
+  console.log(node.title);       // "WebGPU Best Practices"
+  console.log(node.ai_summary);  // "This article covers..."
+  console.log(node.ai_entities); // ["WebGPU", "WGSL", "compute shaders"]
+  console.log(node.dwell_time);  // 342 (seconds)
+}`}</code></pre>
+
+  <h2 id="quira-graph-search" class="content-section"><code>quira.graph.search(query, options?)</code></h2>
+  <p>Full-text search across Context Graph nodes using FTS5. Unlike <code>query()</code>, this performs keyword search without AI summarization.</p>
+  <table><thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead><tbody>
+    <tr><td><code>query</code></td><td><code>string</code></td><td>FTS5 search query string</td></tr>
+    <tr><td><code>options.limit</code></td><td><code>number</code></td><td>Max results (default: 20)</td></tr>
+    <tr><td><code>options.domain</code></td><td><code>string</code></td><td>Filter by domain</td></tr>
+    <tr><td><code>options.dateRange</code></td><td><code>{'{ from: string, to: string }'}</code></td><td>ISO 8601 date range filter</td></tr>
+  </tbody></table>
+  <p><strong>Returns:</strong> <code>{'Promise<ContextNode[]>'}</code></p>
+  <pre><code>{`const results = await quira.graph.search("authentication OAuth", {
+  limit: 10,
+  domain: "docs.rs"
+});`}</code></pre>
+
+  <h2 id="quira-graph-export" class="content-section"><code>quira.graph.export(options?)</code></h2>
+  <p>Export the Context Graph or a subset of it in JSON or Markdown format.</p>
+  <table><thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead><tbody>
+    <tr><td><code>options.format</code></td><td><code>"json" | "markdown"</code></td><td>Export format (default: "json")</td></tr>
+    <tr><td><code>options.nodeIds</code></td><td><code>string[]</code></td><td>Specific node IDs to export (omit for all)</td></tr>
+    <tr><td><code>options.includeEdges</code></td><td><code>boolean</code></td><td>Include edge data (default: true)</td></tr>
+  </tbody></table>
+  <p><strong>Returns:</strong> <code>{'Promise<string>'}</code></p>
+  <pre><code>{`// Export entire graph as JSON
+const json = await quira.graph.export({ format: "json" });
+
+// Export specific nodes as Markdown (for Obsidian import)
+const md = await quira.graph.export({
+  format: "markdown",
+  nodeIds: ["019503a1-...", "019503a2-..."],
+  includeEdges: false
+});`}</code></pre>
+
+  <PrevNext prev={{ href: '/docs/en/api/webextension-api/', title: 'WebExtension API' }} />
+</DocsLayout>

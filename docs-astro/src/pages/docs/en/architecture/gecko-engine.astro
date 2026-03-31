@@ -1,0 +1,27 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'gecko-engine', text: 'Gecko Engine', depth: 2 },
+  { id: 'why-gecko', text: 'Why Gecko, not Chromium?', depth: 2 },
+  { id: 'servo-migration', text: 'Future Servo migration path', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Gecko Engine" description="Why Quira uses a Gecko fork instead of Chromium, and the future Servo migration path." section="Architecture" headings={headings}>
+  <h1 id="gecko-engine" class="content-section">Gecko Engine</h1>
+  <p>As mentioned in the <a href="/docs/en/architecture/technical-overview/">Technical Overview</a>, all of Quira's layers sit on top of a rendering engine. Quira uses a soft fork of Gecko (Mozilla's rendering engine) rather than Chromium.</p>
+  <h2 id="why-gecko" class="content-section">Why Gecko, not Chromium?</h2>
+  <ul>
+    <li><strong>Engine independence</strong>  EChromium holds 80%+ market share. A Gecko-based browser contributes to web engine diversity.</li>
+    <li><strong>WebExtensions MV2 + MV3</strong>  EUnlike Chrome which has fully deprecated MV2, Gecko continues to support both manifest versions.</li>
+    <li><strong>Proven fork path</strong>  EZen Browser and Floorp have demonstrated that Gecko soft forks can ship production-quality browsers in 3-6 months.</li>
+    <li><strong>Servo components already integrated</strong>  EFirefox already includes Servo-derived Stylo (CSS engine) and WebRender (GPU rendering).</li>
+  </ul>
+  <h2 id="servo-migration" class="content-section">Future Servo migration path</h2>
+  <table><thead><tr><th>Phase</th><th>Engine</th><th>Rationale</th></tr></thead><tbody>
+    <tr><td>Phase 1 (0-12 months)</td><td>Gecko fork</td><td>Ship-ready, full WebExtensions support</td></tr>
+    <tr><td>Phase 2 (12-24 months)</td><td>Gecko + Servo subview</td><td>Experimental Servo for AI-generated content views</td></tr>
+    <tr><td>Phase 3 (24+ months)</td><td>Migration decision</td><td>Full Servo migration if WPT pass rate exceeds 90%</td></tr>
+  </tbody></table>
+  <PrevNext prev={{ href: '/docs/en/architecture/technical-overview/', title: 'Technical Overview' }} next={{ href: '/docs/en/architecture/storage/', title: 'Storage (SQLite)' }} />
+</DocsLayout>

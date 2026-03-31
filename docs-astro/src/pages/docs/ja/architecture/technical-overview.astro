@@ -1,0 +1,16 @@
+﻿---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [{ id: 'technical-overview', text: '技術概要', depth: 2 }];
+---
+<DocsLayout lang="ja" title="技術概要" description="Quira の3層アーキテクチャ — UI Layer、Context Layer、Agent Layer。" section="アーキテクチャ" headings={headings}>
+  <h1 id="technical-overview" class="content-section">技術概要</h1>
+  <p>Quira が何をするかを見てきました。次は、どのように構築されているかを見てみましょう。Quira は3つの主要レイヤーで構成されており、すべてローカルマシン上で動作します：</p>
+  <ul>
+    <li><strong>UI Layer</strong>（Rust + WebGPU） — <a href="/docs/ja/features/graph-visualization/">グラフエクスプローラー</a>、Space Bar、すべてのカスタム UI 要素を含むネイティブパフォーマンスのインターフェース。</li>
+    <li><strong>Context Layer</strong>（<a href="/docs/ja/architecture/storage/">SQLite + FTS5 + sqlite-vec</a>） — すべての <a href="/docs/ja/core-concepts/context-graph/">Context Graph</a> データを保存しインデックスするローカルグラフデータベース。</li>
+    <li><strong>Agent Layer</strong>（<a href="/docs/ja/architecture/llm-integration/">llama.cpp / MLX</a>） — 要約、エンティティ抽出、埋め込み生成、<a href="/docs/ja/features/nl-query/">NL Query</a> を実行するローカル LLM ランタイム。</li>
+  </ul>
+  <p>3つのレイヤーはすべて、標準的な Web ページレンダリングと完全な <a href="/docs/ja/api/webextension-api/">WebExtension API</a> 互換性を提供する <a href="/docs/ja/architecture/gecko-engine/">Gecko ベースのレンダリングエンジン</a>の上に位置しています。</p>
+  <PrevNext prev={{ href: '/docs/ja/features/export-import/', title: 'エクスポート & インポート' }} next={{ href: '/docs/ja/architecture/gecko-engine/', title: 'Gecko Engine' }} />
+</DocsLayout>

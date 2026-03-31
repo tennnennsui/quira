@@ -1,0 +1,36 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import PrevNext from '../../../../components/PrevNext.astro';
+const headings = [
+  { id: 'plugin-api', text: 'Plugin API', depth: 2 },
+  { id: 'registration', text: 'Registration and lifecycle', depth: 2 },
+  { id: 'permissions-model', text: 'Permissions model', depth: 2 },
+];
+---
+<DocsLayout lang="en" title="Plugin API" description="Extend Quira with plugins that interact with the Context Graph, Spaces, and AI capabilities." section="API Reference" headings={headings}>
+  <h1 id="plugin-api" class="content-section">Plugin API</h1>
+  <p>Quira exposes a Plugin API that allows extensions to interact with the <a href="/docs/en/core-concepts/context-graph/">Context Graph</a>, <a href="/docs/en/core-concepts/context-spaces/">Spaces</a>, and <a href="/docs/en/core-concepts/local-ai/">AI capabilities</a>. Plugins are standard <a href="/docs/en/api/webextension-api/">WebExtensions</a> with additional Quira-specific APIs available through the <code>quira.*</code> namespace.</p>
+  <h2 id="registration" class="content-section">Registration and lifecycle</h2>
+  <pre><code>{`{
+  "manifest_version": 3,
+  "name": "My Quira Plugin",
+  "version": "1.0.0",
+  "permissions": [
+    "quira.graph.read",
+    "quira.graph.write",
+    "quira.spaces.read"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}`}</code></pre>
+  <h2 id="permissions-model" class="content-section">Permissions model</h2>
+  <table><thead><tr><th>Permission</th><th>Access</th></tr></thead><tbody>
+    <tr><td><code>quira.graph.read</code></td><td>Read Context Graph nodes and edges</td></tr>
+    <tr><td><code>quira.graph.write</code></td><td>Create/update nodes, edges, and tags</td></tr>
+    <tr><td><code>quira.spaces.read</code></td><td>Read Space metadata and tab lists</td></tr>
+    <tr><td><code>quira.spaces.write</code></td><td>Create/modify Spaces and move tabs</td></tr>
+    <tr><td><code>quira.ai.query</code></td><td>Submit NL queries to the local AI</td></tr>
+  </tbody></table>
+  <PrevNext prev={{ href: '/docs/en/contributing/rfc-process/', title: 'RFC Process' }} next={{ href: '/docs/en/api/webextension-api/', title: 'WebExtension API' }} />
+</DocsLayout>
