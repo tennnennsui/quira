@@ -22,7 +22,7 @@ const ui = lang === 'ja'
 <div id="ask-docs-backdrop" style="display:none;position:fixed;inset:0;z-index:75;background:rgba(0,0,0,0.4);backdrop-filter:blur(2px);transition:opacity 0.3s ease;opacity:0;"></div>
 
 <!-- Right slide panel -->
-<div id="ask-docs-panel" style="position:fixed;top:0;right:0;bottom:0;z-index:80;width:420px;max-width:100vw;background:#1F1E1D;border-left:1px solid rgba(222,220,209,0.15);box-shadow:-8px 0 32px rgba(0,0,0,0.4);transform:translateX(100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);font-family:'Inter',system-ui,sans-serif;display:flex;flex-direction:column;">
+<div id="ask-docs-panel" style="position:fixed;top:0;right:0;bottom:0;z-index:80;width:420px;max-width:100vw;background:#1F1E1D;border-left:1px solid rgba(222,220,209,0.15);box-shadow:-8px 0 32px rgba(0,0,0,0.4);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);font-family:'Inter',system-ui,sans-serif;display:flex;flex-direction:column;">
 
   <!-- Header -->
   <div style="display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid rgba(222,220,209,0.15);flex-shrink:0;">
@@ -87,6 +87,7 @@ const ui = lang === 'ja'
   .ask-docs-msg-assistant:hover .ask-docs-copy-btn { opacity:1; }
   .ask-docs-copy-btn:hover { color:#FAF9F5 !important; border-color:rgba(222,220,209,0.3) !important; }
   .ask-docs-copy-btn.copied { color:#E8A838 !important; }
+  #ask-docs-panel { transform: translateX(100%); }
   #ask-docs-panel.open { transform: translateX(0); }
   #ask-docs-backdrop.visible { opacity: 1; }
   #ask-docs-messages { scrollbar-width: thin; scrollbar-color: #4A4A48 transparent; }
